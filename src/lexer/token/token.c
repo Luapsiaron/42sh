@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 token_t *token_new(token_type_t type, const char *value)
 {
@@ -14,7 +15,7 @@ token_t *token_new(token_type_t type, const char *value)
     t->type = type;
     if (value)
     {
-        t->lexeme = strdup(lexeme);
+        t->lexeme = strdup(value);
         if (!t->lexeme)
         {
             free(t);
@@ -112,5 +113,5 @@ void token_printer(const token_t *t)
     {
         printf("(\"%s\")", t->lexeme);
     }
-    print("\n");
+    printf("\n");
 }
