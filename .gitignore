@@ -50,3 +50,27 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+*.lib
+*.obj
+*.out
+
+.idea/
+*~
+*.DotSettings.user
+
+# Autotools
+Makefile
+*.in
+aclocal.m4
+autom4te.cache/
+configure
+config.log
+config.status
+compile
+install-sh
+missing
+depcomp
+*.deps
+configure~
+*.Po

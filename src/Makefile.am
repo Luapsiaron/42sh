@@ -1,6 +1,8 @@
 SUBDIRS = ast\
-		parser\
-		lexer
+        execution\
+        io\
+		lexer\
+		parser
 
 bin_PROGRAMS = 42sh
 
