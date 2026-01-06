@@ -1,0 +1,11 @@
+lib_LIBRARIES = libast.a
+
+liblexer_a_SOURCES = ast.c \
+  					ast.h
+
+liblexer_a_CPPFLAGS = -I$(top_srcdir)/src
+
+liblexer_a_CFLAGS = -std=c99 -pedantic -Werror -Wall -Wextra -Wvla
+
+noinst_LIBRARIES = libast.a
+
