@@ -1,0 +1,8 @@
+TESTS = runner.py
+
+TESTS_ENVIRONMENT = \
+  BIN_PATH="$(BIN_PATH)" \
+  OUTPUT_FILE="$(OUTPUT_FILE)" \
+  COVERAGE="$(COVERAGE)"
+
+  

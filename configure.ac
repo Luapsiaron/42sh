@@ -8,6 +8,8 @@ AM_SILENT_RULES([yes])
 AC_PROG_CC
 AC_PROG_RANLIB
 
+AC_CONFIG_SRCDIR([src/42sh.c])
+
 AX_COMPILER_FLAGS([], [], [], [-std=c99 -pedantic -Werror -Wall -Wextra -Wvla])
 
 AC_CONFIG_FILES([
@@ -16,5 +18,6 @@ AC_CONFIG_FILES([
                     src/ast/Makefile
 					src/lexer/Makefile
                     src/parser/Makefile
+                    tests/Makefile
                 ])
 AC_OUTPUT
