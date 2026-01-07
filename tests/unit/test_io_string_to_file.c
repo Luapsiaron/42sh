@@ -3,14 +3,6 @@
 
 FILE *io_string_to_file(char *string);
 
-static int argv_len(char **argv)
-{
-    int len = 0;
-    while (argv[len] != NULL)
-        len++;
-    return len;
-}
-
 static void redirect_all_stdout(void)
 {
     cr_redirect_stdout();
