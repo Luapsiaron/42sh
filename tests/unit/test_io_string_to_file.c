@@ -1,9 +1,9 @@
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
 
-FILE *io_string_to_file(char *string)
+FILE *io_string_to_file(char *string);
 
-    static int argv_len(char **argv)
+static int argv_len(char **argv)
 {
     int len = 0;
     while (argv[len] != NULL)

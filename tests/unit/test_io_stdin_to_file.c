@@ -1,5 +1,6 @@
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
+#include <unistd.h>
 
 FILE *io_stdin_to_file(void);
 
@@ -30,7 +31,7 @@ Test(io_stdin_to_file, simple_echo, .init = redirect_all_stdout)
     FILE *f3 = io_stdin_to_file();
     fseek(f3, 0, SEEK_SET);
     char buf[100];
-    fgets(buf, sizeof(buf3), f3);
+    fgets(buf, sizeof(buf), f3);
 
     dup2(old_stdin, STDIN_FILENO);
     close(old_stdin);
@@ -50,7 +51,7 @@ Test(io_stdin_to_file, empty_string, .init = redirect_all_stdout)
     FILE *f3 = io_stdin_to_file();
     fseek(f3, 0, SEEK_SET);
     char buf[100];
-    fgets(buf, sizeof(buf3), f3);
+    fgets(buf, sizeof(buf), f3);
 
     dup2(old_stdin, STDIN_FILENO);
     close(old_stdin);
