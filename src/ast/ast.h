@@ -12,7 +12,7 @@ enum node_type
 
 struct ast // ex for: echo toto tata > file.txt
 {
-    node_type type;  // NODE_COMMAND
+    enum node_type type;  // NODE_COMMAND
     char **args;        // Simple command ex: = [echo], [toto], [tata], NULL
     struct ast *left;   // If condition / Left part of pipe etc
     struct ast *right;  // If body / Right part of Pipe etc

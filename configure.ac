@@ -10,7 +10,12 @@ AC_PROG_RANLIB
 
 AC_CONFIG_SRCDIR([src/42sh.c])
 
-AX_COMPILER_FLAGS([], [], [], [-std=c99 -pedantic -Werror -Wall -Wextra -Wvla])
+CFLAGS="${CFLAGS} -std=c99 -pedantic -Werror -Wall -Wextra -Wvla"
+
+
+# Test for criterion package
+PKG_CHECK_MODULES([CRITERION], [criterion >= 2.3.0], [have_criterion=yes], [have_criterion=no])
+AM_CONDITIONAL([HAVE_CRITERION], [test "x$have_criterion" = xyes])
 
 AC_CONFIG_FILES([
                     Makefile
@@ -18,6 +23,9 @@ AC_CONFIG_FILES([
                     src/ast/Makefile
 					src/lexer/Makefile
                     src/parser/Makefile
+                    src/execution/Makefile
+                    src/io/Makefile
+                    src/builtins/Makefile
                     tests/Makefile
                 ])
 AC_OUTPUT

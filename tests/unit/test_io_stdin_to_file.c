@@ -22,7 +22,7 @@ Test(io_stdin_to_file, simple_echo, .init = redirect_all_stdout)
 
     FILE *f3 = io_stdin_to_file();
     fseek(f3, 0, SEEK_SET);
-    char buf[100];
+    char buf[100] = {0};
     fgets(buf, sizeof(buf), f3);
 
     dup2(old_stdin, STDIN_FILENO);

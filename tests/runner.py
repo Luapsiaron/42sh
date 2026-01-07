@@ -5,7 +5,8 @@ import tempfile
 
 REF_SHELL = "bash"
 #GOAT_SHELL = os.path.abspath("./42sh") #OUR SHELL
-GOAT_SHELL = "bash"
+GOAT_SHELL = os.environ.get("BINPATH", "bash")
+
 def pretty_format(expected_stdout, got_stdout, expected_exit = None, got_exit = None):
     errors = []
    

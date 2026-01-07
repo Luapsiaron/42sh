@@ -74,6 +74,7 @@ depcomp
 *.deps
 configure~
 *.Po
+test-driver
 
 # Verify clang
 checker.py
