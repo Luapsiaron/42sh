@@ -9,13 +9,13 @@ GOAT_SHELL = os.path.abspath("./42sh") #OUR SHELL
 def pretty_format(expected_stdout, got_stdout, expected_exit = None, got_exit = None):
     errors = []
     
-    if expected_stdout.strip() != got_stdout.strip():
+    if expected_stdout.strip() != got_stdout.strip(): # strip spaces, can delete it if bad
         exp_lines = expected_stdout.strip().split('\n')
         got_lines = got_stdout.strip().split('\n')
         errors.append("STDOUT DIFF:")
-        errors.append(f"EXPECTED ({len(exp_lines)} lignes):")
+        errors.append("EXPECTED:")
         errors.append(expected_stdout)
-        errors.append(f"GOT ({len(got_lines)} lignes):")
+        errors.append("GOT:")
         errors.append(got_stdout)
     
     if expected_exit is not None and expected_exit != got_exit:
@@ -28,20 +28,20 @@ def run_shell(script, mode = "string", args=[], stdin_data="", expected_exit = N
     temp_path = None
 
     if mode == "file":
-        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix=".sh") as tmp:
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix=".sh") as tmp: #create a temp shell file for file mode testing
             tmp.write(script)
             temp_path= tmp.name
         
         ref_cmd = [REF_SHELL, "--posix", temp_path] + args
         goat_cmd = [GOAT_SHELL, temp_path] + args
 
-    else:
+    else: # default mode/ string mode with -c, mise en liste car subprocess faix execve
         ref_cmd = [REF_SHELL, "--posix", "-c", script, "sh_ref"] + args
         goat_cmd = [GOAT_SHELL,"-c", script, "sh_test"] + args
     
     try:
         ref_process = subprocess.run(ref_cmd, input=stdin_data, capture_output=True, text=True)
-        goat_process = subprocess.run(ref_cmd, input=stdin_data, capture_output=True, text=True, timeout=0.5)
+        goat_process = subprocess.run(goat_cmd, input=stdin_data, capture_output=True, text=True, timeout=0.5)
 
         assert goat_process.stdout == ref_process.stdout, pretty_format(ref_process.stdout, goat_process.stdout)
 
