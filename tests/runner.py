@@ -4,9 +4,24 @@ import subprocess
 import tempfile
 
 REF_SHELL = "bash"
-GOAT_SHELL = os.path.abspath("./42sh")
+GOAT_SHELL = os.path.abspath("./42sh") #OUR SHELL
 
-def pretty_format(expected, got):
+def pretty_format(expected_stdout, got_stdout, expected_exit = None, got_exit = None):
+    errors = []
+    
+    if expected_stdout.strip() != got_stdout.strip():
+        exp_lines = expected_stdout.strip().split('\n')
+        got_lines = got_stdout.strip().split('\n')
+        errors.append("STDOUT DIFF:")
+        errors.append(f"EXPECTED ({len(exp_lines)} lignes):")
+        errors.append(expected_stdout)
+        errors.append(f"GOT ({len(got_lines)} lignes):")
+        errors.append(got_stdout)
+    
+    if expected_exit is not None and expected_exit != got_exit:
+        errors.append(f"EXIT CODE DIFF: expected={expected_exit} got={got_exit}")
+    
+    return "\n".join(errors)
 
 def run_shell(script, mode = "string", args=[], stdin_data="", expected_exit = None):
     
