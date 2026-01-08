@@ -1,4 +1,5 @@
 #include "token.h"
+#include "utils/str/str.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +16,7 @@ token_t *token_new(token_type_t type, const char *value)
     t->type = type;
     if (value)
     {
-        t->lexeme = strdup(value);
+        t->lexeme = xstrdup(value);
         if (!t->lexeme)
         {
             free(t);

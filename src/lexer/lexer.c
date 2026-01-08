@@ -37,7 +37,7 @@ void lexer_init(lexer_t *lx, FILE *input)
         lx = malloc(sizeof(lexer_t));
         if (!lx)
         {
-            return NULL;
+            return;
         }
     }
     lx->input = input;
