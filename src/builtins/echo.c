@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static void echo_print_escaped(const char *s) // Print string without \? transformed
+static void
+echo_print_escaped(const char *s) // Print string without \? transformed
 {
     for (size_t i = 0; s[i]; i++)
     {
@@ -28,10 +29,9 @@ static void echo_print_escaped(const char *s) // Print string without \? transfo
                 continue;
             }
         }
-        putchar (s[i]);
+        putchar(s[i]);
     }
 }
-
 
 int builtin_echo(int argc, char **argv)
 {

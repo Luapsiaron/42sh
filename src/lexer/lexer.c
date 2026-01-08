@@ -32,6 +32,14 @@ static token_t *lexer_is_word(lexer_t *lx)
 }
 void lexer_init(lexer_t *lx, FILE *input)
 {
+    if (!lx)
+    {
+        lx = malloc(sizeof(lexer_t));
+        if (!lx)
+        {
+            return NULL;
+        }
+    }
     lx->input = input;
     lx->current = fgetc(input);
 }

@@ -1,7 +1,7 @@
 #include "ast.h"
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 static ast_t *ast_init(ast_type_t type)
