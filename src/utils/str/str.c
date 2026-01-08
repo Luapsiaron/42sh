@@ -1,7 +1,7 @@
+#include "str.h"
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "utils/str/str.h"
 
 char *xstrdup(const char *s)
 {

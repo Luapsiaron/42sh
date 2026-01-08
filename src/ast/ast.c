@@ -72,7 +72,7 @@ ast_t *ast_pipe_init(ast_t *right, ast_t *left)
     return new;
 }
 
-static void argv_free(char **argv)
+void free_argv(char **argv)
 {
     if (!argv)
     {
@@ -96,7 +96,7 @@ void ast_free(ast_t *node)
     switch (node->type)
     {
     case AST_CMD:
-        argv_free(node->data.ast_cmd.argv);
+        free_argv(node->data.ast_cmd.argv);
         break;
 
     case AST_IF:
@@ -113,4 +113,59 @@ void ast_free(ast_t *node)
         break;
     }
     free(node);
+}
+
+void ast_printer(const ast_t *node, int depth)
+{
+    if (!node)
+    {
+        return;
+    }
+
+    for (int i = 0; i < depth; i++)
+    {
+        printf("  ");
+    }
+
+    switch (node->type)
+    {
+    case AST_CMD:
+        printf("CMD: ");
+        for (size_t i = 0; node->data.ast_cmd.argv[i]; i++)
+        {
+            printf("%s ", node->data.ast_cmd.argv[i]);
+        }
+        printf("\n");
+        break;
+
+    case AST_IF:
+        printf("IF:\n");
+        ast_printer(node->data.ast_if.condition, depth + 1);
+        for (int i = 0; i < depth; i++)
+        {
+            printf("  ");
+        }
+        printf("THEN:\n");
+        ast_printer(node->data.ast_if.then_body, depth + 1);
+        if (node->data.ast_if.else_body)
+        {
+            for (int i = 0; i < depth; i++)
+            {
+                printf("  ");
+            }
+            printf("ELSE:\n");
+            ast_printer(node->data.ast_if.else_body, depth + 1);
+        }
+        break;
+
+    case AST_LIST:
+        printf("LIST:\n");
+        ast_printer(node->data.ast_list.child, depth + 1);
+        ast_printer(node->data.ast_list.next, depth);
+        break;
+
+    default:
+        printf("Unknown AST node type\n");
+        break;
+    }
 }

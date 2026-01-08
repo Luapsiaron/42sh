@@ -4,6 +4,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../utils/stack/stack.h"
+
+static struct stack *stack;
+
 static void lexer_next_char(lexer_t *lx)
 {
     lx->current = fgetc(lx->input);
@@ -30,16 +34,9 @@ static token_t *lexer_is_word(lexer_t *lx)
     }
     return token_new(TOKEN_WORD, buffer);
 }
+
 void lexer_init(lexer_t *lx, FILE *input)
 {
-    if (!lx)
-    {
-        lx = malloc(sizeof(lexer_t));
-        if (!lx)
-        {
-            return;
-        }
-    }
     lx->input = input;
     lx->current = fgetc(input);
 }

@@ -1,20 +1,262 @@
 #include "parser.h"
 
-#include "../lexer/lexer.h"
+#include <stdlib.h>
 
-// a bouger dans un ficheir dédié plus tard
-static free_argv(char **argv)
+#include "../lexer/lexer.h"
+#include "../utils/str/str.h"
+
+static lexer_t c_lexer;
+static token_t *c_token;
+
+static token_type_t peek(void)
 {
-    if (argv)
+    // printf("type: %s\n", token_type_name(c_token->type));
+    if (!c_token)
     {
-        for (int i = 0; argv[i]; i++)
-        {
-            free(argv[i]);
-        }
-        free(argv);
+        return TOKEN_EOF;
+    }
+    return c_token->type;
+}
+
+static void pop(void)
+{
+    if (c_token)
+    {
+        token_free(c_token);
+    }
+    c_token = lexer_next(&c_lexer);
+}
+static int is_semicolon_newline(token_type_t t)
+{
+    return t == TOKEN_SEMICOLON || t == TOKEN_NEWLINE;
+}
+
+static void skip_semicolon_newline(void)
+{
+    while (is_semicolon_newline(peek()))
+    {
+        pop();
     }
 }
 
+static ast_t *parse_simple_command(void)
+{
+    if (peek() != TOKEN_WORD)
+    {
+        return NULL;
+    }
+
+    char **argv = calloc(16, sizeof(char *));
+    if (!argv)
+    {
+        return NULL;
+    }
+
+    int i = 0;
+    // echo if then fi else elif
+    while (!is_semicolon_newline(peek()) && peek() != TOKEN_EOF)
+    {
+        token_type_t token_type = peek();
+        if (token_type == TOKEN_WORD)
+        {
+            argv[i] = xstrdup(c_token->lexeme);
+        }
+        else if (token_type == TOKEN_IF)
+        {
+            argv[i] = xstrdup("if");
+        }
+        else if (token_type == TOKEN_THEN)
+        {
+            argv[i] = xstrdup("then");
+        }
+        else if (token_type == TOKEN_ELIF)
+        {
+            argv[i] = xstrdup("elif");
+        }
+        else if (token_type == TOKEN_ELSE)
+        {
+            argv[i] = xstrdup("else");
+        }
+        else if (token_type == TOKEN_FI)
+        {
+            argv[i] = xstrdup("fi");
+        }
+
+        if (!argv[i])
+        {
+            free_argv(argv);
+            return NULL;
+        }
+        i++;
+        pop();
+    }
+    argv[i] = NULL;
+
+    return ast_cmd_init(argv);
+}
+
+static ast_t *parse_if(void)
+{
+    if (peek() != TOKEN_IF)
+    {
+        return NULL;
+    }
+    pop();
+
+    ast_t *condition = parse_simple_command();
+    if (!condition)
+    {
+        return NULL;
+    }
+
+    skip_semicolon_newline();
+    if (peek() != TOKEN_THEN)
+    {
+        ast_free(condition);
+        return NULL;
+    }
+    pop();
+
+    ast_t *then_body = parse_simple_command();
+    if (!then_body)
+    {
+        ast_free(condition);
+        return NULL;
+    }
+
+    skip_semicolon_newline();
+
+    ast_t *else_body = NULL;
+    if (peek() == TOKEN_ELSE)
+    {
+        pop();
+        else_body = parse_simple_command();
+        if (!else_body)
+        {
+            ast_free(condition);
+            ast_free(then_body);
+            return NULL;
+        }
+    }
+    skip_semicolon_newline();
+    if (peek() != TOKEN_FI)
+    {
+        ast_free(condition);
+        ast_free(then_body);
+        ast_free(else_body);
+        return NULL;
+    }
+    pop();
+
+    return ast_if_init(condition, then_body, else_body);
+}
+
+static ast_t *parse_command(void)
+{
+    if (peek() == TOKEN_IF)
+    {
+        return parse_if();
+    }
+    else if (peek() == TOKEN_WORD)
+    {
+        return parse_simple_command();
+    }
+}
+
+static ast_t *parse_list(void)
+{
+    skip_semicolon_newline();
+
+    ast_t *child = parse_command();
+    if (!child)
+    {
+        return NULL;
+    }
+    ast_t *head = ast_list_init(NULL, child);
+    if (!head)
+    {
+        ast_free(child);
+        return NULL;
+    }
+
+    ast_t *tail = head;
+
+    while (1)
+    {
+        if (!is_semicolon_newline(peek()))
+        {
+            break;
+        }
+
+        skip_semicolon_newline();
+
+        if (peek() == TOKEN_EOF)
+        {
+            break;
+        }
+
+        ast_t *next_child = parse_command();
+        if (!next_child)
+        {
+            ast_free(head);
+            return NULL;
+        }
+
+        ast_t *next_list = ast_list_init(NULL, next_child);
+        if (!next_list)
+        {
+            ast_free(next_child);
+            ast_free(head);
+            return NULL;
+        }
+
+        tail->data.ast_list.next = next_list;
+        tail = next_list;
+    }
+    return head;
+}
+
+ast_t *parse_input(FILE *f)
+{
+    lexer_init(&c_lexer, f);
+    c_token = lexer_next(&c_lexer);
+    if (!c_token)
+    {
+        return NULL;
+    }
+
+    skip_semicolon_newline();
+    if (peek() == TOKEN_EOF)
+    {
+        token_free(c_token);
+        c_token = NULL;
+        return NULL;
+    }
+
+    ast_t *root = parse_list();
+    if (!root)
+    {
+        return NULL;
+    }
+
+    skip_semicolon_newline();
+    if (peek() != TOKEN_EOF)
+    {
+        ast_free(root);
+        return NULL;
+    }
+
+    token_free(c_token);
+    c_token = NULL;
+    return root;
+}
+
+/* ==================================================================================
+ */
+/*
+file f = null
+char * string = null
+parser_input(get_file(f, string))
 static FILE *get_file(FILE *f, char *string)
 {
     if (!f)
@@ -85,16 +327,16 @@ static char **parser_create_argv(lexer_t lx, token_t token)
     return argv;
 }
 
-static ast_t parser_if(lexer_t lx)
+static ast_t *parser_if(lexer_t lx)
 {
-    ast_t new = ast_if_init(NULL, NULL, NULL);
+    ast_t *new = ast_if_init(NULL, NULL, NULL);
     if (!new)
     {
         return NULL;
     }
 
-    token_t token = lexer_next(lx);
-    if (!token || token.type != TOKEN_WORD)
+    token_t *token = lexer_next(lx);
+    if (!token || token->type != TOKEN_WORD)
     {
         ast_free(new);
         return NULL;
@@ -103,15 +345,24 @@ static ast_t parser_if(lexer_t lx)
     new->data.ast_if.condition = parser_create_argv(lx, token);
 }
 
-ast_t parser(lexer_t lx)
+ast_t *parser(lexer_t lx)
 {
-    token_t token = NULL;
+    token_t *token = NULL;
     // a changer le while on peut pas verif si le token a pas foirer son calloc
     // aussi c quoi la struct tt en haut une ast_list? comme ça on peut alterner
     // echo bonjour;
     // if ...
+    // then
+    //    echo 1;
+    //    echo 2
     // dans le même input
-    while ((token = lexer_next(lx)).type != TOKEN_EOF)
+    token = lexer_next(lx);
+    if (!token)
+    {
+        return NULL;
+    }
+
+    while (token->type != TOKEN_EOF)
     {
         if (token.type == TOKEN_IF)
         {
@@ -122,5 +373,12 @@ ast_t parser(lexer_t lx)
         {
             free(token);
         }
+        token = lexer_next(lx);
+
+        if (!token)
+        {
+            return NULL;
+        }
     }
 }
+*/

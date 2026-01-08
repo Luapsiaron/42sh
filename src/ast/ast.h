@@ -79,6 +79,9 @@ ast_t *ast_cmd_init(char **argv);
 ast_t *ast_list_init(ast_t *next, ast_t *child);
 ast_t *ast_pipe_init(ast_t *right, ast_t *left);
 
+void free_argv(char **argv);
 void ast_free(ast_t *node);
+
+void ast_printer(const ast_t *node, int depth);
 
 #endif /* ! AST_H */

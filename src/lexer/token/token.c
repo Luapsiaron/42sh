@@ -1,9 +1,10 @@
 #include "token.h"
-#include "utils/str/str.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+
+#include "../../utils/str/str.h"
 
 token_t *token_new(token_type_t type, const char *value)
 {
