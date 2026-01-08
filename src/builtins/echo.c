@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 
+static int argc_count(char **argv)
+{
+    int count = 0;
+    while (argv[count] != NULL)
+        count++;
+    return count;
+}
+
 static void
 echo_print_escaped(const char *s) // Print string without \? transformed
 {
@@ -33,8 +41,9 @@ echo_print_escaped(const char *s) // Print string without \? transformed
     }
 }
 
-int builtin_echo(int argc, char **argv)
+int builtin_echo(char **argv)
 {
+    int argc = argc_count(argv);
     bool opt_n = true;
     bool opt_e = false;
     int i = 1;

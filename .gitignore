@@ -80,3 +80,7 @@ test-driver
 *.pyc
 # Verify clang
 checker.py
+*.dirstamp
+out*
+*stamp-*
+*.trs
