@@ -21,8 +21,8 @@ typedef enum ast_type
     AST_LIST,
     AST_AND_OR,
     AST_PIPELINE,
-    AST_COMMAND,
-    AST_SIMPLE_COMMAND,
+    AST_CMD,
+    AST_SIMPLE_CMD,
     AST_ELEMENT,
     AST_IF
 } ast_type_t;
@@ -53,11 +53,11 @@ struct ast_pipe
     struct ast *left;
 };
 
-struct ast_redir;
-/*{
+struct ast_redir
+{
     struct ast *next;
     FILE *redirect;
-};*/
+};
 
 union ast_union
 {
@@ -74,8 +74,8 @@ typedef struct ast
     union ast_union data;
 } ast_t;
 
-ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast *else_body);
-ast_t *ast_cmd_init(ast_t **agrv);
+ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body);
+ast_t *ast_cmd_init(char **argv);
 ast_t *ast_list_init(ast_t *next, ast_t *child);
 ast_t *ast_pipe_init(ast_t *right, ast_t *left);
 

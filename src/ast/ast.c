@@ -1,6 +1,6 @@
 #include "ast.h"
 
-#include <sdlib.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -18,7 +18,8 @@ static ast_t *ast_init(ast_type_t type)
 
 ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body)
 {
-    ast_t *new = ast_init(AST_IF) if (!new)
+    ast_t *new = ast_init(AST_IF);
+    if (!new)
     {
         return NULL;
     }
@@ -30,9 +31,9 @@ ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body)
     return new;
 }
 
-ast_t *ast_cmd_init(ast_t **agrv)
+ast_t *ast_cmd_init(char **argv)
 {
-    ast_t *new = ast_init(AST_COMMAND);
+    ast_t *new = ast_init(AST_CMD);
     if (!new)
     {
         return NULL;
@@ -59,7 +60,7 @@ ast_t *ast_list_init(ast_t *next, ast_t *child)
 
 ast_t *ast_pipe_init(ast_t *right, ast_t *left)
 {
-    ast_t *new = ast_init(AST_PIPE);
+    ast_t *new = ast_init(AST_PIPELINE);
     if (!new)
     {
         return NULL;
@@ -95,7 +96,7 @@ void ast_free(ast_t *node)
     switch (node->type)
     {
     case AST_CMD:
-        agrv_free(node->ast_cmd.argv);
+        argv_free(node->data.ast_cmd.argv);
         break;
 
     case AST_IF:
@@ -106,7 +107,7 @@ void ast_free(ast_t *node)
 
     case AST_LIST:
         ast_free(node->data.ast_list.next);
-        ast_free(node->data.ast_list.current);
+        ast_free(node->data.ast_list.child);
         break;
     default:
         break;

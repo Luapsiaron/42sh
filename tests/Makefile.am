@@ -1,4 +1,4 @@
-TESTS = run_all_tests.sh #$(check_PROGRAMS)
+TESTS = run_all_tests.sh $(check_PROGRAMS)
 
 if HAVE_CRITERION
 
@@ -6,7 +6,7 @@ check_PROGRAMS = \
     unit/test_echo \
     unit/test_io_stdin_to_file \
     unit/test_io_string_to_file
-
+ 
 # Flags communs (à l'intérieur du if)
 TEST_CFLAGS = $(CRITERION_CFLAGS) -I$(top_srcdir)/src
 TEST_LDADD = \
