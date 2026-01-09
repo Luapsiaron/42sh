@@ -9,6 +9,14 @@ REF_SH="bash --posix"
 passed=0
 total=0
 
+#COLORS
+RED='\033[38;5;210m'
+GREEN='\033[38;5;114m'
+ORANGE='\033[38;5;215m'
+BLUE='\033[38;5;117m'
+YELLOW='\033[38;5;226m'
+CANCEL='\033[0m'
+
 run_test() {
   name="$1"
   input="$2"
@@ -24,28 +32,73 @@ run_test() {
   printf "%s" "$input" | $REF_SH > "$out_ref"
   code_ref=$?
 
-  printf "%s" "$input" | "$BIN_PATH" > "$out_goat"
+  printf "%s" "$input" | timeout 1s "$BIN_PATH" > "$out_goat"
   code_goat=$?
 
   if [ "$code_ref" -ne "$code_goat" ]; then
     failed=1
-    echo "- FAILED: $name (EXIT CODE): ref=$code_ref, goat=$code_goat"
+    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
   fi
 
   if ! cmp -s "$out_ref" "$out_goat"; then
     failed=1
-    echo "- FAILED: $name (output diff)"
+    echo "[${RED}FAILED${CANCEL}]: $name (output diff)"
     diff "$out_ref" "$out_goat"
   fi
 
   if [ "$failed" -eq 0 ]; then
-    echo "[OK] $name"
+    echo "[${GREEN}OK${CANCEL}] $name"
     passed=$((passed + 1))
+  fi
+
+  if [ "$code_goat" -eq 124 ]; then #124 = $? of timeout
+	  echo "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
   fi
 
   total=$((total + 1))
   rm -f "$out_ref" "$out_goat"
 
+}
+
+
+run_script()
+{
+  name="$1"
+  script="$2"
+
+  total=$((total + 1))
+
+  out_ref="/tmp/ref_script_$$.out"
+  out_goat="/tmp/goat_script_$$.out"
+
+  printf "%s\n" "./$script" | $REF_SH > "$out_ref"
+  code_ref=$?
+
+  printf "%s\n" "./$script" | timeout 1s "$BIN_PATH" > "$out_goat"
+  code_goat=$?
+
+  failed=0
+
+  if [ "$code_ref" -ne "$code_goat" ]; then
+    failed=1
+    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
+  fi
+
+  if ! cmp -s "$out_ref" "$out_goat"; then
+    failed=1
+    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT )${CANCEL}"
+    diff "$out_ref" "$out_goat"
+  fi
+
+  if [ "$failed" -eq 0 ]; then
+    echo "[${GREEN}OK${CANCEL}] $name"
+    passed=$((passed + 1))
+  fi
+  
+  if [ "$code_goat" -eq 124 ]; then #124 = $? of timeout
+	  echo "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
+  fi
+  rm -f "$out_ref" "$out_goat"
 }
 
 run_unit()
@@ -68,17 +121,37 @@ run_unit()
   fi
 }
 
+run_test "LS" "ls"
+run_test "Tree -a" "tree -a"
+
+run_test "cat Makefile.am" "cat Makefile.am"
+
+
+run_test "Cd .. test" "cd .."
+
 run_test "true test" "true"
 run_test "false test" "false"
 
 run_test "simple echo" "echo HOMMERR"
 run_test "echo -n" "echo -n DONNUUT"
+run_test "Echo 2 flags" "echo -n -e Le Date de Baptiste le vendredi 9 Janvier au soir"
 
 run_test "Simple comment" "echo SUCRE # AU SUCRE"
 run_test "Comment inside" "echo thibault#bikini"
 
 run_test "Simple list" "echo paul; echo baptiste"
 
+run_test "Simple double echo" "echo 1; echo 2;"
+run_test "Harder shell" "if true; then echo coucou; echo caca; else false; echo caca; fi"
+run_test "If inside if" "if true; then if false; then echo no; else echo yes; fi; fi"
+
+run_test "Simple quote test" "echo 'aaa;  simple quote'"
+run_test "quote inside" "echo a'b'c"
+run_test "triple simple" "echo 'caca' 'pipi' prout'"
+
+
+run_script "script test 1" "tests/scripts/script.sh"
+run_script "script test 1" "tests/scripts/script1.sh"
 
 if [ "$COVERAGE" = "yes" ]; then
   run_unit "unit: echo" "./test_echo"
@@ -92,7 +165,7 @@ if [ "$total" -gt 0 ]; then
 fi
 
 echo "----------------------------------------"
-echo "Result: $passed / $total => $pct%"
+echo "${YELLOW}Result: $passed / $total => $pct% ${CANCEL}"
 
 if [ -n "$OUTPUT_FILE" ]; then
   printf "%d" "$pct" > "$OUTPUT_FILE"

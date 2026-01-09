@@ -5,7 +5,6 @@ check_PROGRAMS = \
   test_echo \
   test_io_string_to_file 
 
-
 if HAVE_CRITERION
 
 TESTS = run_tests.sh

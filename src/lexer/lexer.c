@@ -13,6 +13,12 @@ static void lexer_next_char(lexer_t *lx)
     lx->current = fgetc(lx->input);
 }
 
+static void lexer_skip_comment(lexer_t *lx)
+{
+    while (lx->current != EOF && lx->current != '\n')
+        lexer_next_char(lx);
+}
+
 static token_t *lexer_is_word(lexer_t *lx)
 {
     char buffer[512];
@@ -43,11 +49,20 @@ void lexer_init(lexer_t *lx, FILE *input)
 
 token_t *lexer_next(lexer_t *lx)
 {
-    while (lx->current == ' ')
+    if (lx->current == ' ')
     {
-        lexer_next_char(lx);
+        while (1)
+        {
+            while (lx->current == ' ')
+            lexer_next_char(lx);
+            if (lx->current == '#')
+            {
+                lexer_skip_comment(lx);
+                continue;
+            }
+            break;
     }
-
+    }
     if (lx->current == ';')
     {
         lexer_next_char(lx);
