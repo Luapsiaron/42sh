@@ -10,10 +10,11 @@ AC_CONFIG_HEADERS([config.h])
 AC_PROG_CC
 AC_PROG_RANLIB
 
-PKG_CHECK_MODULES([CRITERION], [criterion])
+PKG_CHECK_MODULES([CRITERION], [criterion],
+                  [have_criterion=yes],
+                  [have_criterion=no])
 
-AC_SUBST([CRITERION_CFLAGS])
-AC_SUBST([CRITERION_LIBS])
+AM_CONDITIONAL([HAVE_CRITERION], [test "x$have_criterion" = "xyes"])
 
 AC_CONFIG_FILES([
   Makefile

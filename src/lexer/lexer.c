@@ -6,7 +6,7 @@
 
 #include "../utils/stack/stack.h"
 
-static struct stack *stack;
+//static struct stack *stack;
 
 static void lexer_next_char(lexer_t *lx)
 {

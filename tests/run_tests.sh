@@ -22,14 +22,22 @@ run_test() {
 
 
 if [ -n "$BIN_PATH" ]; then
+  # echo hello test
   run_test "func: echo hello" sh -c \
     'out="$(printf "echo hello\n" | "$BIN_PATH" 2>/dev/null)"; [ "$out" = "hello" ]'
-
+  # echo Hello World! test
+  run_test "func: echo Hello World!" sh -c \
+    'out="$(printf "echo Hello World!\n" | "$BIN_PATH" 2>/dev/null)"; [ "$out" = "Hello World!" ]'
+  # true test
   run_test "func: true exit=0" sh -c \
     'printf "true\n" | "$BIN_PATH" >/dev/null 2>/dev/null; [ "$?" -eq 0 ]'
-
+  # false test
   run_test "func: false exit=1" sh -c \
     'printf "false\n" | "$BIN_PATH" >/dev/null 2>/dev/null; [ "$?" -eq 1 ]'
+  # if -c test
+  run_test "func: if true; then false; fi" sh -c \
+    'out="$(printf "if true; then false; fi\n" | "$BIN_PATH" 2>/dev/null)"; [ "$?" -eq 1 ]'
+  
 fi
 
 

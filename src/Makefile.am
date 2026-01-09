@@ -13,7 +13,8 @@ lib42sh_a_SOURCES = \
   lexer/lexer.c \
   lexer/token/token.c \
   parser/parser.c \
-  utils/stack/stack.c
+  utils/stack/stack.c \
+  utils/str/str.c
 
 42sh_SOURCES = 42sh.c
 42sh_LDADD   = lib42sh.a

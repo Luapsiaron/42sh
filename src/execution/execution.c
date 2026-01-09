@@ -1,6 +1,7 @@
 #include "execution.h"
 #include "../builtins/echo.h"
 #include "../ast/ast.h"
+
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +41,17 @@ static int exec_builtin(char **argv)
     return 127;
 }
 
+static int wait_status(pid_t pid)
+{
+    int st = 0;
+    if (waitpid(pid, &st, 0) < 0)
+        return 1;
+    if (WIFEXITED(st))
+        return WEXITSTATUS(st);
+    if (WIFSIGNALED(st))
+        return 128 + WTERMSIG(st);
+    return 1;
+}
 
 int exec_ast(ast_t *ast)
 {

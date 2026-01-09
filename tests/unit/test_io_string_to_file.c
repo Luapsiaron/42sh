@@ -8,8 +8,6 @@ static void redirect_all_stdout(void)
     cr_redirect_stdout();
 }
 
-// Newline tests
-
 Test(io_string_to_file, simple_echo, .init = redirect_all_stdout)
 {
     FILE *f = io_string_to_file("echo test");
