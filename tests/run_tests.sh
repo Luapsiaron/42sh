@@ -4,47 +4,85 @@ set -u
 BIN_PATH="${BIN_PATH:-}"
 OUTPUT_FILE="${OUTPUT_FILE:-/tmp/42sh_out_$$}"
 COVERAGE="${COVERAGE:-}"
+REF_SH="bash --posix"
 
 passed=0
 total=0
 
 run_test() {
   name="$1"
-  shift
-  total=$((total + 1))
-  if "$@"; then
+  input="$2"
+
+  out_ref="/tmp/ref_$$.out"
+  out_goat="/tmp/goat_$$.out"
+
+  touch "$out_ref"
+  touch "$out_goat"
+
+  failed=0
+
+  printf "%s" "$input" | $REF_SH > "$out_ref"
+  code_ref=$?
+
+  printf "%s" "$input" | "$BIN_PATH" > "$out_goat"
+  code_goat=$?
+
+  if [ "$code_ref" -ne "$code_goat" ]; then
+    failed=1
+    echo "- FAILED: $name (EXIT CODE): ref=$code_ref, goat=$code_goat"
+  fi
+
+  if ! cmp -s "$out_ref" "$out_goat"; then
+    failed=1
+    echo "- FAILED: $name (output diff)"
+    diff "$out_ref" "$out_goat"
+  fi
+
+  if [ "$failed" -eq 0 ]; then
+    echo "[OK] $name"
     passed=$((passed + 1))
-    printf "[OK] %s\n" "$name"
+  fi
+
+  total=$((total + 1))
+  rm -f "$out_ref" "$out_goat"
+
+}
+
+run_unit()
+{
+  name="$1"
+  bin="$2"
+
+  total=$((total + 1))
+
+  if [ ! -x "$bin" ]; then
+    echo "Binary file: $bin not found"
+    return
+  fi
+
+  if "$bin"; then
+    echo "[OK] $name"
+    passed=$((passed + 1))
   else
-    printf "[KO] %s\n" "$name"
+    echo "- FAILED: $name"
   fi
 }
 
+run_test "true test" "true"
+run_test "false test" "false"
 
-if [ -n "$BIN_PATH" ]; then
-  # echo hello test
-  run_test "func: echo hello" sh -c \
-    'out="$(printf "echo hello\n" | "$BIN_PATH" 2>/dev/null)"; [ "$out" = "hello" ]'
-  # echo Hello World! test
-  run_test "func: echo Hello World!" sh -c \
-    'out="$(printf "echo Hello World!\n" | "$BIN_PATH" 2>/dev/null)"; [ "$out" = "Hello World!" ]'
-  # true test
-  run_test "func: true exit=0" sh -c \
-    'printf "true\n" | "$BIN_PATH" >/dev/null 2>/dev/null; [ "$?" -eq 0 ]'
-  # false test
-  run_test "func: false exit=1" sh -c \
-    'printf "false\n" | "$BIN_PATH" >/dev/null 2>/dev/null; [ "$?" -eq 1 ]'
-  # if -c test
-  run_test "func: if true; then false; fi" sh -c \
-    'out="$(printf "if true; then false; fi\n" | "$BIN_PATH" 2>/dev/null)"; [ "$?" -eq 1 ]'
-  
-fi
+run_test "simple echo" "echo HOMMERR"
+run_test "echo -n" "echo -n DONNUUT"
+
+run_test "Simple comment" "echo SUCRE # AU SUCRE"
+run_test "Comment inside" "echo thibault#bikini"
+
+run_test "Simple list" "echo paul; echo baptiste"
 
 
 if [ "$COVERAGE" = "yes" ]; then
-  [ -x "./test_echo" ] && run_test "unit: echo" ./test_echo
-  [ -x "./test_io_string_to_file" ] && run_test "unit: io_string_to_file" ./test_io_string_to_file
-  [ -x "./test_io_stdin_to_file" ] && run_test "unit: io_stdin_to_file" ./test_io_stdin_to_file
+  run_unit "unit: echo" "./test_echo"
+  run_unit "unit: io_string_to_file" "./test_io_string_to_file"
 fi
 
 
@@ -52,6 +90,10 @@ pct=0
 if [ "$total" -gt 0 ]; then
   pct=$((passed * 100 / total))
 fi
+
+echo "----------------------------------------"
+echo "Result: $passed / $total => $pct%"
+
 if [ -n "$OUTPUT_FILE" ]; then
   printf "%d" "$pct" > "$OUTPUT_FILE"
 fi

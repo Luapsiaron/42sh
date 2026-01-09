@@ -36,7 +36,7 @@ static int run_stream(FILE *input)
     while (1)
     {
         ast_t *tree = parse_input(input);
-        ast_printer(tree, 0);
+        //ast_printer(tree, 0);
         if (!tree)
             break;
         status = exec_ast(tree);
