@@ -95,15 +95,11 @@ static ast_t *parse_simple_command(void)
     return ast_cmd_init(argv);
 }
 
-static ast_t *parse_if(void)
+static ast_t *parse_elif(void)
 {
-    if (peek() != TOKEN_IF)
-    {
-        return NULL;
-    }
     pop();
 
-    ast_t *condition = parse_simple_command();
+    ast_t *condition = parse_command();
     if (!condition)
     {
         return NULL;
@@ -117,7 +113,7 @@ static ast_t *parse_if(void)
     }
     pop();
 
-    ast_t *then_body = parse_simple_command();
+    ast_t *then_body = parse_command();
     if (!then_body)
     {
         ast_free(condition);
@@ -126,11 +122,86 @@ static ast_t *parse_if(void)
 
     skip_semicolon_newline();
 
+    ast_t *elif_body = NULL;
+    if (peek() == TOKEN_ELIF)
+    {
+        elif_body = parse_elif_command();
+        if (!elif_body)
+        {
+            ast_free(condition);
+            ast_free(then_body);
+            return NULL;
+        }
+    }
+
+    skip_semicolon_newline();
+
     ast_t *else_body = NULL;
     if (peek() == TOKEN_ELSE)
     {
         pop();
-        else_body = parse_simple_command();
+        else_body = parse_command();
+        if (!else_body)
+        {
+            ast_free(condition);
+            ast_free(then_body);
+            return NULL;
+        }
+    }
+
+    if (elif_body)
+    {
+        return ast_if_init(condition, then_body, elif_body);
+    }
+    return ast_if_init(condition, then_body, else_body);
+}
+
+static ast_t *parse_if(void)
+{
+    pop();
+
+    ast_t *condition = parse_command();
+    if (!condition)
+    {
+        return NULL;
+    }
+
+    skip_semicolon_newline();
+    if (peek() != TOKEN_THEN)
+    {
+        ast_free(condition);
+        return NULL;
+    }
+    pop();
+
+    ast_t *then_body = parse_command();
+    if (!then_body)
+    {
+        ast_free(condition);
+        return NULL;
+    }
+
+    skip_semicolon_newline();
+
+    ast_t *elif_body = NULL;
+    if (peek() == TOKEN_ELIF)
+    {
+        elif_body = parse_elif_command();
+        if (!elif_body)
+        {
+            ast_free(condition);
+            ast_free(then_body);
+            return NULL;
+        }
+    }
+
+    skip_semicolon_newline();
+
+    ast_t *else_body = NULL;
+    if (peek() == TOKEN_ELSE)
+    {
+        pop();
+        else_body = parse_command();
         if (!else_body)
         {
             ast_free(condition);
@@ -148,10 +219,23 @@ static ast_t *parse_if(void)
     }
     pop();
 
+    if (elif_body)
+    {
+        return ast_if_init(condition, then_body, elif_body);
+    }
     return ast_if_init(condition, then_body, else_body);
 }
 
-static ast_t *parse_command(void)
+ast_t *parse_elif_command(void)
+{
+    if (peek() == TOKEN_ELIF)
+    {
+        return parse_elif();
+    }
+    return NULL;
+}
+
+ast_t *parse_command(void)
 {
     if (peek() == TOKEN_IF)
     {
@@ -161,6 +245,7 @@ static ast_t *parse_command(void)
     {
         return parse_simple_command();
     }
+    return NULL;
 }
 
 static ast_t *parse_list(void)

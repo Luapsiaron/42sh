@@ -14,6 +14,7 @@ FILE *io_string_to_file(char *string)
 
     fprintf(temporary_file, "%s", string);
 
+    fseek(temporary_file, 0, SEEK_SET);
     return temporary_file;
 }
 
