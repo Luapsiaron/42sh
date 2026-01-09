@@ -13,6 +13,11 @@ lib42sh_a_SOURCES = \
   lexer/lexer.c \
   lexer/token/token.c \
   parser/parser.c \
+  parser/parser_command.c \
+  parser/parser_if.c \
+  parser/parser_input.c \
+  parser/parser_list.c \
+  parser/parser_simple_command.c \
   utils/stack/stack.c \
   utils/str/str.c
 
