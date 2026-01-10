@@ -1,15 +1,15 @@
 #define _GNU_SOURCE
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdbool.h>
 
-#include "parser/parser.h"
-#include "execution/execution.h"
 #include "ast/ast.h"
+#include "execution/execution.h"
 #include "io/io.h"
+#include "parser/parser.h"
 
 static void usage(FILE *out)
 {
@@ -36,7 +36,7 @@ static int run_stream(FILE *input)
     while (1)
     {
         ast_t *tree = parse_input(input);
-        //ast_printer(tree, 0);
+        // ast_printer(tree, 0);
         if (!tree)
             break;
         status = exec_ast(tree);
@@ -83,7 +83,8 @@ int main(int argc, char **argv)
         input = fopen(path, "r");
         if (!input)
         {
-            fprintf(stderr, "42sh: cannot open '%s': %s\n", path, strerror(errno));
+            fprintf(stderr, "42sh: cannot open '%s': %s\n", path,
+                    strerror(errno));
             exit(1);
         }
         must_close = true;

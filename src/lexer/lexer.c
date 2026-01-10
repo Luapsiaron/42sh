@@ -6,7 +6,7 @@
 
 #include "../utils/stack/stack.h"
 
-//static struct stack *stack;
+// static struct stack *stack;
 
 static void lexer_next_char(lexer_t *lx)
 {
@@ -54,14 +54,14 @@ token_t *lexer_next(lexer_t *lx)
         while (1)
         {
             while (lx->current == ' ')
-            lexer_next_char(lx);
+                lexer_next_char(lx);
             if (lx->current == '#')
             {
                 lexer_skip_comment(lx);
                 continue;
             }
             break;
-    }
+        }
     }
     if (lx->current == ';')
     {

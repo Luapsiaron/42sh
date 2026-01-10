@@ -1,8 +1,8 @@
 if true 
 then 
-echo coucou; 
-echo caca
+echo coucou
+echo caca;
 else 
-false;
+false
 echo caca;
 fi

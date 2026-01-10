@@ -83,6 +83,10 @@ ast_t *parse_then(parser_t *p)
 }
 */
 
+// sauv type token, TOKEN_THEN
+// switch switch case TOKEN_THEN: peek(p) == TOKEN_FI || peek(p) == TOKEN_ELSE
+// || peek(p) == TOKEN_ELIF || peek(p) == TOKEN_EOF
+
 ast_t *parse_then(parser_t *p)
 {
     skip_semicolon_newline(p);

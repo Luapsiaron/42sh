@@ -42,7 +42,7 @@ run_test() {
 
   if ! cmp -s "$out_ref" "$out_goat"; then
     failed=1
-    echo "[${RED}FAILED${CANCEL}]: $name (output diff)"
+    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
     diff "$out_ref" "$out_goat"
   fi
 
@@ -86,7 +86,7 @@ run_script()
 
   if ! cmp -s "$out_ref" "$out_goat"; then
     failed=1
-    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT )${CANCEL}"
+    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
     diff "$out_ref" "$out_goat"
   fi
 
@@ -121,6 +121,9 @@ run_unit()
   fi
 }
 
+
+# 8=================D RUN STRING 8===================D
+
 run_test "LS" "ls"
 run_test "Tree -a" "tree -a"
 
@@ -134,7 +137,8 @@ run_test "false test" "false"
 
 run_test "simple echo" "echo HOMMERR"
 run_test "echo -n" "echo -n DONNUUT"
-run_test "Echo 2 flags" "echo -n -e Le Date de Baptiste le vendredi 9 Janvier au soir"
+run_test "Echo 2 flags" "echo -n -e La 1ere fois de Baptiste:\\nLe vendredi 9 Janvier au soir;"
+run_test "Echo 3 flags" "echo -n -e -E Et oui\\\n c etait juste avant un rendu"
 
 run_test "Simple comment" "echo SUCRE # AU SUCRE"
 run_test "Comment inside" "echo thibault#bikini"
@@ -149,15 +153,17 @@ run_test "Simple quote test" "echo 'aaa;  simple quote'"
 run_test "quote inside" "echo a'b'c"
 run_test "triple simple" "echo 'caca' 'pipi' prout'"
 
+# 8=================D RUN SCRIPT 8===================D
 
-run_script "script test 1" "tests/scripts/script.sh"
-run_script "script test 1" "tests/scripts/script1.sh"
+run_script "script test 1" "script/script.sh"
+run_script "script test 2" "script/script1.sh"
+
+# 8=================D RUN UNIT 8=====================D
 
 if [ "$COVERAGE" = "yes" ]; then
   run_unit "unit: echo" "./test_echo"
   run_unit "unit: io_string_to_file" "./test_io_string_to_file"
 fi
-
 
 pct=0
 if [ "$total" -gt 0 ]; then

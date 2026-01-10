@@ -1,17 +1,18 @@
 #include "execution.h"
-#include "../builtins/echo.h"
-#include "../ast/ast.h"
 
+#include <errno.h>
 #include <fcntl.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include <string.h>
-#include <stdbool.h>
-#include <errno.h>
+
+#include "../ast/ast.h"
+#include "../builtins/echo.h"
 
 // command not found = 127
 // command not executable = 126
@@ -19,9 +20,8 @@
 
 static bool is_builtin(char *str)
 {
-    return (strcmp(str, "echo") == 0 ||
-            strcmp(str, "true") == 0 ||
-            strcmp(str, "false") == 0);
+    return (strcmp(str, "echo") == 0 || strcmp(str, "true") == 0
+            || strcmp(str, "false") == 0);
 }
 
 static int exec_builtin(char **argv)
@@ -55,28 +55,28 @@ static int wait_status(pid_t pid)
 
 int exec_ast(ast_t *ast)
 {
-    if(!ast)
+    if (!ast)
         return 2;
-    switch(ast->type)
+    switch (ast->type)
     {
-        case AST_LIST:
-            return exec_list(ast);
-        case AST_IF:
-            return exec_if(ast);
-        case AST_CMD:
-            return exec_cmd(ast->data.ast_cmd.argv);
-        default:
-            fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
-            return 2;
+    case AST_LIST:
+        return exec_list(ast);
+    case AST_IF:
+        return exec_if(ast);
+    case AST_CMD:
+        return exec_cmd(ast->data.ast_cmd.argv);
+    default:
+        fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
+        return 2;
     }
 }
 
 int exec_list(ast_t *ast)
 {
     int exit_code = 0;
-    while(ast && ast->type == AST_LIST)
+    while (ast && ast->type == AST_LIST)
     {
-        if(ast->data.ast_list.child)
+        if (ast->data.ast_list.child)
         {
             exit_code = exec_ast(ast->data.ast_list.child);
         }
@@ -96,7 +96,6 @@ int exec_if(ast_t *ast)
         return exec_ast(ast->data.ast_if.else_body); // ELSE
     }
     return 0; // false condition and no else, should continue
-
 }
 
 int exec_cmd(char **argv)
@@ -124,4 +123,3 @@ int exec_cmd(char **argv)
     }
     return wait_status(pid);
 }
-

@@ -1,1 +1,9 @@
-if true; then if false; then echo no; else echo yes; fi; fi
+if true; 
+then 
+if false;
+then 
+echo no
+else 
+echo yes;
+fi;
+fi
