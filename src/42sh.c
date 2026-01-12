@@ -1,4 +1,4 @@
-#define _GNU_SOURCE
+#define _XOPEN_SOURCE
 #include <errno.h>
 #include <stdbool.h>
 #include <stdio.h>
