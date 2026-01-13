@@ -1,37 +1,30 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "io.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
-FILE *io_string_to_file(char *string)
+static char *io_buf = NULL;
+
+FILE *io_string_to_file(const char *string)
 {
-    FILE *temporary_file = tmpfile();
-    if (!temporary_file)
+    if (!string)
+        return NULL;
+    size_t len = strlen(string);
+    free(io_buf);
+    io_buf = malloc(len + 1);
+    if (!io_buf)
+        return NULL;
+    memcpy(io_buf, string, len + 1);
+    FILE *f = fmemopen(io_buf, len, "r");
+    if (!f)
     {
+        free(io_buf);
+        io_buf = NULL;
         return NULL;
     }
-
-    fprintf(temporary_file, "%s", string);
-
-    fseek(temporary_file, 0, SEEK_SET);
-    return temporary_file;
-}
-
-FILE *io_stdin_to_file(void)
-{
-    FILE *temporary_file = tmpfile();
-    if (!temporary_file)
-    {
-        return NULL;
-    }
-
-    char buffer[4096];
-    ssize_t size_readed;
-    while ((size_readed = read(STDIN_FILENO, &buffer, sizeof(buffer))) > 0)
-    {
-        fprintf(temporary_file, "%s", buffer);
-    }
-
-    return temporary_file;
+    fseek(f, 0, SEEK_SET);
+    return f;
 }

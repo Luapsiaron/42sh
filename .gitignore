@@ -78,9 +78,15 @@ test-driver
 *.log
 *.txt
 *.pyc
+
 # Verify clang
 checker.py
 *.dirstamp
 out*
 *stamp-*
 *.trs
+
+config.h
+src/42sh
+tests/test_echo
+tests/test_io_string_to_file
