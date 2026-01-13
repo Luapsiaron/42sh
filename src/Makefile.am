@@ -18,8 +18,10 @@ lib42sh_a_SOURCES = \
   parser/parser_input.c \
   parser/parser_list.c \
   parser/parser_simple_command.c \
+  parser/parser_pipeline.c \
   utils/stack/stack.c \
-  utils/str/str.c
+  utils/str/str.c \
+  utils/parser/pretty_printer.c
 
 42sh_SOURCES = 42sh.c
 42sh_LDADD   = lib42sh.a

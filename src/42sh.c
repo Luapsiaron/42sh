@@ -18,7 +18,9 @@ static void usage(FILE *out)
             "Options:\n"
             "  -c \"SCRIPT\"   read commands from SCRIPT string\n"
             "  -e FILE.sh      read commands from FILE.sh\n"
-            "  <  FILE.sh      read commands from standard input\n");
+            "  <  FILE.sh      read commands from standard input\n"
+            " --pretty-print   print the parsed AST in a pretty format\n"
+            " PRETTY_PRINT=1   same as --pretty-print\n");
 }
 
 static void error_usage(const char *msg)
@@ -26,10 +28,10 @@ static void error_usage(const char *msg)
     if (msg)
         fprintf(stderr, "42sh: %s\n", msg);
     usage(stderr);
-    exit(1);
+    exit(2);
 }
 
-static int run_stream(FILE *input)
+static int run_stream(FILE *input, int pretty_print)
 {
     int status = 0;
 
@@ -39,6 +41,12 @@ static int run_stream(FILE *input)
         // ast_printer(tree, 0);
         if (!tree)
             break;
+        if (pretty_print)
+        {
+            ast_pretty_print(tree, stdout);
+            ast_free(tree);
+            return 0;
+        }
         status = exec_ast(tree);
         ast_free(tree);
     }
@@ -49,6 +57,27 @@ int main(int argc, char **argv)
 {
     int opt;
     char *command = NULL;
+    int pretty_print = 0;
+
+    if(getenv("PRETTY_PRINT") != NULL)
+    {
+        pretty_print = 1;
+    }
+
+    for(size_t i = 1; i < argc; ++i)
+    {
+        if(strcmp(argv[i], "--pretty-print") == 0)
+        {
+            pretty_print = 1;
+            for(size_t j = i; j < argc - 1; ++j)
+            {
+                argv[j] = argv[j + 1];
+            }
+            --argc;
+            --i;
+        }
+    }
+
     while ((opt = getopt(argc, argv, "c:")) != -1)
     {
         switch (opt)
@@ -85,7 +114,7 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "42sh: cannot open '%s': %s\n", path,
                     strerror(errno));
-            exit(1);
+            exit(2);
         }
         must_close = true;
     }
@@ -94,7 +123,7 @@ int main(int argc, char **argv)
         input = stdin;
         must_close = false;
     }
-    int status = run_stream(input);
+    int status = run_stream(input, pretty_print);
     if (must_close && input)
         fclose(input);
     return status;

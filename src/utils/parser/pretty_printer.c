@@ -1,0 +1,151 @@
+#include "pretty_printer.h"
+
+#include <ctype.h>
+#include <string.h>
+
+
+static void pp_node(const ast_t *ast, FILE *out);
+static void pp_list(const ast_t *ast, FILE *out);
+static void pp_cmd(const ast_t *ast, FILE *out);
+static void pp_pipeline(const ast_t *ast, FILE *out);
+static void pp_negation(const ast_t *ast, FILE *out);
+static void pp_if(const ast_t *ast, FILE *out);
+
+static void pp_ignore_quotes(const char *str, FILE *out)
+{
+    fputc('"', out);
+    for (size_t i = 0; str && str[i]; ++i)
+    {
+        if (str[i] == '"' || str[i] == '\\')
+        {
+            fputc('\\', out);
+        }
+        fputc(str[i], out);
+    }
+    fputc('"', out);
+}
+
+static void pp_braces(const ast_t *ast, FILE *out)
+{
+    fputs("{ ", out);
+    pp_node(ast, out);
+    fputs(" }", out);
+}
+
+static void pp_list(const ast_t *ast, FILE *out)
+{
+    const ast_t *cur = ast;
+    while (cur)
+    {
+        pp_node(cur->data.ast_list.child, out);
+        if(cur->data.ast_list.next)
+        {
+            fprintf(out, "; ");
+        }
+        cur = cur->data.ast_list.next;
+    }
+}
+
+static void pp_cmd(const ast_t *ast, FILE *out)
+{
+    char **argv = ast->data.ast_cmd.argv;
+
+    fputs("command", out);
+
+    for (size_t i = 0; argv && argv[i]; ++i)
+    {
+        fputc(' ', out);
+        pp_ignore_quotes(argv[i], out);
+    }
+}
+
+static void pp_pipeline(const ast_t *ast, FILE *out)
+{
+    fputs("pipeline { ", out);
+    pp_node(ast->data.ast_pipeline.left, out);
+    fprintf(out, " | ");
+    pp_node(ast->data.ast_pipeline.right, out);
+    fputs(" }", out);
+}
+
+static void pp_negation(const ast_t *ast, FILE *out)
+{
+    fputs("negation ", out);
+    pp_node(ast->data.ast_negation.child, out);
+}
+
+static void pp_if(const ast_t *ast, FILE *out)
+{
+    const struct ast_if *if_node = &ast->data.ast_if;
+    fputs("if ", out);
+    pp_braces(if_node->condition, out);
+    fputs("; then ", out);
+    pp_braces(if_node->then_body, out);
+    if (if_node->else_body)
+    {
+        if(if_node->else_body->type == AST_IF)
+        {
+            fputs("; elif ", out);
+            const struct ast_if *elif = &if_node->else_body->data.ast_if;
+            pp_braces(elif->condition, out);
+            fputs("; then ", out);
+            pp_braces(elif->then_body, out);
+
+            if(elif->else_body)
+            {
+                if(elif->else_body->type == AST_IF)
+                {
+                    fputs("; ", out);
+                    pp_node(elif->else_body, out);
+                    return;
+                }
+                fputs("; else ", out);
+                pp_braces(elif->else_body, out);
+            }
+
+        }
+        else
+        {
+            fputs("; else ", out);
+            pp_braces(if_node->else_body, out);
+        }
+    }
+    fputs("; fi", out);
+}
+
+static void pp_node(const ast_t *ast, FILE *out)
+{
+    if (!ast)
+    {
+        fputs("/* NULL AST node */", out);
+        return;
+    }
+
+    switch (ast->type)
+    {
+    case AST_CMD:
+        pp_cmd(ast, out);
+        break;
+    case AST_LIST:
+        pp_list(ast, out);
+        break;
+    case AST_PIPELINE:
+        pp_pipeline(ast, out);
+        break;
+    case AST_NEGATION:
+        pp_negation(ast, out);
+        break;
+    case AST_IF:
+        pp_if(ast, out);
+        break;
+    default:
+        fputs("/* Unknown AST node */", out);
+        break;
+    }
+}
+
+void ast_pretty_print(const ast_t *ast, FILE *out)
+{
+    pp_node(ast, out);
+    fputc('\n', out);
+}
