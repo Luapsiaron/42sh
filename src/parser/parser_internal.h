@@ -14,8 +14,9 @@ typedef struct parser
 token_type_t peek(parser_t *parser);
 void pop(parser_t *parser);
 
-int is_semicolon_newline(token_type_t t);
-void skip_semicolon_newline(parser_t *parser);
+int remove_separator(parser_t *p);
+void skip_newlines(parser_t *p);
+void skip_semicolon_newline(parser_t *p);
 
 ast_t *parse_simple_command(parser_t *parser);
 ast_t *parse_list(parser_t *parser);

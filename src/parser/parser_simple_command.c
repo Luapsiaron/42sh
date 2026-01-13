@@ -6,48 +6,58 @@
 
 ast_t *parse_simple_command(parser_t *p)
 {
-    skip_semicolon_newline(p);
     if (peek(p) != TOKEN_WORD)
     {
         return NULL;
     }
 
-    char **argv = calloc(16, sizeof(char *));
+    size_t i = 0;
+    size_t capacity = 16;
+
+    char **argv = calloc(capacity, sizeof(char *));
     if (!argv)
     {
         return NULL;
     }
 
-    int i = 0;
     // echo if then fi else elif
-    while (!is_semicolon_newline(peek(p)) && peek(p) != TOKEN_EOF)
+    while (peek(p) == TOKEN_WORD)
     {
-        const char *token = NULL;
-
-        if (peek(p) == TOKEN_WORD)
+        if(i+1 >= capacity)
         {
-            token = p->current_token->lexeme;
-        }
-        else
-        {
-            token = token_type_name(peek(p));
+            capacity *= 2;
+            char **new_argv = realloc(argv, capacity * sizeof(char *));
+            if (!new_argv)
+            {
+                free_argv(argv);
+                return NULL;
+            }
+            for(size_t j = i; j < capacity; j++)
+            {
+                new_argv[j] = NULL;
+            }
+            argv = new_argv;
         }
 
-        if (!token)
-        {
-            break;
-        }
-
-        argv[i] = xstrdup(token);
-
+        argv[i] = xstrdup(p->current_token->lexeme);
         if (!argv[i])
         {
             free_argv(argv);
             return NULL;
         }
-
         i++;
         pop(p);
+
+        if(i >= 15)
+        {
+            char **new_argv = realloc(argv, (sizeof(argv) * 2) * sizeof(char *));
+            if (!new_argv)
+            {
+                free_argv(argv);
+                return NULL;
+            }
+            argv = new_argv;
+        }
     }
     argv[i] = NULL;
 

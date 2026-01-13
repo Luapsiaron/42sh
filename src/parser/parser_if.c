@@ -73,7 +73,7 @@ static int expect_token(parser_t *p, token_type_t expected)
 */
 static ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token, size_t end_token_count)
 {
-    skip_semicolon_newline(p);
+    skip_newlines(p);
 
     /* Check if we've reached an end token or EOF (Means invalid condition like 'if then')*/
     if (is_stop_token(peek(p), end_token, end_token_count) || peek(p) == TOKEN_EOF)
@@ -93,42 +93,49 @@ static ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token, si
         return NULL;
     }
 
-    skip_semicolon_newline(p);
     ast_t *tmp = list;
     
-    while (!is_stop_token(peek(p), end_token, end_token_count))
+    while (1)
     {
-        if (peek(p) == TOKEN_EOF)
+        if(is_stop_token(peek(p), end_token, end_token_count) || peek(p) == TOKEN_EOF)
         {
-            ast_free(list);
-            return NULL;
+            goto error;
         }
 
-        skip_semicolon_newline(p);
+        if(!remove_separator(p))
+        {
+            goto error;
+        }
 
         if (is_stop_token(peek(p), end_token, end_token_count))
         {
             break;
         }
 
+        if (peek(p) == TOKEN_EOF)
+        {
+            goto error;
+        }
+
         ast_t *cmd = parse_simple_command(p);
         if (!cmd)
         {
-            ast_free(list);
-            return NULL;
+            goto error;
         }
         tmp->data.ast_list.next = ast_list_init(NULL, cmd);
         tmp = tmp->data.ast_list.next;
         if (!tmp)
         {
             ast_free(cmd);
-            ast_free(list);
-            return NULL;
+            goto error;
         }
 
-        skip_semicolon_newline(p);
     }
     return list;
+
+    error:
+    ast_free(list);
+    return NULL;
 }
 
 /*
@@ -164,7 +171,7 @@ static ast_t *parse_else(parser_t *p)
 */
 static int parse_elif_else_body(parser_t *p, struct elif_else_body *body, ast_t *condition, ast_t *then_body)
 {
-    skip_semicolon_newline(p);
+    skip_newlines(p);
 
     body->elif_body = NULL;
     body->else_body = NULL;
@@ -180,12 +187,12 @@ static int parse_elif_else_body(parser_t *p, struct elif_else_body *body, ast_t 
         }
     }
 
-    skip_semicolon_newline(p);
+    skip_newlines(p);
 
     if (peek(p) == TOKEN_ELSE)
     {
         pop(p);
-        skip_semicolon_newline(p);
+        skip_newlines(p);
         body->else_body = parse_else(p);
         if (!body->else_body)
         {
@@ -214,7 +221,7 @@ static ast_t *parse_elif(parser_t *p)
         return NULL;
     }
 
-    skip_semicolon_newline(p);
+    skip_newlines(p);
     if (!expect_token(p, TOKEN_THEN))
     {
         ast_free(condition);
@@ -271,7 +278,7 @@ ast_t *parse_if(parser_t *p)
         return NULL;
     }
 
-    skip_semicolon_newline(p);
+    skip_newlines(p);
     if(!expect_token(p, TOKEN_THEN))
     {
         ast_free(condition);
@@ -291,7 +298,7 @@ ast_t *parse_if(parser_t *p)
         return NULL;
     }
 
-    skip_semicolon_newline(p);
+    skip_newlines(p);
     if(!expect_token(p, TOKEN_FI))
     {
         ast_free(condition);

@@ -20,12 +20,10 @@ ast_t *parse_list(parser_t *p)
 
     while (1)
     {
-        if (!is_semicolon_newline(peek(p)))
+        if (!remove_separator(p))
         {
             break;
         }
-
-        skip_semicolon_newline(p);
 
         if (peek(p) == TOKEN_EOF)
         {
