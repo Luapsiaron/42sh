@@ -24,7 +24,8 @@ typedef enum ast_type
     AST_CMD,
     AST_SIMPLE_CMD,
     AST_ELEMENT,
-    AST_IF
+    AST_IF,
+    AST_NEGATION
 } ast_type_t;
 
 struct ast_if
@@ -47,7 +48,7 @@ struct ast_list
     struct ast *child;
 };
 
-struct ast_pipe
+struct ast_pipeline
 {
     struct ast *right;
     struct ast *left;
@@ -59,13 +60,19 @@ struct ast_redir
     FILE *redirect;
 };
 
+struct ast_negation
+{
+    struct ast *child;
+};
+
 union ast_union
 {
     struct ast_cmd ast_cmd;
     struct ast_if ast_if;
     struct ast_list ast_list;
-    struct ast_pipe ast_pipe;
+    struct ast_pipeline ast_pipeline;
     struct ast_redir ast_redir;
+    struct ast_negation ast_negation;
 };
 
 typedef struct ast
@@ -77,7 +84,8 @@ typedef struct ast
 ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body);
 ast_t *ast_cmd_init(char **argv);
 ast_t *ast_list_init(ast_t *next, ast_t *child);
-ast_t *ast_pipe_init(ast_t *right, ast_t *left);
+ast_t *ast_pipeline_init(ast_t *right, ast_t *left);
+ast_t *ast_negation_init(ast_t *child);
 
 void free_argv(char **argv);
 void ast_free(ast_t *node);

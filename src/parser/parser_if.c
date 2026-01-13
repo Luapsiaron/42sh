@@ -81,7 +81,7 @@ static ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token, si
         return NULL;
     }
 
-    ast_t *first = parse_simple_command(p);
+    ast_t *first = parser_pipeline(p);
     if (!first)
     {
         return NULL;
@@ -117,7 +117,7 @@ static ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token, si
             goto error;
         }
 
-        ast_t *cmd = parse_simple_command(p);
+        ast_t *cmd = parser_pipeline(p);
         if (!cmd)
         {
             goto error;

@@ -58,7 +58,7 @@ ast_t *ast_list_init(ast_t *next, ast_t *child)
     return new;
 }
 
-ast_t *ast_pipe_init(ast_t *right, ast_t *left)
+ast_t *ast_pipeline_init(ast_t *right, ast_t *left)
 {
     ast_t *new = ast_init(AST_PIPELINE);
     if (!new)
@@ -66,8 +66,21 @@ ast_t *ast_pipe_init(ast_t *right, ast_t *left)
         return NULL;
     }
 
-    new->data.ast_pipe.right = right;
-    new->data.ast_pipe.left = left;
+    new->data.ast_pipeline.right = right;
+    new->data.ast_pipeline.left = left;
+
+    return new;
+}
+
+ast_t *ast_negation_init(ast_t *child)
+{
+    ast_t *new = ast_init(AST_NEGATION);
+    if (!new)
+    {
+        return NULL;
+    }
+
+    new->data.ast_negation.child = child;
 
     return new;
 }
@@ -108,6 +121,13 @@ void ast_free(ast_t *node)
     case AST_LIST:
         ast_free(node->data.ast_list.next);
         ast_free(node->data.ast_list.child);
+        break;
+    case AST_PIPELINE:
+        ast_free(node->data.ast_pipeline.right);
+        ast_free(node->data.ast_pipeline.left);
+        break;
+    case AST_NEGATION:
+        ast_free(node->data.ast_negation.child);
         break;
     default:
         break;
@@ -162,6 +182,15 @@ void ast_printer(const ast_t *node, int depth)
         printf("LIST:\n");
         ast_printer(node->data.ast_list.child, depth + 1);
         ast_printer(node->data.ast_list.next, depth);
+        break;
+    case AST_PIPELINE:
+        printf("PIPELINE:\n");
+        ast_printer(node->data.ast_pipeline.left, depth + 1);
+        ast_printer(node->data.ast_pipeline.right, depth + 1);
+        break;
+    case AST_NEGATION:
+        printf("NEGATION:\n");
+        ast_printer(node->data.ast_negation.child, depth + 1);
         break;
 
     default:

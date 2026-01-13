@@ -20,6 +20,8 @@ typedef enum token_type
     TOKEN_PIPE,
     TOKEN_REDIRECT, // > or >>
 
+    TOKEN_NEGATION, // !
+    
     // End of input
     TOKEN_EOF
 } token_type_t;

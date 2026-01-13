@@ -24,4 +24,6 @@ ast_t *parse_command(parser_t *parser);
 
 ast_t *parse_if(parser_t *parser);
 
+ast_t *parser_pipeline(parser_t *parser);
+
 #endif /* ! PARSER_INTERNAL_H */

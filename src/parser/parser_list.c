@@ -4,7 +4,7 @@ ast_t *parse_list(parser_t *p)
 {
     skip_semicolon_newline(p);
 
-    ast_t *child = parse_command(p);
+    ast_t *child = parser_pipeline(p);
     if (!child)
     {
         return NULL;
@@ -30,7 +30,7 @@ ast_t *parse_list(parser_t *p)
             break;
         }
 
-        ast_t *next_child = parse_command(p);
+        ast_t *next_child = parser_pipeline(p);
         if (!next_child)
         {
             ast_free(head);
