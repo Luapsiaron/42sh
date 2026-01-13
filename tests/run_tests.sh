@@ -122,7 +122,7 @@ run_unit()
 }
 
 
-# 8=================D RUN STRING 8===================D
+# ================= RUN STRING ===================
 
 run_test "LS" "ls"
 run_test "Tree -a" "tree -a"
@@ -139,26 +139,47 @@ run_test "simple echo" "echo HOMMERR"
 run_test "echo -n" "echo -n DONNUUT"
 run_test "Echo 2 flags" "echo -n -e La 1ere fois de Baptiste:\\nLe vendredi 9 Janvier au soir;"
 run_test "Echo 3 flags" "echo -n -e -E Et oui\\\n c etait juste avant un rendu"
+run_test "Echo mix" "echo -n -e -n AAAAAAAAAAAh"
+run_test "Echo escaped" "echo \" \\n \\t \\\\\""
+run_test "Echo bad flags" "echo -nEe Machoire"
 
 run_test "Simple comment" "echo SUCRE # AU SUCRE"
 run_test "Comment inside" "echo thibault#bikini"
 
 run_test "Simple list" "echo paul; echo baptiste"
+run_test "List" "echo a;; echo b"
+run_test "List newline" "echo a;
+echo b"
+run_test "if with list" "if echo cond; true; then echo body; fi"
+
 
 run_test "Simple double echo" "echo 1; echo 2;"
-run_test "Harder shell" "if true; then echo coucou; echo caca; else false; echo caca; fi"
+run_test "Harder shell" "if true; then echo coco; echo mangue; else false; echo dragon; fi"
 run_test "If inside if" "if true; then if false; then echo no; else echo yes; fi; fi"
 
 run_test "Simple quote test" "echo 'aaa;  simple quote'"
 run_test "quote inside" "echo a'b'c"
-run_test "triple simple" "echo 'caca' 'pipi' prout'"
+run_test "triple simple" "echo 'a' 'b' 'c'"
+run_test "SQuote + DQuote Concat" "echo 'Simple'\"Double\""
+run_test "Empty quotes" "echo '' \"\""
+run_test "Empty concat" "echo 'a'\"\"'b'"
+run_test "triple quoted mixed" "echo 'a'\"b\"C"
 
-# 8=================D RUN SCRIPT 8===================D
+
+run_test "Expand simple" "A=10; echo \$A"
+run_test "Expand Dquote" "A=11; echo \"Res: \$A\""
+run_test "Expand SQuote" "A=12; echo 'Res: \$A'"
+run_test "Expand concat" "A=12; echo q\$Aw"
+run_test "True Exit code" "true; echo \$?"
+run_test "False Exit code" "false; echo \$?"
+
+run_test "Weird ls" ";;;;ls;;;;;;;"
+# ================= RUN SCRIPT ===================
 
 run_script "script test 1" "script/script.sh"
 run_script "script test 2" "script/script1.sh"
 
-# 8=================D RUN UNIT 8=====================D
+# ================= RUN UNIT =====================
 
 if [ "$COVERAGE" = "yes" ]; then
   run_unit "unit: echo" "./test_echo"

@@ -59,7 +59,8 @@ static char *handle_dollar(char **buff, size_t *idx, size_t *capacity, char *wor
     }
     else // $VAR
     {
-
+        size_t start = *idx;
+        while(word[*idx] && )
     }
 
 }
@@ -90,7 +91,7 @@ char *expand_word(char *word)
     bool in_squote = false;
     bool in_dquote = false;
     
-    size_t capacity = strlen(word) + 16; // 16 magic value for safeness
+    size_t capacity = strlen(word);
     char *buff = malloc(capacity);
     size_t idx = 0;
 
