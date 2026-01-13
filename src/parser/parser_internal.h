@@ -20,11 +20,7 @@ void skip_semicolon_newline(parser_t *parser);
 ast_t *parse_simple_command(parser_t *parser);
 ast_t *parse_list(parser_t *parser);
 ast_t *parse_command(parser_t *parser);
-ast_t *parse_if(parser_t *parser);
-ast_t *parse_elif(parser_t *parser);
 
-ast_t *parse_condition(parser_t *parser);
-ast_t *parse_then(parser_t *parser);
-ast_t *parse_else(parser_t *parser);
+ast_t *parse_if(parser_t *parser);
 
 #endif /* ! PARSER_INTERNAL_H */
