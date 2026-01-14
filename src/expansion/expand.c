@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <err.h>
+#include <ctype.h>
+
 
 static void char_append(char **buff, size_t *idx, size_t *capacity, char c)
 {
@@ -43,7 +45,7 @@ static char *handle_dollar(char **buff, size_t *idx, size_t *capacity, char *wor
         *idx += 1;
         size_t start = *idx;
 
-        while(word[*idx] && word[*idx] != '}')
+        while(word[*idx] != NULL && word[*idx] != '}')
         {
             (*idx)++;
         }
@@ -60,10 +62,32 @@ static char *handle_dollar(char **buff, size_t *idx, size_t *capacity, char *wor
     else // $VAR
     {
         size_t start = *idx;
-        while(word[*idx] && )
+        while(word[*idx] != NULL && word[*idx] == '_' && isalnum(word[*idx]))
+        {
+            (*idx)++;
+        }
+        len_name = *idx - start;
+        var_name = strndup(word + start, len_name);
+    }
+
+
+    if(var_name != NULL)
+    {
+        char *value =; //GET VALUE
+        if(value != NULL)
+        {
+            append_str(buff,idx,capacity,value);
+        }
+        free(var_name);
+    }
+    else
+    {
+        append_char(buff,idx,capacity,'$');
     }
 
 }
+
+
 
 
 char **expand_argv(char **argv)

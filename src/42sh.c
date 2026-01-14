@@ -10,6 +10,7 @@
 #include "execution/execution.h"
 #include "io/io.h"
 #include "parser/parser.h"
+#include "utils/parser/pretty_printer.h"
 
 static void usage(FILE *out)
 {
@@ -64,12 +65,12 @@ int main(int argc, char **argv)
         pretty_print = 1;
     }
 
-    for(size_t i = 1; i < argc; ++i)
+    for(int i = 1; i < argc; ++i)
     {
         if(strcmp(argv[i], "--pretty-print") == 0)
         {
             pretty_print = 1;
-            for(size_t j = i; j < argc - 1; ++j)
+            for(int j = i; j < argc - 1; ++j)
             {
                 argv[j] = argv[j + 1];
             }
