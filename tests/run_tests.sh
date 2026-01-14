@@ -176,8 +176,11 @@ run_test "False Exit code" "false; echo \$?"
 # run_test "Weird ls" ";;;;ls;;;;;;;"
 # ================= RUN SCRIPT ===================
 
-run_script "script test 1" "script/script.sh"
-run_script "script test 2" "script/script1.sh"
+run_script "script test basic if" "script/script_basic_if.sh"
+run_script "script test multiple if" "script/script_mul_if.sh"
+
+run_script "script test error nl_semi_nl" "script/script_nl_semi_nl.sh"
+run_script "script test fill_nl" "script/script_fill_nl.sh"
 
 # ================= RUN UNIT =====================
 
