@@ -189,7 +189,8 @@ if [ "$COVERAGE" = "yes" ]; then
   run_unit "unit: echo" "./test_builtins"
   run_unit "unit: io" "./test_io"
   run_unit "unit: lexer" "./test_lexer"
-  
+  run_unit "unit: parser" "./test_parser"
+  run_unit "unit: execution" "./test_execution"
 fi
 
 pct=0
