@@ -10,6 +10,7 @@ static void pp_cmd(const ast_t *ast, FILE *out);
 static void pp_pipeline(const ast_t *ast, FILE *out);
 static void pp_negation(const ast_t *ast, FILE *out);
 static void pp_if(const ast_t *ast, FILE *out);
+static void pp_and_or(const ast_t *ast, FILE *out);
 
 static void pp_ignore_quotes(const char *str, FILE *out)
 {
@@ -113,6 +114,22 @@ static void pp_if(const ast_t *ast, FILE *out)
     fputs("; fi", out);
 }
 
+static void pp_and_or(const ast_t *ast, FILE *out)
+{
+    fputs("and_or { ", out);
+    pp_node(ast->data.ast_and_or.left, out);
+    if (ast->data.ast_and_or.operator == AND_OP)
+    {
+        fprintf(out, " && ");
+    }
+    else
+    {
+        fprintf(out, " || ");
+    }
+    pp_node(ast->data.ast_and_or.right, out);
+    fputs(" }", out);
+}
+
 static void pp_node(const ast_t *ast, FILE *out)
 {
     if (!ast)
@@ -137,6 +154,9 @@ static void pp_node(const ast_t *ast, FILE *out)
         break;
     case AST_IF:
         pp_if(ast, out);
+        break;
+    case AST_AND_OR:
+        pp_and_or(ast, out);
         break;
     default:
         fputs("/* Unknown AST node */", out);

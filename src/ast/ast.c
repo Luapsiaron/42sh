@@ -85,6 +85,21 @@ ast_t *ast_negation_init(ast_t *child)
     return new;
 }
 
+ast_t *ast_and_or_init(and_or_op_t operator, ast_t *left, ast_t *right)
+{
+    ast_t *new = ast_init(AST_AND_OR);
+    if (!new)
+    {
+        return NULL;
+    }
+
+    new->data.ast_and_or.operator = operator;
+    new->data.ast_and_or.left = left;
+    new->data.ast_and_or.right = right;
+
+    return new;
+}
+
 void free_argv(char **argv)
 {
     if (!argv)
@@ -128,6 +143,10 @@ void ast_free(ast_t *node)
         break;
     case AST_NEGATION:
         ast_free(node->data.ast_negation.child);
+        break;
+    case AST_AND_OR:
+        ast_free(node->data.ast_and_or.left);
+        ast_free(node->data.ast_and_or.right);
         break;
     default:
         break;
@@ -191,6 +210,11 @@ void ast_printer(const ast_t *node, int depth)
     case AST_NEGATION:
         printf("NEGATION:\n");
         ast_printer(node->data.ast_negation.child, depth + 1);
+        break;
+    case AST_AND_OR:
+        printf("AND_OR: %s\n", node->data.ast_and_or.operator == AND_OP ? "AND" : "OR");
+        ast_printer(node->data.ast_and_or.left, depth + 1);
+        ast_printer(node->data.ast_and_or.right, depth + 1);
         break;
 
     default:

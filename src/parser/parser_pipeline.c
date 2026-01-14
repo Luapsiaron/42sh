@@ -1,6 +1,6 @@
 #include "parser_internal.h"
 
-ast_t *parser_pipeline(parser_t *p)
+ast_t *parse_pipeline(parser_t *p)
 {
     int neg = 0;
     if(peek(p) == TOKEN_NEGATION)

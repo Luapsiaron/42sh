@@ -18,12 +18,14 @@ int remove_separator(parser_t *p);
 void skip_newlines(parser_t *p);
 void skip_semicolon_newline(parser_t *p);
 
-ast_t *parse_simple_command(parser_t *parser);
-ast_t *parse_list(parser_t *parser);
-ast_t *parse_command(parser_t *parser);
+ast_t *parse_simple_command(parser_t *p);
+ast_t *parse_list(parser_t *p);
+ast_t *parse_command(parser_t *p);
 
-ast_t *parse_if(parser_t *parser);
+ast_t *parse_if(parser_t *p);
 
-ast_t *parser_pipeline(parser_t *parser);
+ast_t *parse_pipeline(parser_t *p);
+
+ast_t *parse_and_or(parser_t *p);
 
 #endif /* ! PARSER_INTERNAL_H */

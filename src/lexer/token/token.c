@@ -96,6 +96,12 @@ const char *token_type_name(token_type_t t)
         return "PIPE";
     case TOKEN_REDIRECT:
         return "REDIRECT";
+    case TOKEN_NEGATION:
+        return "NEGATION";
+    case TOKEN_AND_IF:
+        return "AND_IF";
+    case TOKEN_OR_IF:
+        return "OR_IF";
     case TOKEN_EOF:
         return "EOF";
     default:

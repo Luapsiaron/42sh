@@ -73,11 +73,6 @@ token_t *lexer_next(lexer_t *lx)
         lexer_next_char(lx);
         return token_new(TOKEN_NEWLINE, NULL);
     }
-    if (lx->current == '|')
-    {
-        lexer_next_char(lx);
-        return token_new(TOKEN_PIPE, NULL);
-    }
     if (lx->current == '>')
     {
         lexer_next_char(lx);
@@ -91,6 +86,25 @@ token_t *lexer_next(lexer_t *lx)
     {
         lexer_next_char(lx);
         return token_new(TOKEN_NEGATION, NULL);
+    }
+    if( lx->current == '&')
+    {
+        lexer_next_char(lx);
+        if (lx->current == '&')
+        {
+            lexer_next_char(lx);
+            return token_new(TOKEN_AND_IF, NULL);
+        }
+    }
+    if (lx->current == '|')
+    {
+        lexer_next_char(lx);
+        if (lx->current == '|')
+        {
+            lexer_next_char(lx);
+            return token_new(TOKEN_OR_IF, NULL);
+        }
+        return token_new(TOKEN_PIPE, NULL);
     }
     if (lx->current == EOF)
     {

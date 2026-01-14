@@ -21,6 +21,9 @@ typedef enum token_type
     TOKEN_REDIRECT, // > or >>
 
     TOKEN_NEGATION, // !
+
+    TOKEN_AND_IF, // &&
+    TOKEN_OR_IF,  // ||
     
     // End of input
     TOKEN_EOF

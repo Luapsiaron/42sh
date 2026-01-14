@@ -28,6 +28,12 @@ typedef enum ast_type
     AST_NEGATION
 } ast_type_t;
 
+typedef enum and_or_op
+{
+    AND_OP, // &&
+    OR_OP // ||
+} and_or_op_t;
+
 struct ast_if
 {
     struct ast *condition; // the condition
@@ -65,6 +71,13 @@ struct ast_negation
     struct ast *child;
 };
 
+struct ast_and_or
+{
+    and_or_op_t operator;
+    struct ast *left;
+    struct ast *right;
+};
+
 union ast_union
 {
     struct ast_cmd ast_cmd;
@@ -73,6 +86,7 @@ union ast_union
     struct ast_pipeline ast_pipeline;
     struct ast_redir ast_redir;
     struct ast_negation ast_negation;
+    struct ast_and_or ast_and_or;
 };
 
 typedef struct ast
@@ -86,6 +100,7 @@ ast_t *ast_cmd_init(char **argv);
 ast_t *ast_list_init(ast_t *next, ast_t *child);
 ast_t *ast_pipeline_init(ast_t *right, ast_t *left);
 ast_t *ast_negation_init(ast_t *child);
+ast_t *ast_and_or_init(and_or_op_t operator, ast_t *left, ast_t *right);
 
 void free_argv(char **argv);
 void ast_free(ast_t *node);
