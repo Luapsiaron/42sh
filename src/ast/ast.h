@@ -25,6 +25,8 @@ typedef enum ast_type
     AST_SIMPLE_CMD,
     AST_ELEMENT,
     AST_IF,
+    AST_WHILE,
+    AST_FOR,
     AST_NEGATION
 } ast_type_t;
 
@@ -78,6 +80,19 @@ struct ast_and_or
     struct ast *right;
 };
 
+struct ast_while
+{
+    struct ast *condition;
+    struct ast *body;
+};
+
+struct ast_for
+{
+    struct ast *first_arg;
+    struct ast *second_arg;
+    struct ast *body;
+};
+
 union ast_union
 {
     struct ast_cmd ast_cmd;
@@ -87,6 +102,8 @@ union ast_union
     struct ast_redir ast_redir;
     struct ast_negation ast_negation;
     struct ast_and_or ast_and_or;
+    struct ast_while ast_while;
+    struct ast_for ast_for;
 };
 
 typedef struct ast
@@ -100,7 +117,9 @@ ast_t *ast_cmd_init(char **argv);
 ast_t *ast_list_init(ast_t *next, ast_t *child);
 ast_t *ast_pipeline_init(ast_t *right, ast_t *left);
 ast_t *ast_negation_init(ast_t *child);
-ast_t *ast_and_or_init(and_or_op_t operator, ast_t *left, ast_t *right);
+ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right);
+ast_t *ast_while_init(ast_t *condition, ast_t *body);
+ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body);
 
 void free_argv(char **argv);
 void ast_free(ast_t *node);

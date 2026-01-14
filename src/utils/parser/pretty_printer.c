@@ -3,7 +3,6 @@
 #include <ctype.h>
 #include <string.h>
 
-
 static void pp_node(const ast_t *ast, FILE *out);
 static void pp_list(const ast_t *ast, FILE *out);
 static void pp_cmd(const ast_t *ast, FILE *out);
@@ -39,7 +38,7 @@ static void pp_list(const ast_t *ast, FILE *out)
     while (cur)
     {
         pp_node(cur->data.ast_list.child, out);
-        if(cur->data.ast_list.next)
+        if (cur->data.ast_list.next)
         {
             fprintf(out, "; ");
         }
@@ -84,7 +83,7 @@ static void pp_if(const ast_t *ast, FILE *out)
     pp_braces(if_node->then_body, out);
     if (if_node->else_body)
     {
-        if(if_node->else_body->type == AST_IF)
+        if (if_node->else_body->type == AST_IF)
         {
             fputs("; elif ", out);
             const struct ast_if *elif = &if_node->else_body->data.ast_if;
@@ -92,9 +91,9 @@ static void pp_if(const ast_t *ast, FILE *out)
             fputs("; then ", out);
             pp_braces(elif->then_body, out);
 
-            if(elif->else_body)
+            if (elif->else_body)
             {
-                if(elif->else_body->type == AST_IF)
+                if (elif->else_body->type == AST_IF)
                 {
                     fputs("; ", out);
                     pp_node(elif->else_body, out);
@@ -103,7 +102,6 @@ static void pp_if(const ast_t *ast, FILE *out)
                 fputs("; else ", out);
                 pp_braces(elif->else_body, out);
             }
-
         }
         else
         {
@@ -118,7 +116,7 @@ static void pp_and_or(const ast_t *ast, FILE *out)
 {
     fputs("and_or { ", out);
     pp_node(ast->data.ast_and_or.left, out);
-    if (ast->data.ast_and_or.operator == AND_OP)
+    if (ast->data.ast_and_or.operator== AND_OP)
     {
         fprintf(out, " && ");
     }

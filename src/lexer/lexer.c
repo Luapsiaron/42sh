@@ -87,7 +87,7 @@ token_t *lexer_next(lexer_t *lx)
         lexer_next_char(lx);
         return token_new(TOKEN_NEGATION, NULL);
     }
-    if( lx->current == '&')
+    if (lx->current == '&')
     {
         lexer_next_char(lx);
         if (lx->current == '&')

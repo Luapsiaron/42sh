@@ -60,17 +60,17 @@ int main(int argc, char **argv)
     char *command = NULL;
     int pretty_print = 0;
 
-    if(getenv("PRETTY_PRINT") != NULL)
+    if (getenv("PRETTY_PRINT") != NULL)
     {
         pretty_print = 1;
     }
 
-    for(int i = 1; i < argc; ++i)
+    for (int i = 1; i < argc; ++i)
     {
-        if(strcmp(argv[i], "--pretty-print") == 0)
+        if (strcmp(argv[i], "--pretty-print") == 0)
         {
             pretty_print = 1;
-            for(int j = i; j < argc - 1; ++j)
+            for (int j = i; j < argc - 1; ++j)
             {
                 argv[j] = argv[j + 1];
             }

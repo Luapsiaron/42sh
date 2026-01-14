@@ -42,13 +42,13 @@ void skip_newlines(parser_t *p)
 
 int remove_separator(parser_t *p)
 {
-    if(peek(p) == TOKEN_SEMICOLON)
+    if (peek(p) == TOKEN_SEMICOLON)
     {
         pop(p);
         skip_newlines(p);
         return 1;
     }
-    if(peek(p) == TOKEN_NEWLINE)
+    if (peek(p) == TOKEN_NEWLINE)
     {
         skip_newlines(p);
         return 1;

@@ -23,7 +23,7 @@ ast_t *parse_simple_command(parser_t *p)
     // echo if then fi else elif
     while (peek(p) == TOKEN_WORD)
     {
-        if(i+1 >= capacity)
+        if (i + 1 >= capacity)
         {
             capacity *= 2;
             char **new_argv = realloc(argv, capacity * sizeof(char *));
@@ -32,7 +32,7 @@ ast_t *parse_simple_command(parser_t *p)
                 free_argv(argv);
                 return NULL;
             }
-            for(size_t j = i; j < capacity; j++)
+            for (size_t j = i; j < capacity; j++)
             {
                 new_argv[j] = NULL;
             }
@@ -48,9 +48,10 @@ ast_t *parse_simple_command(parser_t *p)
         i++;
         pop(p);
 
-        if(i >= 15)
+        if (i >= 15)
         {
-            char **new_argv = realloc(argv, (sizeof(argv) * 2) * sizeof(char *));
+            char **new_argv =
+                realloc(argv, (sizeof(argv) * 2) * sizeof(char *));
             if (!new_argv)
             {
                 free_argv(argv);

@@ -1,181 +1,154 @@
 #include "expand.h"
 
+#include <ctype.h>
+#include <err.h>
+#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdbool.h>
-#include <err.h>
-#include <ctype.h>
-
-
 
 static void char_append(char **buff, size_t *idx, size_t *capacity, char c)
 {
-    if(*idx+1 < *capacity)
+    if (*idx + 1 < *capacity)
     {
         (*buff)[*idx] = c;
         (*idx)++;
     }
     else
     {
-        *capacity *=2;
+        *capacity *= 2;
         *buff = realloc(*buff, *capacity);
     }
 }
 
 static void str_append(char **buff, size_t *idx, size_t *capacity, char *str)
 {
-    if(!str)
+    if (!str)
         return;
-    for(size_t i =0; str[i] != NULL ; i++)
+    for (size_t i = 0; str[i] != NULL; i++)
     {
         char_append(buff, idx, capacity, str[i]);
     }
-
 }
 
-static void handle_specials(char **buff, size_t *idx, size_t *capactiy, char *var_name)
+static void handle_specials(char **buff, size_t *idx, size_t *capactiy,
+                            char *var_name)
 {
-    if(strcmp(var_name, '?')) // EXIT CODE
-    {
-
-    }
-    if(strcmp(var_name, '$')) // PID
-    {
-
-    }
-    if(strcmp(var_name, 'RANDOM')) // RANDOM VALUE
-    {
-
-    }
-    if(strcmp(var_name, '*')) //
-    {
-
-    }
-    if(strcmp(var_name, '@')) //
-    {
-
-    }
-    if(strcmp(var_name, '#')) //ARG NUMBER
-    {
-
-    }
-    if(strcmp(var_name, "UID"))
-    {
-
-    }
-    if(strcmp(var_name, "IFS"))
-    {
-
-    }
-    if(strcmp(var_name, "PWD"))
-    {
-
-    }
-    if(strcmp(var_name, "OLDPWD"))
-    {
-        
-    }
+    if (strcmp(var_name, '?')) // EXIT CODE
+    {}
+    if (strcmp(var_name, '$')) // PID
+    {}
+    if (strcmp(var_name, 'RANDOM')) // RANDOM VALUE
+    {}
+    if (strcmp(var_name, '*')) //
+    {}
+    if (strcmp(var_name, '@')) //
+    {}
+    if (strcmp(var_name, '#')) // ARG NUMBER
+    {}
+    if (strcmp(var_name, "UID"))
+    {}
+    if (strcmp(var_name, "IFS"))
+    {}
+    if (strcmp(var_name, "PWD"))
+    {}
+    if (strcmp(var_name, "OLDPWD"))
+    {}
     return 1;
 }
 
-static char *handle_dollar(char **buff, size_t *idx, size_t *capacity, char *word)
+static char *handle_dollar(char **buff, size_t *idx, size_t *capacity,
+                           char *word)
 {
-    (*idx) +=1;
+    (*idx) += 1;
 
     size_t len_name = 0;
     char *var_name = NULL;
 
-    if(buff[*idx] == '{') // ${VAR}
+    if (buff[*idx] == '{') // ${VAR}
     {
         *idx += 1;
         size_t start = *idx;
 
-        while(word[*idx] != NULL && word[*idx] != '}')
+        while (word[*idx] != NULL && word[*idx] != '}')
         {
             (*idx)++;
         }
-        if(word[*idx] == '}')
+        if (word[*idx] == '}')
         {
             len_name = *idx - start;
             var_name = strndup(word + start, len_name); // STRNDUP a implem
         }
         else
         {
-            errx(2,"42sh: can't expand value");
+            errx(2, "42sh: can't expand value");
         }
     }
     else // $VAR
     {
         size_t start = *idx;
-        while(word[*idx] != NULL && word[*idx] == '_' && isalnum(word[*idx]))
+        while (word[*idx] != NULL && word[*idx] == '_' && isalnum(word[*idx]))
         {
             (*idx)++;
         }
         len_name = *idx - start;
         var_name = strndup(word + start, len_name);
-        
-        if(word[*idx] == '?')
+
+        if (word[*idx] == '?')
         {
-            handle_specials(char **buff, size_t *idx, char* var_name);
+            handle_specials(char **buff, size_t *idx, char *var_name);
         }
     }
 
-
-    if(var_name != NULL)
+    if (var_name != NULL)
     {
-        char *value =; //GET VALUE
-        if(value != NULL)
+        char *value = ; // GET VALUE
+        if (value != NULL)
         {
-            append_str(buff,idx,capacity,value);
+            append_str(buff, idx, capacity, value);
         }
         free(var_name);
     }
     else
     {
-        append_char(buff,idx,capacity,'$');
+        append_char(buff, idx, capacity, '$');
     }
-
 }
-
-
-
 
 char **expand_argv(char **argv)
 {
     char **res = NULL;
     size_t count = 0;
-    for(size_t i=0; argv[i]!= NULL;  i++)
+    for (size_t i = 0; argv[i] != NULL; i++)
     {
         char *word = argv[i];
         char *expanded = expand_word(word);
 
         count++;
         res = realloc(res, sizeof(char *) * (count + 1));
-        res[count -1 ] = expanded;
+        res[count - 1] = expanded;
         res[count] = '\0';
-    }   
-    
+    }
+
     return res;
 }
 
 char *expand_word(char *word)
 {
     size_t word_len = strlen(word);
-    
+
     bool in_squote = false;
     bool in_dquote = false;
-    
+
     size_t capacity = strlen(word);
     char *buff = malloc(capacity);
     size_t idx = 0;
 
-
-    for(size_t i = 0; word[i] != NULL; i++)
+    for (size_t i = 0; word[i] != NULL; i++)
     {
         char c = word[i];
-        if(in_squote)
+        if (in_squote)
         {
-            if(c == '\'')
+            if (c == '\'')
             {
                 in_squote = false;
             }
@@ -183,11 +156,10 @@ char *expand_word(char *word)
             {
                 buff[idx + 1] = c;
             }
-
         }
-        else if(in_dquote)
+        else if (in_dquote)
         {
-            if(c =='"')
+            if (c == '"')
             {
                 in_dquote = false;
             }
@@ -196,9 +168,7 @@ char *expand_word(char *word)
                 handle_dollar(&buff, &idx, &capacity, word);
             }
             else if (c == '\\')
-            {
-                
-            }
+            {}
             else
             {
                 buff = realloc(buff, strlen(buff) + 1);
@@ -207,21 +177,21 @@ char *expand_word(char *word)
         }
         else
         {
-            if(c == '\'')
+            if (c == '\'')
             {
                 in_squote = true;
             }
-            else if(c = '"')
+            else if (c = '"')
             {
                 in_dquote = true;
             }
-            else if(c == '$')
+            else if (c == '$')
             {
                 handle_dollar(&buff, &idx, &capacity, word);
             }
             else if (c == '\\')
             {
-                if(word[i+1] != NULL)
+                if (word[i + 1] != NULL)
                 {
                     buff[idx++] = word[i + 1];
                     i++;
@@ -232,8 +202,6 @@ char *expand_word(char *word)
                 append_char(&buff, &idx, &capacity, c);
             }
         }
-
-
     }
     append_char(&buff, &idx, &capacity, '\0');
     return buff;

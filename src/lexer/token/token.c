@@ -69,6 +69,31 @@ int token_is_reserved_word(const char *s, token_type_t *out)
         *out = TOKEN_FI;
         return 1;
     }
+    if (!strcmp(s, "for"))
+    {
+        *out = TOKEN_FOR;
+        return 1;
+    }
+    if (!strcmp(s, "while"))
+    {
+        *out = TOKEN_WHILE;
+        return 1;
+    }
+    if (!strcmp(s, "in"))
+    {
+        *out = TOKEN_IN;
+        return 1;
+    }
+    if (!strcmp(s, "do"))
+    {
+        *out = TOKEN_DO;
+        return 1;
+    }
+    if (!strcmp(s, "done"))
+    {
+        *out = TOKEN_DONE;
+        return 1;
+    }
     return 0;
 }
 
@@ -102,6 +127,16 @@ const char *token_type_name(token_type_t t)
         return "AND_IF";
     case TOKEN_OR_IF:
         return "OR_IF";
+    case TOKEN_WHILE:
+        return "WHILE";
+    case TOKEN_FOR:
+        return "FOR";
+    case TOKEN_IN:
+        return "IN";
+    case TOKEN_DO:
+        return "DO";
+    case TOKEN_DONE:
+        return "DONE";
     case TOKEN_EOF:
         return "EOF";
     default:

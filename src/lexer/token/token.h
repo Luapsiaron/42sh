@@ -10,6 +10,13 @@ typedef enum token_type
     TOKEN_ELIF,
     TOKEN_FI,
 
+    // Loop
+    TOKEN_FOR,
+    TOKEN_WHILE,
+    TOKEN_IN,
+    TOKEN_DO,
+    TOKEN_DONE,
+
     // Separators
     TOKEN_SEMICOLON,
     TOKEN_NEWLINE,
@@ -23,8 +30,8 @@ typedef enum token_type
     TOKEN_NEGATION, // !
 
     TOKEN_AND_IF, // &&
-    TOKEN_OR_IF,  // ||
-    
+    TOKEN_OR_IF, // ||
+
     // End of input
     TOKEN_EOF
 } token_type_t;

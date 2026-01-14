@@ -182,6 +182,9 @@ run_script "script test multiple if" "script/script_mul_if.sh"
 run_script "script test error nl_semi_nl" "script/script_nl_semi_nl.sh"
 run_script "script test fill_nl" "script/script_fill_nl.sh"
 
+run_script "script test while" "script/script_while.sh"
+run_script "script test for 2 forms" "script/script_2_for.sh"
+
 # ================= RUN UNIT =====================
 
 if [ "$COVERAGE" = "yes" ]; then

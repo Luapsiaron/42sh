@@ -3,7 +3,7 @@
 ast_t *parse_pipeline(parser_t *p)
 {
     int neg = 0;
-    if(peek(p) == TOKEN_NEGATION)
+    if (peek(p) == TOKEN_NEGATION)
     {
         pop(p);
         skip_newlines(p);
@@ -16,7 +16,7 @@ ast_t *parse_pipeline(parser_t *p)
         return NULL;
     }
 
-    while(peek(p) == TOKEN_PIPE)
+    while (peek(p) == TOKEN_PIPE)
     {
         pop(p);
         skip_newlines(p);
@@ -38,7 +38,7 @@ ast_t *parse_pipeline(parser_t *p)
 
         left = pipeline;
 
-        if(neg)
+        if (neg)
         {
             ast_t *negation = ast_negation_init(left);
             if (!negation)

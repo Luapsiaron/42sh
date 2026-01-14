@@ -16,6 +16,35 @@ static ast_t *ast_init(ast_type_t type)
     return new;
 }
 
+ast_t *ast_while_init(ast_t *condition, ast_t *body)
+{
+    ast_t *new = ast_init(AST_WHILE);
+    if (!new)
+    {
+        return NULL;
+    }
+
+    new->data.ast_while.condition = condition;
+    new->data.ast_while.body = body;
+
+    return new;
+}
+
+ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body)
+{
+    ast_t *new = ast_init(AST_FOR);
+    if (!new)
+    {
+        return NULL;
+    }
+
+    new->data.ast_for.first_arg = first_arg;
+    new->data.ast_for.second_arg = second_arg;
+    new->data.ast_for.body = body;
+
+    return new;
+}
+
 ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body)
 {
     ast_t *new = ast_init(AST_IF);
@@ -85,7 +114,7 @@ ast_t *ast_negation_init(ast_t *child)
     return new;
 }
 
-ast_t *ast_and_or_init(and_or_op_t operator, ast_t *left, ast_t *right)
+ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right)
 {
     ast_t *new = ast_init(AST_AND_OR);
     if (!new)
@@ -93,7 +122,7 @@ ast_t *ast_and_or_init(and_or_op_t operator, ast_t *left, ast_t *right)
         return NULL;
     }
 
-    new->data.ast_and_or.operator = operator;
+    new->data.ast_and_or.operator= operator;
     new->data.ast_and_or.left = left;
     new->data.ast_and_or.right = right;
 
@@ -147,6 +176,15 @@ void ast_free(ast_t *node)
     case AST_AND_OR:
         ast_free(node->data.ast_and_or.left);
         ast_free(node->data.ast_and_or.right);
+        break;
+    case AST_WHILE:
+        ast_free(node->data.ast_while.condition);
+        ast_free(node->data.ast_while.body);
+        break;
+    case AST_FOR:
+        ast_free(node->data.ast_for.first_arg);
+        ast_free(node->data.ast_for.second_arg);
+        ast_free(node->data.ast_for.body);
         break;
     default:
         break;
@@ -212,11 +250,22 @@ void ast_printer(const ast_t *node, int depth)
         ast_printer(node->data.ast_negation.child, depth + 1);
         break;
     case AST_AND_OR:
-        printf("AND_OR: %s\n", node->data.ast_and_or.operator == AND_OP ? "AND" : "OR");
+        printf("AND_OR: %s\n",
+               node->data.ast_and_or.operator== AND_OP ? "AND" : "OR");
         ast_printer(node->data.ast_and_or.left, depth + 1);
         ast_printer(node->data.ast_and_or.right, depth + 1);
         break;
-
+    case AST_WHILE:
+        printf("WHILE:\n");
+        ast_printer(node->data.ast_while.condition, depth + 1);
+        ast_printer(node->data.ast_while.body, depth + 1);
+        break;
+    case AST_FOR:
+        printf("FOR:\n");
+        ast_printer(node->data.ast_for.first_arg, depth + 1);
+        ast_printer(node->data.ast_for.second_arg, depth + 1);
+        ast_printer(node->data.ast_for.body, depth + 1);
+        break;
     default:
         printf("Unknown AST node type\n");
         break;

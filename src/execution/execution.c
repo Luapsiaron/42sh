@@ -20,9 +20,8 @@
 
 static bool is_builtin(char *str)
 {
-    return (strcmp(str, "echo") == 0 ||
-            strcmp(str, "true") == 0 ||
-            strcmp(str, "false") == 0);
+    return (strcmp(str, "echo") == 0 || strcmp(str, "true") == 0
+            || strcmp(str, "false") == 0);
 }
 
 static int exec_builtin(char **argv)

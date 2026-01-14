@@ -13,11 +13,11 @@ ast_t *parse_and_or(parser_t *p)
         and_or_op_t operator;
         if (peek(p) == TOKEN_AND_IF)
         {
-            operator = AND_OP;
+            operator= AND_OP;
         }
         else
         {
-            operator = OR_OP;
+            operator= OR_OP;
         }
         pop(p);
         skip_newlines(p);
