@@ -7,6 +7,7 @@
 #include <ctype.h>
 
 
+
 static void char_append(char **buff, size_t *idx, size_t *capacity, char c)
 {
     if(*idx+1 < *capacity)
@@ -32,6 +33,50 @@ static void str_append(char **buff, size_t *idx, size_t *capacity, char *str)
 
 }
 
+static void handle_specials(char **buff, size_t *idx, size_t *capactiy, char *var_name)
+{
+    if(strcmp(var_name, '?')) // EXIT CODE
+    {
+
+    }
+    if(strcmp(var_name, '$')) // PID
+    {
+
+    }
+    if(strcmp(var_name, 'RANDOM')) // RANDOM VALUE
+    {
+
+    }
+    if(strcmp(var_name, '*')) //
+    {
+
+    }
+    if(strcmp(var_name, '@')) //
+    {
+
+    }
+    if(strcmp(var_name, '#')) //ARG NUMBER
+    {
+
+    }
+    if(strcmp(var_name, "UID"))
+    {
+
+    }
+    if(strcmp(var_name, "IFS"))
+    {
+
+    }
+    if(strcmp(var_name, "PWD"))
+    {
+
+    }
+    if(strcmp(var_name, "OLDPWD"))
+    {
+        
+    }
+    return 1;
+}
 
 static char *handle_dollar(char **buff, size_t *idx, size_t *capacity, char *word)
 {
@@ -68,6 +113,11 @@ static char *handle_dollar(char **buff, size_t *idx, size_t *capacity, char *wor
         }
         len_name = *idx - start;
         var_name = strndup(word + start, len_name);
+        
+        if(word[*idx] == '?')
+        {
+            handle_specials(char **buff, size_t *idx, char* var_name);
+        }
     }
 
 
