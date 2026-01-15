@@ -188,6 +188,12 @@ run_test "Output redir append" "echo Line1 > /tmp/test_output_redir_append.txt; 
 run_test "Input redir" "echo Line1 > /tmp/test_input_redir.txt; echo Line2 >> /tmp/test_input_redir.txt; cat < /tmp/test_input_redir.txt"
 run_test "Input redir with pipe" "echo Line1 > /tmp/test_input_redir_pipe.txt; echo Line2 >> /tmp/test_input_redir_pipe.txt; cat < /tmp/test_input_redir_pipe.txt | grep Line2"
 
+# Negation
+run_test "Negation of true" " ! true;"
+run_test "Negation of false" " ! false;"
+run_test "Negation with if" " if ! false; then echo yes; else echo no; fi"
+run_test "Double negation" " ! ! false;"
+
 # ================= RUN SCRIPT ===================
 
 run_script "script test basic if" "script/script_basic_if.sh"

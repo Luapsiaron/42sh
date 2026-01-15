@@ -75,7 +75,14 @@ int exec_ast(ast_t *ast)
     case AST_FOR:
         // TODO
     case AST_NEGATION:
-        // TODO
+    {
+        int st = exec_ast(ast->data.ast_negation.child);
+        if (st == 0)
+            return 1;
+        else if (st == 1)
+            return 0;
+        return st;
+    }
     default:
         fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
         return 2;
