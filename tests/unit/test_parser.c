@@ -1,10 +1,9 @@
 #define _POSIX_C_SOURCE 200809L
 #include <criterion/criterion.h>
-
 #include <string.h>
 
-#include "../../src/parser/parser.h"
 #include "../../src/ast/ast.h"
+#include "../../src/parser/parser.h"
 
 static FILE *fmem_from_str(const char *s)
 {
@@ -40,9 +39,9 @@ Test(parser, command_list_two_cmds)
     cr_assert_not_null(ast->data.ast_list.next);
     cr_assert_eq(ast->data.ast_list.next->type, AST_LIST);
     cr_assert_eq(ast->data.ast_list.next->data.ast_list.child->type, AST_CMD);
-    cr_assert_str_eq(ast->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv[0], "false");
+    cr_assert_str_eq(
+        ast->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv[0],
+        "false");
 
     ast_free(ast);
 }
-
-

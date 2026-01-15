@@ -1,6 +1,5 @@
 #define _POSIX_C_SOURCE 200809L
 #include <criterion/criterion.h>
-
 #include <string.h>
 
 #include "../../src/lexer/lexer.h"
@@ -31,16 +30,36 @@ Test(lexer, reserved_words_and_separators)
 
     token_t *t = NULL;
 
-    t = lexer_next(&lx); assert_tok(t, TOKEN_IF, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_WORD, "true"); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_SEMICOLON, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_THEN, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_NEWLINE, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_WORD, "false"); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_NEWLINE, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_FI, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_NEWLINE, NULL); token_free(t);
-    t = lexer_next(&lx); assert_tok(t, TOKEN_EOF, NULL); token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_IF, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_WORD, "true");
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_SEMICOLON, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_THEN, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_NEWLINE, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_WORD, "false");
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_NEWLINE, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_FI, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_NEWLINE, NULL);
+    token_free(t);
+    t = lexer_next(&lx);
+    assert_tok(t, TOKEN_EOF, NULL);
+    token_free(t);
 
     fclose(f);
 }

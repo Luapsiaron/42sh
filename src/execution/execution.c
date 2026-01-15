@@ -13,6 +13,7 @@
 
 #include "../ast/ast.h"
 #include "../builtins/echo.h"
+#include "redir_pipe.h"
 
 // command not found = 127
 // command not executable = 126
@@ -41,7 +42,7 @@ static int exec_builtin(char **argv)
     return 127;
 }
 
-static int wait_status(pid_t pid)
+int wait_status(pid_t pid)
 {
     int st = 0;
     if (waitpid(pid, &st, 0) < 0)
@@ -64,7 +65,17 @@ int exec_ast(ast_t *ast)
     case AST_IF:
         return exec_if(ast);
     case AST_CMD:
-        return exec_cmd(ast->data.ast_cmd.argv);
+        return exec_cmd_node(ast);
+    case AST_PIPELINE:
+        return exec_pipeline(ast);
+    case AST_AND_OR:
+        // TODO
+    case AST_WHILE:
+        // TODO
+    case AST_FOR:
+        // TODO
+    case AST_NEGATION:
+        // TODO
     default:
         fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
         return 2;
@@ -122,4 +133,66 @@ int exec_cmd(char **argv)
         _exit(126);
     }
     return wait_status(pid);
+}
+
+int exec_cmd_node(ast_t *cmd)
+/*
+    If builtin: apply redirs in parent, run builtin, restore
+    If external: fork, apply redirs in child, exec, wait
+*/
+{
+    char **argv = cmd->data.ast_cmd.argv;
+    if (!argv || !argv[0])
+        return 0;
+
+    if (is_builtin(argv[0]))
+    {
+        struct saved_fd *saved = NULL;
+        if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
+        {
+            restore_fds(saved);
+            return 1;
+        }
+        int st = exec_builtin(argv);
+        fflush(stdout); // subject reminder for builtins
+        restore_fds(saved);
+        return st;
+    }
+
+    pid_t pid = fork();
+    if (pid < 0)
+        return 1;
+
+    if (pid == 0)
+    {
+        // child: apply redirs, no need to restore
+        struct saved_fd *saved = NULL;
+        if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
+            _exit(1);
+
+        execvp(argv[0], argv);
+        _exit(errno == ENOENT ? 127 : 126);
+    }
+    return wait_status(pid);
+}
+
+int child_exec_command(ast_t *node)
+{
+    if (!node)
+        return 0;
+    if (node->type == AST_CMD)
+    {
+        char **argv = node->data.ast_cmd.argv;
+        if (!argv || !argv[0])
+            return 0;
+        if (is_builtin(argv[0]))
+            return exec_builtin(argv);
+        execvp(argv[0], argv);
+        // execvp failed:
+        int err = errno;
+        if (err == ENOENT)
+            _exit(127);
+        _exit(126);
+    }
+    return exec_ast(node);
 }

@@ -54,10 +54,10 @@ struct ast_pipeline
 
 typedef enum redir_type
 {
-    REDIR_OUT,     // >
+    REDIR_OUT, // >
     REDIR_APPEND, // >>
     REDIR_CLOBBER, // >|
-    REDIR_IN,      // <
+    REDIR_IN, // <
 } redir_type_t;
 
 typedef struct ast_redir
@@ -68,11 +68,11 @@ typedef struct ast_redir
     struct ast *next;
 } ast_redir_t;
 
-struct ast_cmd 
+struct ast_cmd
 {
     char **argv; // list of args
     struct ast *redirs;
-}; 
+};
 
 struct ast_negation
 {
@@ -133,7 +133,8 @@ ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right);
 ast_t *ast_while_init(ast_t *condition, ast_t *body);
 ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body);
 
-ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word, ast_t *next);
+ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
+                      ast_t *next);
 int ast_redir_append(ast_t *cmd, ast_t *redir);
 
 void free_argv(char **argv);

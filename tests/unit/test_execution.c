@@ -1,10 +1,9 @@
 #include <criterion/criterion.h>
 #include <criterion/redirect.h>
-
 #include <string.h>
 
-#include "../../src/execution/execution.h"
 #include "../../src/ast/ast.h"
+#include "../../src/execution/execution.h"
 #include "../../src/utils/str/str.h"
 
 static void redirect_all_stdout(void)

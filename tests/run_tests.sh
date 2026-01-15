@@ -130,39 +130,35 @@ run_unit()
 
 # ================= RUN STRING ===================
 
+# Simple commands
 run_test "LS" "ls"
 run_test "Tree -a" "tree -a"
-
 run_test "cat Makefile.am" "cat Makefile.am"
-
-
 run_test "Cd .. test" "cd .."
 
+# Builtins
 run_test "true test" "true"
 run_test "false test" "false"
-
 run_test "simple echo" "echo HOMMERR"
 run_test "echo -n" "echo -n DONNUUT"
-run_test "Echo 2 flags" "echo -n -e La 1ere fois de Baptiste: Le vendredi 9 Janvier au soir;"
+run_test "Echo 2 flags" "echo -n -e La 1 ere fois de Baptiste: Le vendredi 9 Janvier au soir;"
 run_test "Echo 3 flags" "echo -n -e -E Et oui c etait juste avant un rendu"
 run_test "Echo mix" "echo -n -e -n AAAAAAAAAAAh"
 run_test "Echo escaped" "echo \" \\n \\t \\\\\""
-run_test "Echo bad flags" "echo -nEe Machoire"
-
+run_test "Echo bad flags" "echo -n -E -e Machoire"
 run_test "Simple comment" "echo SUCRE # AU SUCRE"
 run_test "Comment inside" "echo thibault#bikini"
 
+# Lists and ifs
 run_test "Simple list" "echo paul; echo baptiste"
-# run_test "List" "echo a;; echo b"
 run_test "List newline" "echo a;
 echo b"
 run_test "if with list" "if echo cond; true; then echo body; fi"
-
-
 run_test "Simple double echo" "echo 1; echo 2;"
 run_test "Harder shell" "if true; then echo coco; echo mangue; else false; echo dragon; fi"
 run_test "If inside if" "if true; then if false; then echo no; else echo yes; fi; fi"
 
+# Quotes
 run_test "Simple quote test" "echo 'aaa;  simple quote'"
 run_test "quote inside" "echo a'b'c"
 run_test "triple simple" "echo 'a' 'b' 'c'"
@@ -171,7 +167,7 @@ run_test "Empty quotes" "echo '' \"\""
 run_test "Empty concat" "echo 'a'\"\"'b'"
 run_test "triple quoted mixed" "echo 'a'\"b\"C"
 
-
+# Expansions
 run_test "Expand simple" "A=10; echo \$A"
 run_test "Expand Dquote" "A=11; echo \"Res: \$A\""
 run_test "Expand SQuote" "A=12; echo 'Res: \$A'"
@@ -179,7 +175,19 @@ run_test "Expand concat" "A=12; echo q\$Aw"
 run_test "True Exit code" "true; echo \$?"
 run_test "False Exit code" "false; echo \$?"
 
-# run_test "Weird ls" ";;;;ls;;;;;;;"
+# Pipelines
+run_test "Simple pipe" "echo Hello World | cat -e"
+run_test "Pipe with spaces" "   echo    Hello    World    |    cat -e"
+run_test "Pipe multiple" "echo line1 line2 line3 | grep line2 | wc -l"
+run_test "Pipe with builtin" "echo line1 line2 line3 | grep line2 | echo final"
+run_test "Pipe with exit code" "echo line1 line2 line3 | grep line2 | false; echo \$?"
+
+# Redirections
+run_test "Simple output redir" "echo Hello > /tmp/test_output_redir.txt; cat /tmp/test_output_redir.txt"
+run_test "Output redir append" "echo Line1 > /tmp/test_output_redir_append.txt; echo Line2 >> /tmp/test_output_redir_append.txt; cat /tmp/test_output_redir_append.txt"
+run_test "Input redir" "echo Line1 > /tmp/test_input_redir.txt; echo Line2 >> /tmp/test_input_redir.txt; cat < /tmp/test_input_redir.txt"
+run_test "Input redir with pipe" "echo Line1 > /tmp/test_input_redir_pipe.txt; echo Line2 >> /tmp/test_input_redir_pipe.txt; cat < /tmp/test_input_redir_pipe.txt | grep Line2"
+
 # ================= RUN SCRIPT ===================
 
 run_script "script test basic if" "script/script_basic_if.sh"

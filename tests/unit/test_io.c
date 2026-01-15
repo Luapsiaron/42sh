@@ -17,7 +17,7 @@ static void assert_file_equals_string(FILE *f, const char *expected)
 
 Test(io_string_to_file, simple_echo)
 {
-    char* str = "echo test";
+    char *str = "echo test";
     FILE *f = io_string_to_file(str);
     assert_file_equals_string(f, str);
     fclose(f);
@@ -25,7 +25,7 @@ Test(io_string_to_file, simple_echo)
 
 Test(io_string_to_file, empty_string)
 {
-    char* str = "";
+    char *str = "";
     FILE *f = io_string_to_file(str);
     assert_file_equals_string(f, str);
     fclose(f);
@@ -33,7 +33,7 @@ Test(io_string_to_file, empty_string)
 
 Test(io_string_to_file, newline_inside)
 {
-    char* str = "echo\n test";
+    char *str = "echo\n test";
     FILE *f = io_string_to_file(str);
     assert_file_equals_string(f, str);
     fclose(f);
@@ -44,4 +44,3 @@ Test(io_string_to_file, null_string)
     FILE *f = io_string_to_file(NULL);
     cr_assert_null(f, "io_string_to_file should return NULL for NULL input");
 }
-
