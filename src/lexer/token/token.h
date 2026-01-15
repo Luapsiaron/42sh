@@ -25,7 +25,11 @@ typedef enum token_type
 
     // Operators
     TOKEN_PIPE,
-    TOKEN_REDIRECT, // > or >>
+    TOKEN_LESS, // <
+    TOKEN_GREAT, // >
+    TOKEN_DGREAT, // >>
+    TOKEN_CLOBBER, // >|
+    TOKEN_IONUMBER, // n>
 
     TOKEN_NEGATION, // !
 

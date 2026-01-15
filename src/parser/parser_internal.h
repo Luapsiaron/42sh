@@ -33,4 +33,7 @@ ast_t *parse_pipeline(parser_t *p);
 
 ast_t *parse_and_or(parser_t *p);
 
+ast_t *parse_redirection(parser_t *p);
+int is_redirection_token(token_type_t type);
+
 #endif /* ! PARSER_INTERNAL_H */

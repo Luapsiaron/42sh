@@ -14,7 +14,8 @@ ast_t *parse_command(parser_t *p)
     {
         return parse_for(p);
     }
-    if (peek(p) == TOKEN_WORD)
+    if (peek(p) == TOKEN_WORD || peek(p) == TOKEN_IONUMBER
+        || is_redirection_token(peek(p)))
     {
         return parse_simple_command(p);
     }

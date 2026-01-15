@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../utils/str/str.h"
+
 static ast_t *ast_init(ast_type_t type)
 {
     ast_t *new = calloc(1, sizeof(*new));
@@ -69,6 +71,7 @@ ast_t *ast_cmd_init(char **argv)
     }
 
     new->data.ast_cmd.argv = argv;
+    new->data.ast_cmd.redirs = NULL;
 
     return new;
 }
@@ -129,6 +132,54 @@ ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right)
     return new;
 }
 
+ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
+                      ast_t *next)
+{
+    ast_t *new = ast_init(AST_REDIR);
+    if (!new)
+    {
+        return NULL;
+    }
+
+    new->data.ast_redir.io_number = io_number;
+    new->data.ast_redir.type = type;
+
+    if (word)
+    {
+        new->data.ast_redir.word = xstrdup(word);
+        if (!new->data.ast_redir.word)
+        {
+            free(new);
+            return NULL;
+        }
+    }
+    new->data.ast_redir.next = next;
+    return new;
+}
+
+int ast_redir_append(ast_t *cmd, ast_t *redir)
+{
+    if (!cmd || cmd->type != AST_CMD || !redir || redir->type != AST_REDIR)
+    {
+        return 0;
+    }
+
+    ast_t **head = &cmd->data.ast_cmd.redirs;
+    if (!*head)
+    {
+        *head = redir;
+        return 1;
+    }
+
+    ast_t *cur = *head;
+    while (cur->data.ast_redir.next)
+    {
+        cur = cur->data.ast_redir.next;
+    }
+    cur->data.ast_redir.next = redir;
+    return 1;
+}
+
 void free_argv(char **argv)
 {
     if (!argv)
@@ -154,14 +205,17 @@ void ast_free(ast_t *node)
     {
     case AST_CMD:
         free_argv(node->data.ast_cmd.argv);
+        ast_free(node->data.ast_cmd.redirs);
         break;
-
+    case AST_REDIR:
+        free(node->data.ast_redir.word);
+        ast_free(node->data.ast_redir.next);
+        break;
     case AST_IF:
         ast_free(node->data.ast_if.condition);
         ast_free(node->data.ast_if.then_body);
         ast_free(node->data.ast_if.else_body);
         break;
-
     case AST_LIST:
         ast_free(node->data.ast_list.next);
         ast_free(node->data.ast_list.child);
@@ -192,6 +246,37 @@ void ast_free(ast_t *node)
     free(node);
 }
 
+static const char *redir_name(redir_type_t type)
+{
+    switch (type)
+    {
+    case REDIR_IN:
+        return "<";
+    case REDIR_OUT:
+        return ">";
+    case REDIR_APPEND:
+        return ">>";
+    case REDIR_CLOBBER:
+        return ">|";
+    default:
+        return "UNKNOWN";
+    }
+}
+
+static void print_redirs(const ast_t *redir, int depth)
+{
+    while (redir)
+    {
+        for (int i = 0; i < depth; i++)
+        {
+            printf("  ");
+        }
+        printf("REDIR: %d%s %s\n", redir->data.ast_redir.io_number,
+               redir_name(redir->data.ast_redir.type),
+               redir->data.ast_redir.word);
+        redir = redir->data.ast_redir.next;
+    }
+}
 void ast_printer(const ast_t *node, int depth)
 {
     if (!node)
@@ -208,11 +293,15 @@ void ast_printer(const ast_t *node, int depth)
     {
     case AST_CMD:
         printf("CMD: ");
-        for (size_t i = 0; node->data.ast_cmd.argv[i]; i++)
+        if (node->data.ast_cmd.argv)
         {
-            printf("%s ", node->data.ast_cmd.argv[i]);
+            for (size_t i = 0; node->data.ast_cmd.argv[i]; i++)
+            {
+                printf("%s ", node->data.ast_cmd.argv[i]);
+            }
         }
         printf("\n");
+        print_redirs(node->data.ast_cmd.redirs, depth + 1);
         break;
 
     case AST_IF:

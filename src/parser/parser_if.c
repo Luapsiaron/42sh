@@ -124,8 +124,6 @@ ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token,
             goto error;
         }
 
-        skip_newlines(p);
-
         ast_t *cmd = parse_and_or(p);
         if (!cmd)
         {

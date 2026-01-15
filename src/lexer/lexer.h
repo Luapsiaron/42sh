@@ -11,6 +11,7 @@ typedef struct lexer
 {
     FILE *input;
     int current;
+    int force_word;
 } lexer_t;
 
 // Initialize the lexer struct and read first character

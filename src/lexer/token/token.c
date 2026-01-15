@@ -119,8 +119,14 @@ const char *token_type_name(token_type_t t)
         return "WORD";
     case TOKEN_PIPE:
         return "PIPE";
-    case TOKEN_REDIRECT:
-        return "REDIRECT";
+    case TOKEN_LESS:
+        return "<";
+    case TOKEN_GREAT:
+        return ">";
+    case TOKEN_DGREAT:
+        return ">>";
+    case TOKEN_CLOBBER:
+        return ">|";
     case TOKEN_NEGATION:
         return "NEGATION";
     case TOKEN_AND_IF:

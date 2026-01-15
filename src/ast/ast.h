@@ -27,14 +27,9 @@ typedef enum ast_type
     AST_IF,
     AST_WHILE,
     AST_FOR,
-    AST_NEGATION
+    AST_NEGATION,
+    AST_REDIR
 } ast_type_t;
-
-typedef enum and_or_op
-{
-    AND_OP, // &&
-    OR_OP // ||
-} and_or_op_t;
 
 struct ast_if
 {
@@ -42,11 +37,6 @@ struct ast_if
     struct ast *then_body; // the body of the then clause
     struct ast *else_body; // the body of the else, may be NULL
 };
-
-struct ast_cmd // part with multiple commands
-{
-    char **argv; // list of args
-}; // no need to have a size as argv finish with NULL
 
 struct ast_input;
 
@@ -62,16 +52,38 @@ struct ast_pipeline
     struct ast *left;
 };
 
-struct ast_redir
+typedef enum redir_type
 {
+    REDIR_OUT,     // >
+    REDIR_APPEND, // >>
+    REDIR_CLOBBER, // >|
+    REDIR_IN,      // <
+} redir_type_t;
+
+typedef struct ast_redir
+{
+    int io_number;
+    redir_type_t type; // IN/OUT/APPEND/CLOBBER
+    char *word; // filename
     struct ast *next;
-    FILE *redirect;
-};
+} ast_redir_t;
+
+struct ast_cmd 
+{
+    char **argv; // list of args
+    struct ast *redirs;
+}; 
 
 struct ast_negation
 {
     struct ast *child;
 };
+
+typedef enum and_or_op
+{
+    AND_OP, // &&
+    OR_OP // ||
+} and_or_op_t;
 
 struct ast_and_or
 {
@@ -99,11 +111,11 @@ union ast_union
     struct ast_if ast_if;
     struct ast_list ast_list;
     struct ast_pipeline ast_pipeline;
-    struct ast_redir ast_redir;
     struct ast_negation ast_negation;
     struct ast_and_or ast_and_or;
     struct ast_while ast_while;
     struct ast_for ast_for;
+    struct ast_redir ast_redir;
 };
 
 typedef struct ast
@@ -120,6 +132,9 @@ ast_t *ast_negation_init(ast_t *child);
 ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right);
 ast_t *ast_while_init(ast_t *condition, ast_t *body);
 ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body);
+
+ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word, ast_t *next);
+int ast_redir_append(ast_t *cmd, ast_t *redir);
 
 void free_argv(char **argv);
 void ast_free(ast_t *node);

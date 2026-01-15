@@ -22,6 +22,7 @@ lib42sh_a_SOURCES = \
   parser/parser_while.c \
   parser/parser_for.c \
   parser/parser_and_or.c \
+  parser/parser_redir.c \
   utils/stack/stack.c \
   utils/str/str.c \
   utils/parser/pretty_printer.c

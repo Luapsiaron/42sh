@@ -37,22 +37,25 @@ run_test() {
 
   if [ "$code_ref" -ne "$code_goat" ]; then
     failed=1
-    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
+    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
   fi
 
   if ! cmp -s "$out_ref" "$out_goat"; then
     failed=1
-    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
-    diff "$out_ref" "$out_goat"
+    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
+    echo -e "${YELLOW}Expected:${CANCEL}"
+    sed 's/^/  /' "$out_ref"
+    echo -e "${YELLOW}Got:${CANCEL}"
+    sed 's/^/  /' "$out_goat"
   fi
 
   if [ "$failed" -eq 0 ]; then
-    echo "[${GREEN}OK${CANCEL}] $name"
+    echo -e "[${GREEN}OK${CANCEL}] $name"
     passed=$((passed + 1))
   fi
 
   if [ "$code_goat" -eq 124 ]; then #124 = $? of timeout
-	  echo "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
+	  echo -e "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
   fi
 
   total=$((total + 1))
@@ -81,22 +84,25 @@ run_script()
 
   if [ "$code_ref" -ne "$code_goat" ]; then
     failed=1
-    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
+    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
   fi
 
   if ! cmp -s "$out_ref" "$out_goat"; then
     failed=1
-    echo "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
-    diff "$out_ref" "$out_goat"
+    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
+    echo -e "${YELLOW}Expected:${CANCEL}"
+    sed 's/^/  /' "$out_ref"
+    echo -e "${YELLOW}Got:${CANCEL}"
+    sed 's/^/  /' "$out_goat"
   fi
 
   if [ "$failed" -eq 0 ]; then
-    echo "[${GREEN}OK${CANCEL}] $name"
+    echo -e "[${GREEN}OK${CANCEL}] $name"
     passed=$((passed + 1))
   fi
   
   if [ "$code_goat" -eq 124 ]; then #124 = $? of timeout
-	  echo "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
+	  echo -e "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
   fi
   rm -f "$out_ref" "$out_goat"
 }
