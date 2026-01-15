@@ -1,208 +1,263 @@
 #include "expand.h"
+#include "hashmap.h"
 
-#include <ctype.h>
-#include <err.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <err.h>
+#include <ctype.h>
+#include <unistd.h>
 
-static void char_append(char **buff, size_t *idx, size_t *capacity, char c)
+
+static void char_append(buffer_t *buff, char c)
 {
-    if (*idx + 1 < *capacity)
+    if(buff->idx +1 < buff->capacity)
     {
-        (*buff)[*idx] = c;
-        (*idx)++;
+        buff->buff[buff->idx++] = c;
     }
     else
     {
-        *capacity *= 2;
-        *buff = realloc(*buff, *capacity);
+        buff->capacity *=2;
+        buff->buff = realloc(buff->buff, buff->capacity);
     }
 }
 
-static void str_append(char **buff, size_t *idx, size_t *capacity, char *str)
+static void str_append(buffer_t *buff, char *str)
 {
-    if (!str)
+    if(!str)
         return;
-    for (size_t i = 0; str[i] != NULL; i++)
+    for(size_t i =0; str[i] != '\0' ; i++)
     {
-        char_append(buff, idx, capacity, str[i]);
+        char_append(buff, str[i]);
     }
+
 }
 
-static void handle_specials(char **buff, size_t *idx, size_t *capactiy,
-                            char *var_name)
+static char *handle_specials(struct hash_map *hm, char *var_name) //var name = key in hashmap
 {
-    if (strcmp(var_name, '?')) // EXIT CODE
-    {}
-    if (strcmp(var_name, '$')) // PID
-    {}
-    if (strcmp(var_name, 'RANDOM')) // RANDOM VALUE
-    {}
-    if (strcmp(var_name, '*')) //
-    {}
-    if (strcmp(var_name, '@')) //
-    {}
-    if (strcmp(var_name, '#')) // ARG NUMBER
-    {}
-    if (strcmp(var_name, "UID"))
-    {}
-    if (strcmp(var_name, "IFS"))
-    {}
-    if (strcmp(var_name, "PWD"))
-    {}
-    if (strcmp(var_name, "OLDPWD"))
-    {}
-    return 1;
+    if(strcmp(var_name, "?") == 0) // EXIT CODE
+    {
+        char *res = malloc(16);
+        sprintf(res, "%d", exit_code.last);
+        return res;
+    }
+    if(strcmp(var_name, "$") == 0) // PID
+    {
+        char *res = malloc(16);
+        sprintf(res, "%d", getpid());
+        return res;
+
+    }
+    if(strcmp(var_name, "RANDOM")== 0) // RANDOM VALUE
+    {
+
+    }
+    if(strcmp(var_name, "*")== 0) //
+    {
+
+    }
+    if(strcmp(var_name, "@")== 0) //
+    {
+
+    }
+    if(strcmp(var_name, "#")== 0) //ARG NUMBER
+    {
+
+    }
+    if(strcmp(var_name, "UID")== 0)
+    {
+
+    }
+    if(strcmp(var_name, "IFS")== 0)
+    {
+
+    }
+    if(strcmp(var_name, "PWD"))
+    {
+
+    }
+    if(strcmp(var_name, "OLDPWD"))
+    {
+        
+    }
+
+    char *val = hash_map_get(hm, var_name);
+    if(val != NULL)
+    {
+        return xstrdup(val);
+    }
+
+    return NULL;
 }
 
-static char *handle_dollar(char **buff, size_t *idx, size_t *capacity,
-                           char *word)
+static char *handle_dollar(buffer_t *buff, size_t *index, char *word, struct hash_map *hm)
 {
-    (*idx) += 1;
+    (*index)++; // skip first $
 
     size_t len_name = 0;
+    size_t start = *index;
     char *var_name = NULL;
 
-    if (buff[*idx] == '{') // ${VAR}
+    if(word[*index] == '{') // ${VAR}
     {
-        *idx += 1;
-        size_t start = *idx;
+        (*index)++;
+        start = *index;
 
-        while (word[*idx] != NULL && word[*idx] != '}')
+        while(word[*index] != '\0' && word[*index] != '}')
         {
-            (*idx)++;
+            (*index)++;
         }
-        if (word[*idx] == '}')
+        if(word[*index] == '}')
         {
-            len_name = *idx - start;
+            len_name = *index - start;
             var_name = strndup(word + start, len_name); // STRNDUP a implem
         }
         else
         {
-            errx(2, "42sh: can't expand value");
+            errx(2,"42sh: can't expand value");
         }
     }
     else // $VAR
     {
-        size_t start = *idx;
-        while (word[*idx] != NULL && word[*idx] == '_' && isalnum(word[*idx]))
+        if(word[*index] == '?' || word[*index] == '!' || word[*index] == '$')
         {
-            (*idx)++;
+            len_name = 1;
+            (*index)++;
         }
-        len_name = *idx - start;
+        else
+        {
+            while(word[*index] != '\0' && (word[*index] == '_' || isalnum(word[*index])))
+            {
+                (*index)++;
+            }
+        }
+        len_name = *index - start;
         var_name = strndup(word + start, len_name);
 
-        if (word[*idx] == '?')
-        {
-            handle_specials(char **buff, size_t *idx, char *var_name);
-        }
+        (*index)--; //Expand word func do i++, so one too far
     }
 
-    if (var_name != NULL)
+
+    if(var_name != NULL)
     {
-        char *value = ; // GET VALUE
-        if (value != NULL)
+        char *value = handle_specials(hm, var_name); //GET VALUE
+        if(value != NULL)
         {
-            append_str(buff, idx, capacity, value);
+            str_append(buff,value);
+            free(value);
         }
         free(var_name);
     }
     else
     {
-        append_char(buff, idx, capacity, '$');
+        char_append(buff, '$');
     }
+
 }
 
-char **expand_argv(char **argv)
+
+
+char **expand_argv(char **argv, struct hash_map *hm)
 {
     char **res = NULL;
     size_t count = 0;
-    for (size_t i = 0; argv[i] != NULL; i++)
+    for(size_t i=0; argv[i]!= NULL;  i++)
     {
         char *word = argv[i];
-        char *expanded = expand_word(word);
+        char *expanded = expand_word(word, hm);
 
         count++;
         res = realloc(res, sizeof(char *) * (count + 1));
-        res[count - 1] = expanded;
+        res[count -1 ] = expanded;
         res[count] = '\0';
-    }
-
+    }   
+    
     return res;
 }
 
-char *expand_word(char *word)
-{
-    size_t word_len = strlen(word);
-
+char *expand_word(char *word, struct hash_map *hm)
+{    
     bool in_squote = false;
     bool in_dquote = false;
+    
+    buffer_t buff;
+    buff.capacity = strlen(word) * 2;
+    buff.buff = malloc(buff.capacity);
+    buff.idx = 0;
 
-    size_t capacity = strlen(word);
-    char *buff = malloc(capacity);
-    size_t idx = 0;
 
-    for (size_t i = 0; word[i] != NULL; i++)
+    for(size_t i = 0; word[i] != '\0'; i++)
     {
         char c = word[i];
-        if (in_squote)
+        if(in_squote)
         {
-            if (c == '\'')
+            if(c == '\'')
             {
                 in_squote = false;
             }
             else
             {
-                buff[idx + 1] = c;
+               char_append(&buff, c);
             }
+
         }
-        else if (in_dquote)
+        else if(in_dquote)
         {
-            if (c == '"')
+            if(c =='"')
             {
                 in_dquote = false;
             }
             else if (c == '$')
             {
-                handle_dollar(&buff, &idx, &capacity, word);
-            }
-            else if (c == '\\')
-            {}
-            else
-            {
-                buff = realloc(buff, strlen(buff) + 1);
-                buff[idx++] = c;
-            }
-        }
-        else
-        {
-            if (c == '\'')
-            {
-                in_squote = true;
-            }
-            else if (c = '"')
-            {
-                in_dquote = true;
-            }
-            else if (c == '$')
-            {
-                handle_dollar(&buff, &idx, &capacity, word);
+                handle_dollar(&buff, &i, word, hm);
             }
             else if (c == '\\')
             {
-                if (word[i + 1] != NULL)
+                if(word[i+1] == '\\' || word[i + 1] == '$') // escape only \ and $ in dquote ?
                 {
-                    buff[idx++] = word[i + 1];
                     i++;
+                    char_append(&buff, word[i]);
+                }
+                else
+                {
+                    char_append(&buff, '\\');
                 }
             }
             else
             {
-                append_char(&buff, &idx, &capacity, c);
+                char_append(&buff, c);
             }
         }
+        else
+        {
+            if(c == '\'')
+            {
+                in_squote = true;
+            }
+            else if(c == '"')
+            {
+                in_dquote = true;
+            }
+            else if(c == '$')
+            {
+                handle_dollar(&buff, &i, word, hm);
+            }
+            else if (c == '\\')
+            {
+                if(word[i+1] != '\0')
+                {
+                    i++;
+                    char_append(&buff, word[i]);
+                }
+            }
+            else
+            {
+                char_append(&buff, c);
+            }
+        }
+
+
     }
-    append_char(&buff, &idx, &capacity, '\0');
-    return buff;
+    char_append(&buff, '\0');
+    return buff.buff;
 }
