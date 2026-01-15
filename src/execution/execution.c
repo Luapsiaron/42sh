@@ -70,7 +70,7 @@ int exec_ast(ast_t *ast)
         return exec_pipeline(ast);
     case AST_AND_OR:
         // TODO
-    case AST_WHILE:
+    case AST_WHILE_UNTIL:
         // TODO
     case AST_FOR:
         // TODO

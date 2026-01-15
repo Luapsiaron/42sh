@@ -18,16 +18,17 @@ static ast_t *ast_init(ast_type_t type)
     return new;
 }
 
-ast_t *ast_while_init(ast_t *condition, ast_t *body)
+ast_t *ast_while_until_init(ast_t *condition, ast_t *body, loop_t type)
 {
-    ast_t *new = ast_init(AST_WHILE);
+    ast_t *new = ast_init(AST_WHILE_UNTIL);
     if (!new)
     {
         return NULL;
     }
 
-    new->data.ast_while.condition = condition;
-    new->data.ast_while.body = body;
+    new->data.ast_while_until.condition = condition;
+    new->data.ast_while_until.body = body;
+    new->data.ast_while_until.type = type;
 
     return new;
 }
@@ -231,9 +232,9 @@ void ast_free(ast_t *node)
         ast_free(node->data.ast_and_or.left);
         ast_free(node->data.ast_and_or.right);
         break;
-    case AST_WHILE:
-        ast_free(node->data.ast_while.condition);
-        ast_free(node->data.ast_while.body);
+    case AST_WHILE_UNTIL:
+        ast_free(node->data.ast_while_until.condition);
+        ast_free(node->data.ast_while_until.body);
         break;
     case AST_FOR:
         ast_free(node->data.ast_for.first_arg);
@@ -344,10 +345,17 @@ void ast_printer(const ast_t *node, int depth)
         ast_printer(node->data.ast_and_or.left, depth + 1);
         ast_printer(node->data.ast_and_or.right, depth + 1);
         break;
-    case AST_WHILE:
-        printf("WHILE:\n");
-        ast_printer(node->data.ast_while.condition, depth + 1);
-        ast_printer(node->data.ast_while.body, depth + 1);
+    case AST_WHILE_UNTIL:
+        if (node->data.ast_while_until.type == LOOP_WHILE)
+        {
+            printf("WHILE:\n");
+        }
+        else
+        {
+            printf("UNTIL:\n");
+        }
+        ast_printer(node->data.ast_while_until.condition, depth + 1);
+        ast_printer(node->data.ast_while_until.body, depth + 1);
         break;
     case AST_FOR:
         printf("FOR:\n");

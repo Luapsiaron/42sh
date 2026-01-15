@@ -10,6 +10,10 @@ ast_t *parse_command(parser_t *p)
     {
         return parse_while(p);
     }
+    if (peek(p) == TOKEN_UNTIL)
+    {
+        return parse_until(p);
+    }
     if (peek(p) == TOKEN_FOR)
     {
         return parse_for(p);

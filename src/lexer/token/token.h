@@ -13,6 +13,7 @@ typedef enum token_type
     // Loop
     TOKEN_FOR,
     TOKEN_WHILE,
+    TOKEN_UNTIL,
     TOKEN_IN,
     TOKEN_DO,
     TOKEN_DONE,

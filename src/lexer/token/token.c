@@ -79,6 +79,11 @@ int token_is_reserved_word(const char *s, token_type_t *out)
         *out = TOKEN_WHILE;
         return 1;
     }
+    if (!strcmp(s, "until"))
+    {
+        *out = TOKEN_UNTIL;
+        return 1;
+    }
     if (!strcmp(s, "in"))
     {
         *out = TOKEN_IN;
@@ -143,6 +148,8 @@ const char *token_type_name(token_type_t t)
         return "DO";
     case TOKEN_DONE:
         return "DONE";
+    case TOKEN_UNTIL:
+        return "UNTIL";
     case TOKEN_EOF:
         return "EOF";
     default:

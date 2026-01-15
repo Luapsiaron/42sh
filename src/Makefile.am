@@ -20,7 +20,7 @@ lib42sh_a_SOURCES = \
   parser/parser_list.c \
   parser/parser_simple_command.c \
   parser/parser_pipeline.c \
-  parser/parser_while.c \
+  parser/parser_while_until.c \
   parser/parser_for.c \
   parser/parser_and_or.c \
   parser/parser_redir.c \

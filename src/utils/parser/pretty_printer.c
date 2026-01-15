@@ -5,11 +5,13 @@
 
 static void pp_node(const ast_t *ast, FILE *out);
 static void pp_list(const ast_t *ast, FILE *out);
+static void pp_redir(const ast_t *ast, FILE *out);
 static void pp_cmd(const ast_t *ast, FILE *out);
 static void pp_pipeline(const ast_t *ast, FILE *out);
 static void pp_negation(const ast_t *ast, FILE *out);
 static void pp_if(const ast_t *ast, FILE *out);
 static void pp_and_or(const ast_t *ast, FILE *out);
+static void pp_while_until(const ast_t *ast, FILE *out);
 
 static void pp_ignore_quotes(const char *str, FILE *out)
 {
@@ -46,6 +48,38 @@ static void pp_list(const ast_t *ast, FILE *out)
     }
 }
 
+static void pp_redir(const ast_t *ast, FILE *out)
+{
+    const struct ast_redir *ast_tmp = &ast->data.ast_redir;
+    if (ast_tmp->type == REDIR_IN)
+    {
+        if (ast_tmp->next)
+        {
+            pp_node(ast_tmp->next, out);
+        }
+        fprintf(out, " < ");
+        fputs(ast_tmp->word, out);
+        return;
+    }
+    else if (ast_tmp->type == REDIR_OUT)
+    {
+        fprintf(out, " > ");
+    }
+    else if (ast_tmp->type == REDIR_APPEND)
+    {
+        fprintf(out, " >> ");
+    }
+    else if (ast_tmp->type == REDIR_CLOBBER)
+    {
+        fprintf(out, " >| ");
+    }
+    fputs(ast_tmp->word, out);
+    if (ast_tmp->next)
+    {
+        pp_node(ast_tmp->next, out);
+    }
+}
+
 static void pp_cmd(const ast_t *ast, FILE *out)
 {
     char **argv = ast->data.ast_cmd.argv;
@@ -56,6 +90,10 @@ static void pp_cmd(const ast_t *ast, FILE *out)
     {
         fputc(' ', out);
         pp_ignore_quotes(argv[i], out);
+    }
+    if (ast->data.ast_cmd.redirs)
+    {
+        pp_redir(ast->data.ast_cmd.redirs, out);
     }
 }
 
@@ -128,6 +166,23 @@ static void pp_and_or(const ast_t *ast, FILE *out)
     fputs(" }", out);
 }
 
+static void pp_while_until(const ast_t *ast, FILE *out)
+{
+    const struct ast_while_until *ast_tmp = &ast->data.ast_while_until;
+    if (ast_tmp->type == LOOP_WHILE)
+    {
+        fprintf(out, "while ");
+    }
+    else
+    {
+        fprintf(out, "until ");
+    }
+    pp_braces(ast_tmp->condition, out);
+    fputs("; do ", out);
+    pp_braces(ast_tmp->body, out);
+    fputs("; done ", out);
+}
+
 static void pp_node(const ast_t *ast, FILE *out)
 {
     if (!ast)
@@ -155,6 +210,9 @@ static void pp_node(const ast_t *ast, FILE *out)
         break;
     case AST_AND_OR:
         pp_and_or(ast, out);
+        break;
+    case AST_WHILE_UNTIL:
+        pp_while_until(ast, out);
         break;
     default:
         fputs("/* Unknown AST node */", out);

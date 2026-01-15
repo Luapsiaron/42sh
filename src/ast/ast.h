@@ -25,8 +25,9 @@ typedef enum ast_type
     AST_SIMPLE_CMD,
     AST_ELEMENT,
     AST_IF,
-    AST_WHILE,
+    AST_WHILE_UNTIL,
     AST_FOR,
+    AST_UNTIL,
     AST_NEGATION,
     AST_REDIR
 } ast_type_t;
@@ -92,8 +93,15 @@ struct ast_and_or
     struct ast *right;
 };
 
-struct ast_while
+typedef enum loop_type
 {
+    LOOP_WHILE,
+    LOOP_UNTIL
+} loop_t;
+
+struct ast_while_until
+{
+    loop_t type; // WHILE/UNTIL
     struct ast *condition;
     struct ast *body;
 };
@@ -113,7 +121,7 @@ union ast_union
     struct ast_pipeline ast_pipeline;
     struct ast_negation ast_negation;
     struct ast_and_or ast_and_or;
-    struct ast_while ast_while;
+    struct ast_while_until ast_while_until;
     struct ast_for ast_for;
     struct ast_redir ast_redir;
 };
@@ -130,7 +138,7 @@ ast_t *ast_list_init(ast_t *next, ast_t *child);
 ast_t *ast_pipeline_init(ast_t *right, ast_t *left);
 ast_t *ast_negation_init(ast_t *child);
 ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right);
-ast_t *ast_while_init(ast_t *condition, ast_t *body);
+ast_t *ast_while_until_init(ast_t *condition, ast_t *body, loop_t type);
 ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body);
 
 ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,

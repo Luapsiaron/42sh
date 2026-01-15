@@ -26,7 +26,8 @@ ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token,
                            size_t end_token_count);
 
 ast_t *parse_if(parser_t *p);
-ast_t *parse_while(parser_t *parser);
+ast_t *parse_while(parser_t *p);
+ast_t *parse_until(parser_t *p);
 ast_t *parse_for(parser_t *p);
 
 ast_t *parse_pipeline(parser_t *p);
