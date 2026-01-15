@@ -37,17 +37,17 @@ ast_t *parse_pipeline(parser_t *p)
         }
 
         left = pipeline;
+    }
 
-        if (neg)
+     if (neg)
+    {
+        ast_t *negation = ast_negation_init(left);
+        if (!negation)
         {
-            ast_t *negation = ast_negation_init(left);
-            if (!negation)
-            {
-                ast_free(left);
-                return NULL;
-            }
-            return negation;
+            ast_free(left);
+            return NULL;
         }
+        return negation;
     }
 
     return left;
