@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #include "../ast/ast.h"
+#include "../ast/ast_free.h"
 #include "../builtins/echo.h"
 #include "redir_pipe.h"
 #include "loop.h"
@@ -73,11 +74,11 @@ int exec_ast(ast_t *ast, struct hash_map *hm)
     case AST_PIPELINE:
         return exec_pipeline(ast, hm);
     case AST_AND_OR:
-        return eval_condition(ast);
+        return eval_condition(ast, hm);
     case AST_WHILE_UNTIL:
-        return exec_while_until(ast);
+        return exec_while_until(ast, hm);
     case AST_FOR:
-        return exec_for(ast);
+        return exec_for(ast, hm);
     case AST_NEGATION: {
         int st = exec_ast(ast->data.ast_negation.child,hm);
         if (st == 0)
