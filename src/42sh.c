@@ -6,7 +6,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "ast/ast.h"
 #include "execution/execution.h"
 #include "io/io.h"
 #include "parser/parser.h"

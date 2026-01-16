@@ -102,59 +102,45 @@ int token_is_reserved_word(const char *s, token_type_t *out)
     return 0;
 }
 
+static const char *token_type_names[] = {
+    [TOKEN_IF] = "IF",
+    [TOKEN_THEN] = "THEN",
+    [TOKEN_ELSE] = "ELSE",
+    [TOKEN_ELIF] = "ELIF",
+    [TOKEN_FI] = "FI",
+
+    [TOKEN_FOR] = "FOR",
+    [TOKEN_WHILE] = "WHILE",
+    [TOKEN_UNTIL] = "UNTIL",
+    [TOKEN_IN] = "IN",
+    [TOKEN_DO] = "DO",
+    [TOKEN_DONE] = "DONE",
+
+    [TOKEN_SEMICOLON] = "SEMICOLON",
+    [TOKEN_NEWLINE] = "NEWLINE",
+
+    [TOKEN_WORD] = "WORD",
+
+    [TOKEN_PIPE] = "PIPE",
+    [TOKEN_LESS] = "<",
+    [TOKEN_GREAT] = ">",
+    [TOKEN_DGREAT] = ">>",
+    [TOKEN_CLOBBER] = ">|",
+
+    [TOKEN_NEGATION] = "NEGATION",
+    [TOKEN_AND_IF] = "AND_IF",
+    [TOKEN_OR_IF] = "OR_IF",
+
+    [TOKEN_EOF] = "EOF",
+};
+
 const char *token_type_name(token_type_t t)
 {
-    switch (t)
+    if (t < 0 || t >= sizeof(token_type_names) / sizeof(token_type_names[0]))
     {
-    case TOKEN_IF:
-        return "IF";
-    case TOKEN_THEN:
-        return "THEN";
-    case TOKEN_ELSE:
-        return "ELSE";
-    case TOKEN_ELIF:
-        return "ELIF";
-    case TOKEN_FI:
-        return "FI";
-    case TOKEN_SEMICOLON:
-        return "SEMICOLON";
-    case TOKEN_NEWLINE:
-        return "NEWLINE";
-    case TOKEN_WORD:
-        return "WORD";
-    case TOKEN_PIPE:
-        return "PIPE";
-    case TOKEN_LESS:
-        return "<";
-    case TOKEN_GREAT:
-        return ">";
-    case TOKEN_DGREAT:
-        return ">>";
-    case TOKEN_CLOBBER:
-        return ">|";
-    case TOKEN_NEGATION:
-        return "NEGATION";
-    case TOKEN_AND_IF:
-        return "AND_IF";
-    case TOKEN_OR_IF:
-        return "OR_IF";
-    case TOKEN_WHILE:
-        return "WHILE";
-    case TOKEN_FOR:
-        return "FOR";
-    case TOKEN_IN:
-        return "IN";
-    case TOKEN_DO:
-        return "DO";
-    case TOKEN_DONE:
-        return "DONE";
-    case TOKEN_UNTIL:
-        return "UNTIL";
-    case TOKEN_EOF:
-        return "EOF";
-    default:
         return "UNKNOWN";
     }
+    return token_type_names[t];
 }
 
 void token_printer(const token_t *t)

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "../../src/ast/ast.h"
+#include "../../src/ast/ast_free.h"
 #include "../../src/execution/execution.h"
 #include "../../src/utils/str/str.h"
 

@@ -2,7 +2,6 @@
 #include <criterion/criterion.h>
 #include <string.h>
 
-#include "../../src/ast/ast.h"
 #include "../../src/parser/parser.h"
 
 static FILE *fmem_from_str(const char *s)

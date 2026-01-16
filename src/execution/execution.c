@@ -74,8 +74,7 @@ int exec_ast(ast_t *ast)
         // TODO
     case AST_FOR:
         // TODO
-    case AST_NEGATION:
-    {
+    case AST_NEGATION: {
         int st = exec_ast(ast->data.ast_negation.child);
         if (st == 0)
             return 1;

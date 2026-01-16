@@ -145,9 +145,4 @@ ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
                       ast_t *next);
 int ast_redir_append(ast_t *cmd, ast_t *redir);
 
-void free_argv(char **argv);
-void ast_free(ast_t *node);
-
-void ast_printer(const ast_t *node, int depth);
-
 #endif /* ! AST_H */

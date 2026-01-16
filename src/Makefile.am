@@ -7,6 +7,8 @@ noinst_LIBRARIES = lib42sh.a
 
 lib42sh_a_SOURCES = \
   ast/ast.c \
+  ast/ast_free.c \
+  ast/ast_printer.c \
   builtins/echo.c \
   execution/execution.c \
   execution/redir_pipe.c \

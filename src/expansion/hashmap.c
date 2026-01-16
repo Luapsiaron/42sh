@@ -52,7 +52,7 @@ bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
     {
         if (updated)
             *updated = true;
-        
+
         free(existing->value);
         existing->value = xstrdup(value);
         return true;
@@ -85,7 +85,7 @@ void hash_map_free(struct hash_map *hash_map)
             while (cur)
             {
                 struct pair_list *next = cur->next;
-                
+
                 free((char *)cur->key);
                 free(cur->value);
 
@@ -163,7 +163,7 @@ bool hash_map_remove(struct hash_map *hash_map, const char *key)
 
             free((char *)cur->key);
             free(cur->value);
-            
+
             free(cur);
             return true;
         }
