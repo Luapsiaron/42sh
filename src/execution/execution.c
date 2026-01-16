@@ -15,6 +15,7 @@
 #include "../builtins/echo.h"
 #include "redir_pipe.h"
 #include "loop.h"
+#include "condition.h"
 
 // command not found = 127
 // command not executable = 126
@@ -70,7 +71,7 @@ int exec_ast(ast_t *ast)
     case AST_PIPELINE:
         return exec_pipeline(ast);
     case AST_AND_OR:
-        // TODO
+        return eval_condition(ast);
     case AST_WHILE_UNTIL:
         return exec_while_until(ast);
     case AST_FOR:

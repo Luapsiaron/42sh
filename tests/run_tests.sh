@@ -194,6 +194,18 @@ run_test "Negation of false" " ! false;"
 run_test "Negation with if" " if ! false; then echo yes; else echo no; fi"
 run_test "Double negation" "! ! false"
 
+# And
+run_test "AND true true" "true && true; echo after_and"
+run_test "AND true false" "true && false; echo after_and"
+run_test "AND false true" "false && true; echo after_and"
+run_test "AND false false" "false && false; echo after_and"
+
+# Or
+run_test "OR true true" "true || true; echo after_or"
+run_test "OR true false" "true || false; echo after_or"
+run_test "OR false true" "false || true; echo after_or"
+run_test "OR false false" "false || false; echo after_or"
+
 # While loop
 run_test "Simple while false loop" "while false; do echo 1; done"
 run_test "While with false" "while false; do echo ShouldPrint; done; echo Done"
