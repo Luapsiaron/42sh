@@ -41,6 +41,26 @@ static token_t *lexer_ionumber(lexer_t *lx)
     return token_new(TOKEN_WORD, buffer);
 }
 
+static int is_assignment_word(const char *s)
+{
+    if (!s || !s[0])
+    {
+        return 0;
+    }
+
+    if (!isalpha(s[0]) && s[0] != '_')
+    {
+        return 0;
+    }
+
+    size_t i = 1;
+    while (s[i] && (isalnum(s[i]) || isalpha(s[i]) || s[i] == '_'))
+    {
+        i++;
+    }
+    return s[i] == '=';
+}
+
 static token_t *lexer_is_word(lexer_t *lx)
 {
     char buffer[512];
@@ -55,6 +75,11 @@ static token_t *lexer_is_word(lexer_t *lx)
     }
     buffer[i] = '\0';
 
+    if (is_assignment_word(buffer))
+    {
+        return token_new(TOKEN_ASSIGNMENT_WORD, buffer);
+    }
+
     if (lx->force_word)
     {
         return token_new(TOKEN_WORD, buffer);
@@ -64,6 +89,10 @@ static token_t *lexer_is_word(lexer_t *lx)
     if (token_is_reserved_word(buffer, &type))
     {
         return token_new(type, NULL);
+    }
+    if (is_assignment_word(buffer))
+    {
+        return token_new(TOKEN_ASSIGNMENT_WORD, buffer);
     }
     return token_new(TOKEN_WORD, buffer);
 }

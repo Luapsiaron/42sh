@@ -120,6 +120,7 @@ static const char *token_type_names[] = {
     [TOKEN_NEWLINE] = "NEWLINE",
 
     [TOKEN_WORD] = "WORD",
+    [TOKEN_ASSIGNMENT_WORD] = "ASSIGNMENT_WORD",
 
     [TOKEN_PIPE] = "PIPE",
     [TOKEN_LESS] = "<",

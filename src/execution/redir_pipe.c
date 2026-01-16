@@ -43,7 +43,8 @@ void restore_fds(struct saved_fd *s) // Restore saved file descriptors
     }
 }
 
-static int apply_one_redir(const ast_redir_t *r) // Apply a single redirection
+static int
+apply_one_redir(const struct ast_redir *r) // Apply a single redirection
 {
     int fd = -1;
     int target = r->io_number;
@@ -88,7 +89,7 @@ int apply_redirs(
 {
     for (ast_t *n = redir_list; n; n = n->data.ast_redir.next)
     {
-        const ast_redir_t *r = &n->data.ast_redir;
+        const struct ast_redir *r = &n->data.ast_redir;
         int target = r->io_number;
         if (target < 0)
         {

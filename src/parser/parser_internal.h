@@ -38,4 +38,6 @@ ast_t *parse_and_or(parser_t *p);
 ast_t *parse_redirection(parser_t *p);
 int is_redirection_token(token_type_t type);
 
+ast_t *parse_assignment(parser_t *p);
+
 #endif /* ! PARSER_INTERNAL_H */

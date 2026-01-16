@@ -23,6 +23,7 @@ typedef enum token_type
     TOKEN_NEWLINE,
 
     TOKEN_WORD, // ls, echo etc
+    TOKEN_ASSIGNMENT_WORD, // VAR=VALUE (prefix)
 
     // Operators
     TOKEN_PIPE,

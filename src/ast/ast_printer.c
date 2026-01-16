@@ -31,14 +31,22 @@ static void print_redirs(const ast_t *redir, int depth)
 {
     while (redir)
     {
-        for (int i = 0; i < depth; i++)
-        {
-            printf("  ");
-        }
+        print_indent(depth);
         printf("REDIR: %d%s %s\n", redir->data.ast_redir.io_number,
                redir_name(redir->data.ast_redir.type),
                redir->data.ast_redir.word);
         redir = redir->data.ast_redir.next;
+    }
+}
+
+static void print_assignment(const ast_t *node, int depth)
+{
+    while (node)
+    {
+        print_indent(depth);
+        printf("ASSIGNMENT: %s=%s\n", node->data.ast_assignment.var_name,
+               node->data.ast_assignment.value);
+        node = node->data.ast_assignment.next;
     }
 }
 
@@ -55,6 +63,7 @@ static void print_cmd(const ast_t *node, int depth)
     }
     printf("\n");
     print_redirs(node->data.ast_cmd.redirs, depth + 1);
+    print_assignment(node->data.ast_cmd.assignments, depth + 1);
 }
 
 static void print_if(const ast_t *node, int depth)
@@ -168,6 +177,9 @@ void ast_printer(const ast_t *node, int depth)
         break;
     case AST_FOR:
         print_for(node, depth);
+        break;
+    case AST_ASSIGNMENT:
+        print_assignment(node, depth);
         break;
     default:
         print_indent(depth);

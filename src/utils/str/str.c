@@ -16,3 +16,23 @@ char *xstrdup(const char *s)
     memcpy(p, s, n);
     return p;
 }
+
+char *xstrndup(const char *s, size_t n)
+{
+    if (!s)
+        return NULL;
+
+    size_t len = 0;
+    while (len < n && s[len])
+    {
+        ++len;
+    }
+
+    char *p = malloc(len + 1);
+    if (!p)
+        return NULL;
+    
+    memcpy(p, s, len);
+    p[len] = '\0';
+    return p;
+}

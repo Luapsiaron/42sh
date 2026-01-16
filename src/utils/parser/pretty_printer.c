@@ -183,6 +183,35 @@ static void pp_while_until(const ast_t *ast, FILE *out)
     fputs("; done ", out);
 }
 
+static void pp_for(const ast_t *ast, FILE *out)
+{
+    const struct ast_for *ast_tmp = &ast->data.ast_for;
+    fputs("for ", out);
+    pp_node(ast_tmp->first_arg, out);
+    if (ast_tmp->second_arg)
+    {
+        fputs(" in ", out);
+        pp_node(ast_tmp->second_arg, out);
+    }
+    fputs("; do ", out);
+    pp_braces(ast_tmp->body, out);
+    fputs("; done ", out);
+}
+
+static void pp_assignment(const ast_t *ast, FILE *out)
+{
+    const struct ast_assignment *ast_tmp = &ast->data.ast_assignment;
+    fputs("assignment ", out);
+    pp_ignore_quotes(ast_tmp->var_name, out);
+    fputc('=', out);
+    pp_ignore_quotes(ast_tmp->value, out);
+    if (ast_tmp->next)
+    {
+        fputc(' ', out);
+        pp_assignment(ast_tmp->next, out);
+    }
+}
+
 static void pp_node(const ast_t *ast, FILE *out)
 {
     if (!ast)
@@ -213,6 +242,12 @@ static void pp_node(const ast_t *ast, FILE *out)
         break;
     case AST_WHILE_UNTIL:
         pp_while_until(ast, out);
+        break;
+    case AST_FOR:
+        pp_for(ast, out);
+        break;
+    case AST_ASSIGNMENT:
+        pp_assignment(ast, out);
         break;
     default:
         fputs("/* Unknown AST node */", out);

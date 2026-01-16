@@ -29,7 +29,8 @@ typedef enum ast_type
     AST_FOR,
     AST_UNTIL,
     AST_NEGATION,
-    AST_REDIR
+    AST_REDIR,
+    AST_ASSIGNMENT
 } ast_type_t;
 
 struct ast_if
@@ -61,18 +62,26 @@ typedef enum redir_type
     REDIR_IN, // <
 } redir_type_t;
 
-typedef struct ast_redir
+struct ast_redir
 {
     int io_number;
     redir_type_t type; // IN/OUT/APPEND/CLOBBER
     char *word; // filename
     struct ast *next;
-} ast_redir_t;
+};
+
+struct ast_assignment
+{
+    char *var_name;
+    char *value;
+    struct ast *next;
+};
 
 struct ast_cmd
 {
     char **argv; // list of args
     struct ast *redirs;
+    struct ast *assignments;
 };
 
 struct ast_negation
@@ -124,6 +133,7 @@ union ast_union
     struct ast_while_until ast_while_until;
     struct ast_for ast_for;
     struct ast_redir ast_redir;
+    struct ast_assignment ast_assignment;
 };
 
 typedef struct ast
@@ -144,5 +154,8 @@ ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body);
 ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
                       ast_t *next);
 int ast_redir_append(ast_t *cmd, ast_t *redir);
+
+ast_t *ast_assignment_init(const char *var, const char *value);
+int ast_assignment_append(ast_t *cmd, ast_t *assignment);
 
 #endif /* ! AST_H */

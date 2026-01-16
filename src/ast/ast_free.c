@@ -20,12 +20,20 @@ static void free_cmd(ast_t *node)
 {
     free_argv(node->data.ast_cmd.argv);
     ast_free(node->data.ast_cmd.redirs);
+    ast_free(node->data.ast_cmd.assignments);
 }
 
 static void free_redir(ast_t *node)
 {
     free(node->data.ast_redir.word);
     ast_free(node->data.ast_redir.next);
+}
+
+static void free_assignment(ast_t *node)
+{
+    free(node->data.ast_assignment.var_name);
+    free(node->data.ast_assignment.value);
+    ast_free(node->data.ast_assignment.next);
 }
 
 static void free_if(ast_t *node)
@@ -85,6 +93,9 @@ void ast_free(ast_t *node)
         break;
     case AST_REDIR:
         free_redir(node);
+        break;
+    case AST_ASSIGNMENT:
+        free_assignment(node);
         break;
     case AST_IF:
         free_if(node);
