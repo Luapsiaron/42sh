@@ -31,7 +31,9 @@ lib42sh_a_SOURCES = \
   parser/parser_assignment.c \
   utils/stack/stack.c \
   utils/str/str.c \
-  utils/parser/pretty_printer.c
+  utils/parser/pretty_printer.c \
+  expansion/expand.c \
+  expansion/hashmap.c
 
 42sh_SOURCES = 42sh.c
 42sh_LDADD   = lib42sh.a

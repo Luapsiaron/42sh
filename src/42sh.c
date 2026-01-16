@@ -10,6 +10,7 @@
 #include "io/io.h"
 #include "parser/parser.h"
 #include "utils/parser/pretty_printer.h"
+#include "expansion/hashmap.h"
 
 static void usage(FILE *out)
 {
@@ -31,7 +32,7 @@ static void error_usage(const char *msg)
     exit(2);
 }
 
-static int run_stream(FILE *input, int pretty_print)
+static int run_stream(FILE *input, int pretty_print, struct hash_map *hm)
 {
     int status = 0;
 
@@ -47,17 +48,30 @@ static int run_stream(FILE *input, int pretty_print)
             ast_free(tree);
             return 0;
         }
-        status = exec_ast(tree);
+        status = exec_ast(tree, hm);
         ast_free(tree);
     }
     return status;
 }
 
-int main(int argc, char **argv)
+int main(int argc, char **argv, char **envp) // envp -> collect system variables
 {
     int opt;
     char *command = NULL;
     int pretty_print = 0;
+
+    struct hash_map *hm = hash_map_init(100); // 100 = magic value
+
+    for(int i = 0; envp[i]; i++)
+    {
+        char *eq = strchr(envp[i], '=');
+        if(eq)
+        {
+            *eq = '\0';
+            hash_map_insert(hm, envp[i], eq + 1, NULL);
+            *eq = '=';
+        }
+    }
 
     if (getenv("PRETTY_PRINT") != NULL)
     {
@@ -114,6 +128,7 @@ int main(int argc, char **argv)
         {
             fprintf(stderr, "42sh: cannot open '%s': %s\n", path,
                     strerror(errno));
+            hash_map_free(hm);
             exit(2);
         }
         must_close = true;
@@ -123,8 +138,10 @@ int main(int argc, char **argv)
         input = stdin;
         must_close = false;
     }
-    int status = run_stream(input, pretty_print);
+    int status = run_stream(input, pretty_print, hm);
     if (must_close && input)
         fclose(input);
+
+    hash_map_free(hm);
     return status;
 }

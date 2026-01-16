@@ -1,4 +1,9 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include "expand.h"
+#include "hashmap.h"
+#include "../utils/str/str.h"
+
 
 #include <ctype.h>
 #include <err.h>
@@ -6,8 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 
-#include "hashmap.h"
+struct exit_info exit_code = { .last = 0 };
 
 static void char_append(buffer_t *buff, char c)
 {
@@ -77,12 +83,11 @@ static char *handle_specials(struct hash_map *hm,
     {
         return xstrdup(val);
     }
-
     return NULL;
 }
 
-static char *handle_dollar(buffer_t *buff, size_t *index, char *word,
-                           struct hash_map *hm)
+static void handle_dollar(buffer_t *buff, size_t *index, char *word, 
+    struct hash_map *hm)
 {
     (*index)++; // skip first $
 

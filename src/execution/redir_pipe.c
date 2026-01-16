@@ -121,7 +121,7 @@ pipeline_collect(ast_t *p, ast_t **arr,
     pipeline_collect(p->data.ast_pipeline.right, arr, len);
 }
 
-int exec_pipeline(ast_t *pipe_node) // Execute a pipeline of commands
+int exec_pipeline(ast_t *pipe_node, struct hash_map *hm) // Execute a pipeline of commands
 {
     ast_t *cmds[MAX_PIPELINE_CMDS];
     int n = 0;
@@ -174,7 +174,7 @@ int exec_pipeline(ast_t *pipe_node) // Execute a pipeline of commands
                     _exit(1);
             }
             // execute command node
-            _exit(child_exec_command(cmds[i]));
+            _exit(child_exec_command(cmds[i], hm));
         }
         // parent
         pids[i] = pid;

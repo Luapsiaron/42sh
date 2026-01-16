@@ -8,6 +8,17 @@
 
 #include "../utils/str/str.h"
 
+static size_t hash(const char *str) // DJB2 Algorithm
+{
+    size_t hash = 5381;
+    int c;
+    while((c = *str++))
+    {
+        hash = hash * 33 + c;
+    }
+    return hash;
+}
+
 static struct pair_list *find_at(const struct hash_map *hash_map,
                                  size_t hash_value, const char *key)
 {
@@ -123,7 +134,7 @@ void hash_map_dump(struct hash_map *hash_map)
     }
 }
 
-const char *hash_map_get(const struct hash_map *hash_map, const char *key)
+char *hash_map_get(const struct hash_map *hash_map, const char *key)
 {
     if (!hash_map || !key || hash_map->size == 0 || !hash_map->data)
         return NULL;

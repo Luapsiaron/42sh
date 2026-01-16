@@ -3,10 +3,10 @@
 
 #include "hashmap.h"
 
-struct
+struct exit_info
 {
     int last;
-}exit_code;
+};
 
 typedef struct {
     char *buff;

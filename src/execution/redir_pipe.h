@@ -2,6 +2,7 @@
 #define REDIR_PIPE_H
 
 #include "../ast/ast.h"
+#include "../expansion/hashmap.h"
 
 struct saved_fd
 {
@@ -12,6 +13,6 @@ struct saved_fd
 
 void restore_fds(struct saved_fd *s);
 int apply_redirs(ast_t *redir_list, struct saved_fd **saved);
-int exec_pipeline(ast_t *pipe_node);
+int exec_pipeline(ast_t *pipe_node, struct hash_map *hm);
 
 #endif /* ! REDIR_PIPE_H */
