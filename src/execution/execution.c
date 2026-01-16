@@ -14,6 +14,7 @@
 #include "../ast/ast.h"
 #include "../builtins/echo.h"
 #include "redir_pipe.h"
+#include "loop.h"
 
 // command not found = 127
 // command not executable = 126
@@ -71,7 +72,7 @@ int exec_ast(ast_t *ast)
     case AST_AND_OR:
         // TODO
     case AST_WHILE_UNTIL:
-        // TODO
+        return exec_while_until(ast);
     case AST_FOR:
         // TODO
     case AST_NEGATION: {

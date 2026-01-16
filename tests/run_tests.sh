@@ -179,7 +179,7 @@ run_test "False Exit code" "false; echo \$?"
 run_test "Simple pipe" "echo Hello World | cat -e"
 run_test "Pipe with spaces" "   echo    Hello    World    |    cat -e"
 run_test "Pipe multiple" "echo line1 line2 line3 | grep line2 | wc -l"
-run_test "Pipe with builtin" "echo line1 line2 line3 | grep line2 | echo final"
+run_test "Pipe with builtin" "! echo line1 line2 line3 | grep line2 | echo final"
 run_test "Pipe with exit code" "echo line1 line2 line3 | grep line2 | false; echo \$?"
 
 # Redirections
@@ -192,7 +192,11 @@ run_test "Input redir with pipe" "echo Line1 > /tmp/test_input_redir_pipe.txt; e
 run_test "Negation of true" " ! true;"
 run_test "Negation of false" " ! false;"
 run_test "Negation with if" " if ! false; then echo yes; else echo no; fi"
-run_test "Double negation" " ! ! false;"
+run_test "Double negation" "! ! false"
+
+# While loop
+run_test "Simple while false loop" "while false; do echo 1; done"
+run_test "While with false" "while false; do echo ShouldPrint; done; echo Done"
 
 # ================= RUN SCRIPT ===================
 

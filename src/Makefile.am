@@ -12,6 +12,7 @@ lib42sh_a_SOURCES = \
   builtins/echo.c \
   execution/execution.c \
   execution/redir_pipe.c \
+  execution/loop.c \
   io/io.c \
   lexer/lexer.c \
   lexer/token/token.c \
