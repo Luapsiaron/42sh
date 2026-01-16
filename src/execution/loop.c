@@ -30,3 +30,13 @@ int exec_while_until(ast_t *ast)
     }
     return last_status;
 }
+
+
+
+
+int exec_for(ast_t *ast)
+{
+    // TODO
+    (void)ast;
+    return 0;
+}

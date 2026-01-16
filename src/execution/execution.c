@@ -75,7 +75,7 @@ int exec_ast(ast_t *ast)
     case AST_WHILE_UNTIL:
         return exec_while_until(ast);
     case AST_FOR:
-        // TODO
+        return exec_for(ast);
     case AST_NEGATION: {
         int st = exec_ast(ast->data.ast_negation.child);
         if (st == 0)
