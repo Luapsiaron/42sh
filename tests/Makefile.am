@@ -7,7 +7,7 @@ check_PROGRAMS = \
   test_io \
   test_lexer \
   test_execution \
-  test_execution
+  test_parser
 
 TESTS = run_tests.sh
 EXTRA_DIST = run_tests.sh
