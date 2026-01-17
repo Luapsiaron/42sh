@@ -17,15 +17,15 @@ struct exit_info exit_code = { .last = 0 };
 
 static void char_append(buffer_t *buff, char c)
 {
-    if (buff->idx + 1 < buff->capacity)
+    if (buff->idx + 1 >= buff->capacity)
     {
-        buff->buff[buff->idx++] = c;
-    }
-    else
-    {
-        buff->capacity *= 2;
+        buff->capacity = (buff->capacity == 0) ? 16 : buff->capacity * 2;
         buff->buff = realloc(buff->buff, buff->capacity);
+        if(!buff->buff)
+            return;
     }
+    buff->buff[buff->idx++] = c;
+
 }
 
 static void str_append(buffer_t *buff, char *str)

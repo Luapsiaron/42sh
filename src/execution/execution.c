@@ -145,40 +145,51 @@ int exec_cmd(char **argv)
     }
     return wait_status(pid);
 }
-static bool hm_assign(struct hash_map *hm, char **argv)
+
+static void exec_assignments(ast_t *assn, struct hash_map *hm)
 {
-    char *eq = strchr(argv[0], '=');
-    if(eq && argv[1] == NULL)
+    while(assn)
     {
-        *eq = '\0';
-        char *key = argv[0];
-        char *val = eq + 1;
-        hash_map_insert(hm, key, val, NULL);
-        
-        *eq = '=';
-        
-        return 0;
+        if(assn->type  == AST_ASSIGNMENT)
+        {
+            char *key = assn->data.ast_assignment.var_name;
+            char *val = assn->data.ast_assignment.value;
+            hash_map_insert(hm, key, val, NULL);
+            break;
+        }
+        else if (assn->type == AST_LIST)
+        {
+            ast_t *child = assn->data.ast_list.child;
+            if(child && child->type == AST_ASSIGNMENT)
+            {
+                char *key = assn->data.ast_assignment.var_name;
+                char *val = assn->data.ast_assignment.value;
+                hash_map_insert(hm, key, val, NULL);
+            }
+            assn = assn->data.ast_list.next;
 
+        }
+        else
+        {
+            break;
+        }
     }
-    return 1;
-
-
 }
+
 int exec_cmd_node(ast_t *cmd, struct hash_map *hm)
 /*
     If builtin: apply redirs in parent, run builtin, restore
     If external: fork, apply redirs in child, exec, wait
 */
 {
+    if(cmd->data.ast_cmd.assignments)
+    {
+        exec_assignments(cmd->data.ast_cmd.assignments, hm);
+    }
+    
     char **before_argv = cmd->data.ast_cmd.argv;
     if (!before_argv || !before_argv[0])
         return 0;
-
-    bool assigned = hm_assign(hm, before_argv);
-    if(!assigned)
-    {
-        return 1;
-    }
     
     char **argv = expand_argv(before_argv, hm);
     if(!argv || !argv[0])
