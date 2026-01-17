@@ -121,75 +121,75 @@ pipeline_collect(ast_t *p, ast_t **arr,
     pipeline_collect(p->data.ast_pipeline.right, arr, len);
 }
 
-int exec_pipeline(ast_t *pipe_node, struct hash_map *hm) // Execute a pipeline of commands
+static int fork_pipeline_stage(struct pipe_stage_args a,
+                               int *next_read, pid_t *pid_out)
+{
+    int fds[2] = { -1, -1 };
+    int is_last = (next_read == NULL);
+
+    if (!is_last && pipe(fds) < 0)
+        return 1;
+
+    pid_t pid = fork();
+    if (pid < 0)
+        return 1;
+
+    if (pid == 0)
+    {
+        if (a.prev_read != -1)
+            dup2(a.prev_read, 0);
+        if (!is_last)
+            dup2(fds[1], 1);
+
+        if (a.prev_read != -1)
+            close(a.prev_read);
+        if (!is_last) { close(fds[0]); close(fds[1]); }
+
+        if (a.cmd->type == AST_CMD)
+        {
+            struct saved_fd *saved = NULL;
+            if (apply_redirs(a.cmd->data.ast_cmd.redirs, &saved) != 0)
+                _exit(1);
+        }
+        _exit(child_exec_command(a.cmd, a.hm));
+    }
+
+    *pid_out = pid;
+
+    if (a.prev_read != -1)
+        close(a.prev_read);
+
+    if (!is_last)
+    {
+        close(fds[1]);
+        *next_read = fds[0];
+    }
+    return 0;
+}
+
+int exec_pipeline(ast_t *pipe_node, struct hash_map *hm)
 {
     ast_t *cmds[MAX_PIPELINE_CMDS];
-    int n = 0;
+    pid_t pids[MAX_PIPELINE_CMDS];
+    int n = 0, prev_read = -1;
+
     pipeline_collect(pipe_node, cmds, &n);
     if (n == 0)
         return 0;
 
-    int prev_read = -1;
-    pid_t pids[MAX_PIPELINE_CMDS];
-
     for (int i = 0; i < n; i++)
     {
-        int fds[2] = { -1, -1 };
-        if (i != n - 1)
-        {
-            if (pipe(fds) < 0)
-                return 1;
-        }
+        int is_last = (i == n - 1);
+        int *next_read = is_last ? NULL : &prev_read;
 
-        pid_t pid = fork();
-        if (pid < 0)
+        struct pipe_stage_args a = { cmds[i], hm, prev_read };
+        if (fork_pipeline_stage(a, next_read, &pids[i]) != 0)
             return 1;
 
-        if (pid == 0)
-        {
-            // stdin from previous pipe read
-            if (prev_read != -1)
-            {
-                dup2(prev_read, 0);
-            }
-            // stdout to current pipe write (unless last)
-            if (i != n - 1)
-            {
-                dup2(fds[1], 1);
-            }
-            // close fds we don't need in child
-            if (prev_read != -1)
-                close(prev_read);
-            if (i != n - 1)
-            {
-                close(fds[0]);
-                close(fds[1]);
-            }
-            // Apply command’s redirections AFTER pipe dup2
-            // (so redirs override the pipe if both exist)
-            if (cmds[i]->type == AST_CMD)
-            {
-                struct saved_fd *saved = NULL;
-                if (apply_redirs(cmds[i]->data.ast_cmd.redirs, &saved) != 0)
-                    _exit(1);
-            }
-            // execute command node
-            _exit(child_exec_command(cmds[i], hm));
-        }
-        // parent
-        pids[i] = pid;
-        if (prev_read != -1)
-            close(prev_read);
-        if (i != n - 1)
-        {
-            close(fds[1]); // parent closes write end
-            prev_read = fds[0]; // keep read end for next cmd
-        }
+        if (is_last)
+            prev_read = -1;
     }
-    // parent: close last prev_read if any
-    if (prev_read != -1)
-        close(prev_read);
-    // wait all; status is last command
+
     int last_status = 0;
     for (int i = 0; i < n; i++)
     {
@@ -199,3 +199,4 @@ int exec_pipeline(ast_t *pipe_node, struct hash_map *hm) // Execute a pipeline o
     }
     return last_status;
 }
+
