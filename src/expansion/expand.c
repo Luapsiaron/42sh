@@ -1,17 +1,17 @@
 #define _POSIX_C_SOURCE 200809L
 
 #include "expand.h"
-#include "hashmap.h"
-#include "../utils/str/str.h"
-
 
 #include <ctype.h>
 #include <err.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdio.h>
+
+#include "../utils/str/str.h"
+#include "hashmap.h"
 
 struct exit_info exit_code = { .last = 0 };
 
@@ -21,11 +21,10 @@ static void char_append(buffer_t *buff, char c)
     {
         buff->capacity = (buff->capacity == 0) ? 16 : buff->capacity * 2;
         buff->buff = realloc(buff->buff, buff->capacity);
-        if(!buff->buff)
+        if (!buff->buff)
             return;
     }
     buff->buff[buff->idx++] = c;
-
 }
 
 static void str_append(buffer_t *buff, char *str)
@@ -36,6 +35,24 @@ static void str_append(buffer_t *buff, char *str)
     {
         char_append(buff, str[i]);
     }
+}
+
+static char *dollar_hashtag(struct hash_map *hm)
+{
+    int c = 0;
+    char key[16];
+    while (1)
+    {
+        sprintf(key, "%d", c + 1);
+        if (!hash_map_get(hm, key))
+        {
+            break;
+        }
+        c++;
+    }
+    char *res = malloc(16);
+    sprintf(res, "%d", c);
+    return res;
 }
 
 static char *handle_specials(struct hash_map *hm,
@@ -55,6 +72,9 @@ static char *handle_specials(struct hash_map *hm,
     }
     if (strcmp(var_name, "RANDOM") == 0) // RANDOM VALUE
     {
+        char *res = malloc(16);
+        sprintf(res, "%d", rand() % 32768); // 0-32767 range in bash rand
+        return res;
     }
     if (strcmp(var_name, "*") == 0) //
     {
@@ -64,18 +84,40 @@ static char *handle_specials(struct hash_map *hm,
     }
     if (strcmp(var_name, "#") == 0) // ARG NUMBER
     {
+        return dollar_hashtag(hm);
     }
     if (strcmp(var_name, "UID") == 0)
     {
+        char *res = malloc(16);
+        sprintf(res, "%d", getuid());
+        return res;
     }
     if (strcmp(var_name, "IFS") == 0)
     {
+        char *val = hash_map_get(hm, "IFS");
+        if (val != NULL)
+        {
+            return xstrdup(val);
+        }
+        return xstrdup("");
     }
-    if (strcmp(var_name, "PWD"))
+    if (strcmp(var_name, "PWD") == 0)
     {
+        char *val = hash_map_get(hm, "PWD");
+        if (val)
+        {
+            return xstrdup(val);
+        }
+        return xstrdup("");
     }
-    if (strcmp(var_name, "OLDPWD"))
+    if (strcmp(var_name, "OLDPWD") == 0)
     {
+        char *val = hash_map_get(hm, "OLDPWD");
+        if (val != NULL)
+        {
+            return xstrdup(val);
+        }
+        return xstrdup("");
     }
 
     char *val = hash_map_get(hm, var_name);
@@ -86,8 +128,8 @@ static char *handle_specials(struct hash_map *hm,
     return NULL;
 }
 
-static void handle_dollar(buffer_t *buff, size_t *index, char *word, 
-    struct hash_map *hm)
+static void handle_dollar(buffer_t *buff, size_t *index, char *word,
+                          struct hash_map *hm)
 {
     (*index)++; // skip first $
 
@@ -169,6 +211,19 @@ char **expand_argv(char **argv, struct hash_map *hm)
     return res;
 }
 
+static void handle_escaped(buffer_t *buff, char *word, size_t *i)
+{
+    if (word[*i + 1] == '\\' || word[*i + 1] == '$' || word[*i + 1] == '"'
+        || word[*i + 1] == '\n')
+    {
+        (*i)++;
+        char_append(buff, word[*i]);
+    }
+    else
+    {
+        char_append(buff, '\\');
+    }
+}
 char *expand_word(char *word, struct hash_map *hm)
 {
     bool in_squote = false;
@@ -205,16 +260,7 @@ char *expand_word(char *word, struct hash_map *hm)
             }
             else if (c == '\\')
             {
-                if (word[i + 1] == '\\'
-                    || word[i + 1] == '$') // escape only \ and $ in dquote ?
-                {
-                    i++;
-                    char_append(&buff, word[i]);
-                }
-                else
-                {
-                    char_append(&buff, '\\');
-                }
+                handle_escaped(&buff, word, &i);
             }
             else
             {

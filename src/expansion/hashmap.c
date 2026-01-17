@@ -12,7 +12,7 @@ static size_t hash(const char *str) // DJB2 Algorithm
 {
     size_t hash = 5381;
     int c;
-    while((c = *str++))
+    while ((c = *str++))
     {
         hash = hash * 33 + c;
     }
