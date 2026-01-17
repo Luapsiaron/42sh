@@ -13,7 +13,7 @@
 #include "../utils/str/str.h"
 #include "hashmap.h"
 
-struct exit_info exit_code = { .last = 0 };
+static struct exit_info exit_code = { .last = 0 };
 
 static void char_append(buffer_t *buff, char c)
 {

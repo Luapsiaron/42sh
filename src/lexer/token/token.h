@@ -49,6 +49,12 @@ typedef struct token
                   // Only for TOKEN_WORD, NULL for others
 } token_t;
 
+struct reserved_word
+{
+    const char *word;
+    token_type_t type;
+};
+
 // Allocate and initialize a new token
 // type: type of the token
 // value: lexeme of the token (Word copied with strdup or NULL)

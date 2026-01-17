@@ -37,12 +37,6 @@ void token_free(token_t *t)
     free(t);
 }
 
-struct reserved_word
-{
-    const char *word;
-    token_type_t type;
-};
-
 static const struct reserved_word reserved_words[] = {
     { "if", TOKEN_IF },       { "then", TOKEN_THEN },   { "else", TOKEN_ELSE },
     { "elif", TOKEN_ELIF },   { "fi", TOKEN_FI },       { "for", TOKEN_FOR },
