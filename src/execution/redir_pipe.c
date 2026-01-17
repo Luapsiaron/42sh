@@ -121,8 +121,8 @@ pipeline_collect(ast_t *p, ast_t **arr,
     pipeline_collect(p->data.ast_pipeline.right, arr, len);
 }
 
-static int fork_pipeline_stage(struct pipe_stage_args a,
-                               int *next_read, pid_t *pid_out)
+static int fork_pipeline_stage(struct pipe_stage_args a, int *next_read,
+                               pid_t *pid_out)
 {
     int fds[2] = { -1, -1 };
     int is_last = (next_read == NULL);
@@ -143,7 +143,11 @@ static int fork_pipeline_stage(struct pipe_stage_args a,
 
         if (a.prev_read != -1)
             close(a.prev_read);
-        if (!is_last) { close(fds[0]); close(fds[1]); }
+        if (!is_last)
+        {
+            close(fds[0]);
+            close(fds[1]);
+        }
 
         if (a.cmd->type == AST_CMD)
         {
@@ -199,4 +203,3 @@ int exec_pipeline(ast_t *pipe_node, struct hash_map *hm)
     }
     return last_status;
 }
-

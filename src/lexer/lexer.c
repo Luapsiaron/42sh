@@ -65,15 +65,16 @@ static int append_buffer(char *buffer, size_t *index, size_t capacity, int c)
 {
     if (*index >= capacity - 1)
     {
-        return 0; 
+        return 0;
     }
     buffer[(*index)++] = (char)c;
     return 1;
 }
 
-static int lexer_single_quotes(lexer_t *lx, char *buffer, size_t *index, size_t capacity)
+static int lexer_single_quotes(lexer_t *lx, char *buffer, size_t *index,
+                               size_t capacity)
 {
-    if(!append_buffer(buffer, index, capacity, '\''))
+    if (!append_buffer(buffer, index, capacity, '\''))
     {
         return 0;
     }
@@ -90,10 +91,10 @@ static int lexer_single_quotes(lexer_t *lx, char *buffer, size_t *index, size_t 
 
     if (lx->current != '\'')
     {
-        return 0; 
+        return 0;
     }
 
-    if(!append_buffer(buffer, index, capacity, '\''))
+    if (!append_buffer(buffer, index, capacity, '\''))
     {
         return 0;
     }
@@ -101,9 +102,10 @@ static int lexer_single_quotes(lexer_t *lx, char *buffer, size_t *index, size_t 
     return 1;
 }
 
-static int lexer_double_quotes(lexer_t *lx, char *buffer, size_t *index, size_t capacity)
+static int lexer_double_quotes(lexer_t *lx, char *buffer, size_t *index,
+                               size_t capacity)
 {
-    if(!append_buffer(buffer, index, capacity, '"'))
+    if (!append_buffer(buffer, index, capacity, '"'))
     {
         return 0;
     }
@@ -111,25 +113,25 @@ static int lexer_double_quotes(lexer_t *lx, char *buffer, size_t *index, size_t 
 
     while (lx->current != EOF && lx->current != '"')
     {
-        if(lx->current == '\\')
+        if (lx->current == '\\')
         {
             lexer_next_char(lx);
             if (lx->current == EOF)
             {
-                return 0; 
+                return 0;
             }
 
-            if(lx->current == '\n')
+            if (lx->current == '\n')
             {
                 lexer_next_char(lx);
-                continue; 
+                continue;
             }
 
-            if(!append_buffer(buffer, index, capacity, '\\'))
+            if (!append_buffer(buffer, index, capacity, '\\'))
             {
-                return 0; 
+                return 0;
             }
-            if(!append_buffer(buffer, index, capacity, lx->current))
+            if (!append_buffer(buffer, index, capacity, lx->current))
             {
                 return 0;
             }
@@ -138,16 +140,16 @@ static int lexer_double_quotes(lexer_t *lx, char *buffer, size_t *index, size_t 
         }
         if (!append_buffer(buffer, index, capacity, lx->current))
         {
-            return 0; 
+            return 0;
         }
         lexer_next_char(lx);
     }
 
     if (lx->current != '"')
     {
-        return 0; 
+        return 0;
     }
-    if(!append_buffer(buffer, index, capacity, '"'))
+    if (!append_buffer(buffer, index, capacity, '"'))
     {
         return 0;
     }
@@ -171,7 +173,7 @@ static token_t *lexer_is_word(lexer_t *lx)
             quote = 1;
             if (!lexer_single_quotes(lx, buffer, &i, sizeof(buffer)))
             {
-                return NULL; 
+                return NULL;
             }
             continue;
         }
@@ -180,13 +182,13 @@ static token_t *lexer_is_word(lexer_t *lx)
             quote = 1;
             if (!lexer_double_quotes(lx, buffer, &i, sizeof(buffer)))
             {
-                return NULL; 
+                return NULL;
             }
             continue;
         }
         if (!append_buffer(buffer, &i, sizeof(buffer), lx->current))
         {
-            return NULL; 
+            return NULL;
         }
         lexer_next_char(lx);
     }
@@ -204,7 +206,8 @@ static token_t *lexer_is_word(lexer_t *lx)
     }
 
     token_type_t type;
-    if (!quote && lx->condition == LEXER_NORMAL && token_is_reserved_word(buffer, &type))
+    if (!quote && lx->condition == LEXER_NORMAL
+        && token_is_reserved_word(buffer, &type))
     {
         return token_new(type, NULL);
     }
@@ -349,7 +352,7 @@ token_t *lexer_next(lexer_t *lx)
     }
     if ((token = handle_and_or(lx)) != NULL)
     {
-        if(token->type == TOKEN_AND_IF)
+        if (token->type == TOKEN_AND_IF)
         {
             lx->condition = LEXER_NORMAL;
         }

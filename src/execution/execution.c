@@ -13,10 +13,10 @@
 
 #include "../ast/ast.h"
 #include "../builtins/echo.h"
-#include "redir_pipe.h"
-#include "loop.h"
-#include "condition.h"
 #include "../expansion/expand.h"
+#include "condition.h"
+#include "loop.h"
+#include "redir_pipe.h"
 
 // command not found = 127
 // command not executable = 126
@@ -45,7 +45,6 @@ static int exec_builtin(char **argv)
     return 127;
 }
 
-
 int wait_status(pid_t pid)
 {
     int st = 0;
@@ -69,7 +68,7 @@ int exec_ast(ast_t *ast, struct hash_map *hm)
     case AST_IF:
         return exec_if(ast, hm);
     case AST_CMD:
-        return exec_cmd_node(ast,hm);
+        return exec_cmd_node(ast, hm);
     case AST_PIPELINE:
         return exec_pipeline(ast, hm);
     case AST_AND_OR:
@@ -79,7 +78,7 @@ int exec_ast(ast_t *ast, struct hash_map *hm)
     case AST_FOR:
         return exec_for(ast, hm);
     case AST_NEGATION: {
-        int st = exec_ast(ast->data.ast_negation.child,hm);
+        int st = exec_ast(ast->data.ast_negation.child, hm);
         if (st == 0)
             return 1;
         else if (st == 1)
@@ -147,9 +146,9 @@ int exec_cmd(char **argv)
 
 static void exec_assignments(ast_t *assn, struct hash_map *hm)
 {
-    while(assn)
+    while (assn)
     {
-        if(assn->type  == AST_ASSIGNMENT)
+        if (assn->type == AST_ASSIGNMENT)
         {
             char *key = assn->data.ast_assignment.var_name;
             char *val = assn->data.ast_assignment.value;
@@ -159,14 +158,13 @@ static void exec_assignments(ast_t *assn, struct hash_map *hm)
         else if (assn->type == AST_LIST)
         {
             ast_t *child = assn->data.ast_list.child;
-            if(child && child->type == AST_ASSIGNMENT)
+            if (child && child->type == AST_ASSIGNMENT)
             {
                 char *key = assn->data.ast_assignment.var_name;
                 char *val = assn->data.ast_assignment.value;
                 hash_map_insert(hm, key, val, NULL);
             }
             assn = assn->data.ast_list.next;
-
         }
         else
         {
@@ -181,17 +179,17 @@ int exec_cmd_node(ast_t *cmd, struct hash_map *hm)
     If external: fork, apply redirs in child, exec, wait
 */
 {
-    if(cmd->data.ast_cmd.assignments)
+    if (cmd->data.ast_cmd.assignments)
     {
         exec_assignments(cmd->data.ast_cmd.assignments, hm);
     }
-    
+
     char **before_argv = cmd->data.ast_cmd.argv;
     if (!before_argv || !before_argv[0])
         return 0;
-    
+
     char **argv = expand_argv(before_argv, hm);
-    if(!argv || !argv[0])
+    if (!argv || !argv[0])
     {
         free_argv((argv));
         return 0;

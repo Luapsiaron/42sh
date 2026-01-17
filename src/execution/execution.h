@@ -3,8 +3,8 @@
 
 #include <sys/types.h>
 
-#include "ast/ast.h"
 #include "../expansion/hashmap.h"
+#include "ast/ast.h"
 
 int exec_cmd_node(ast_t *cmd, struct hash_map *hm);
 int exec_ast(ast_t *ast, struct hash_map *hm);

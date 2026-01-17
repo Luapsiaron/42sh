@@ -3,7 +3,7 @@
 ast_t *parse_list(parser_t *p)
 {
     skip_newlines(p);
-    if(peek(p) == TOKEN_SEMICOLON)
+    if (peek(p) == TOKEN_SEMICOLON)
     {
         return NULL;
     }

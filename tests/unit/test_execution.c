@@ -4,9 +4,8 @@
 
 #include "../../src/ast/ast.h"
 #include "../../src/execution/execution.h"
-#include "../../src/utils/str/str.h"
 #include "../../src/expansion/hashmap.h"
-
+#include "../../src/utils/str/str.h"
 
 static void redirect_all_stdout(void)
 {

@@ -11,7 +11,8 @@ struct saved_fd
     struct saved_fd *next;
 };
 
-struct pipe_stage_args {
+struct pipe_stage_args
+{
     ast_t *cmd;
     struct hash_map *hm;
     int prev_read;

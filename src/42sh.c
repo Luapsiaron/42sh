@@ -7,12 +7,13 @@
 #include <unistd.h>
 
 #include "execution/execution.h"
+#include "expansion/hashmap.h"
 #include "io/io.h"
 #include "parser/parser.h"
 #include "utils/parser/pretty_printer.h"
-#include "expansion/hashmap.h"
 
-struct input_sel_ctx {
+struct input_sel_ctx
+{
     int argc;
     char **argv;
     char *command;
@@ -96,7 +97,8 @@ static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close)
         FILE *in = fopen(path, "r");
         if (!in)
         {
-            fprintf(stderr, "42sh: cannot open '%s': %s\n", path, strerror(errno));
+            fprintf(stderr, "42sh: cannot open '%s': %s\n", path,
+                    strerror(errno));
             hash_map_free(c.hm);
             exit(2);
         }
@@ -118,19 +120,29 @@ int main(int argc, char **argv, char **envp)
 
     for (int i = 1; i < argc; ++i)
         if (strcmp(argv[i], "--pretty-print") == 0)
-        { pretty_print = 1; for (int j = i; j < argc - 1; ++j) argv[j] = argv[j + 1]; --argc; --i; }
+        {
+            pretty_print = 1;
+            for (int j = i; j < argc - 1; ++j)
+                argv[j] = argv[j + 1];
+            --argc;
+            --i;
+        }
 
     while ((opt = getopt(argc, argv, "c:")) != -1)
-        if (opt == 'c') command = optarg;
-        else if (opt == '?' && optopt == 'c') error_usage("option -c requires an argument");
-        else error_usage("invalid option");
+        if (opt == 'c')
+            command = optarg;
+        else if (opt == '?' && optopt == 'c')
+            error_usage("option -c requires an argument");
+        else
+            error_usage("invalid option");
 
     bool must_close = false;
     struct input_sel_ctx c = { argc, argv, command, hm };
     FILE *input = select_input_stream(c, &must_close);
 
     int status = run_stream(input, pretty_print, hm);
-    if (must_close && input) fclose(input);
+    if (must_close && input)
+        fclose(input);
     hash_map_free(hm);
     return status;
 }

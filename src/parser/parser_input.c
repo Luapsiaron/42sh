@@ -14,7 +14,7 @@ ast_t *parse_input(FILE *f)
     }
 
     skip_newlines(&p);
-    if(peek(&p) == TOKEN_SEMICOLON || peek(&p) == TOKEN_NEWLINE)
+    if (peek(&p) == TOKEN_SEMICOLON || peek(&p) == TOKEN_NEWLINE)
     {
         token_free(p.current_token);
         p.current_token = NULL;

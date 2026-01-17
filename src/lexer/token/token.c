@@ -37,23 +37,17 @@ void token_free(token_t *t)
     free(t);
 }
 
-struct reserved_word {
+struct reserved_word
+{
     const char *word;
     token_type_t type;
 };
 
 static const struct reserved_word reserved_words[] = {
-    {"if", TOKEN_IF},
-    {"then", TOKEN_THEN},
-    {"else", TOKEN_ELSE},
-    {"elif", TOKEN_ELIF},
-    {"fi", TOKEN_FI},
-    {"for", TOKEN_FOR},
-    {"while", TOKEN_WHILE},
-    {"until", TOKEN_UNTIL},
-    {"in", TOKEN_IN},
-    {"do", TOKEN_DO},
-    {"done", TOKEN_DONE},
+    { "if", TOKEN_IF },       { "then", TOKEN_THEN },   { "else", TOKEN_ELSE },
+    { "elif", TOKEN_ELIF },   { "fi", TOKEN_FI },       { "for", TOKEN_FOR },
+    { "while", TOKEN_WHILE }, { "until", TOKEN_UNTIL }, { "in", TOKEN_IN },
+    { "do", TOKEN_DO },       { "done", TOKEN_DONE },
 };
 
 int token_is_reserved_word(const char *s, token_type_t *out_type)

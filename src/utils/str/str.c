@@ -31,7 +31,7 @@ char *xstrndup(const char *s, size_t n)
     char *p = malloc(len + 1);
     if (!p)
         return NULL;
-    
+
     memcpy(p, s, len);
     p[len] = '\0';
     return p;

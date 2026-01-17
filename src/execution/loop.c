@@ -1,8 +1,9 @@
 #include "execution/loop.h"
-#include "execution.h"
+
 #include "../ast/ast.h"
-#include "../expansion/hashmap.h"
 #include "../expansion/expand.h"
+#include "../expansion/hashmap.h"
+#include "execution.h"
 
 static int loop_should_continue(loop_t type, int cond_status)
 {
@@ -33,9 +34,6 @@ int exec_while_until(ast_t *ast, struct hash_map *hm)
     return last_status;
 }
 
-
-
-
 int exec_for(ast_t *ast, struct hash_map *hm)
 {
     if (!ast || ast->type != AST_FOR)
@@ -60,6 +58,6 @@ int exec_for(ast_t *ast, struct hash_map *hm)
         hash_map_insert(hm, var_name, values[i], NULL);
         last_status = exec_ast(f->body, hm);
     }
-    
+
     return last_status;
 }

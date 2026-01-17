@@ -1,8 +1,8 @@
 #ifndef HASHMAP_H
 #define HASHMAP_H
 
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 struct pair_list
 {
