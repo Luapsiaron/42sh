@@ -2,7 +2,6 @@
 #include <criterion/redirect.h>
 
 #include "../../src/ast/ast.h"
-#include "../../src/ast/ast_free.h"
 #include "../../src/utils/str/str.h"
 
 Test(ast, cmd_init_sets_type_and_argv)

@@ -6,8 +6,12 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 noinst_LIBRARIES = lib42sh.a
 
 lib42sh_a_SOURCES = \
-  ast/ast.c \
-  ast/ast_free.c \
+  ast/ast_commands.c \
+  ast/ast_basics.c \
+  ast/ast_core.c \
+  ast/ast_operators.c \
+  ast/ast_redir.c \
+  ast/ast_assignment.c \
   ast/ast_printer.c \
   builtins/echo.c \
   execution/execution.c \

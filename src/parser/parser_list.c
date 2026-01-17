@@ -2,7 +2,11 @@
 
 ast_t *parse_list(parser_t *p)
 {
-    skip_semicolon_newline(p);
+    skip_newlines(p);
+    if(peek(p) == TOKEN_SEMICOLON)
+    {
+        return NULL;
+    }
 
     ast_t *child = parse_and_or(p);
     if (!child)
@@ -24,7 +28,11 @@ ast_t *parse_list(parser_t *p)
         {
             break;
         }
-
+        if (peek(p) == TOKEN_SEMICOLON)
+        {
+            ast_free(head);
+            return NULL;
+        }
         if (peek(p) == TOKEN_EOF)
         {
             break;

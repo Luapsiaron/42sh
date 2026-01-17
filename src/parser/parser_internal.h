@@ -2,7 +2,6 @@
 #define PARSER_INTERNAL_H
 
 #include "../ast/ast.h"
-#include "../ast/ast_free.h"
 #include "../lexer/lexer.h"
 #include "../lexer/token/token.h"
 

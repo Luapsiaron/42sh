@@ -77,23 +77,24 @@ static token_t *lexer_is_word(lexer_t *lx)
 
     if (is_assignment_word(buffer))
     {
+        lx->condition = LEXER_WORD_UNTIL;
         return token_new(TOKEN_ASSIGNMENT_WORD, buffer);
     }
 
-    if (lx->force_word)
+    if (lx->condition == LEXER_FORCE_WORD)
     {
+        lx->condition = LEXER_WORD_UNTIL;
         return token_new(TOKEN_WORD, buffer);
     }
 
-    token_type_t type;
-    if (token_is_reserved_word(buffer, &type))
+    if (lx->condition == LEXER_NORMAL)
     {
-        return token_new(type, NULL);
+        token_type_t type;
+        if (token_is_reserved_word(buffer, &type))
+            return token_new(type, NULL);
     }
-    if (is_assignment_word(buffer))
-    {
-        return token_new(TOKEN_ASSIGNMENT_WORD, buffer);
-    }
+
+    lx->condition = LEXER_WORD_UNTIL;
     return token_new(TOKEN_WORD, buffer);
 }
 
@@ -112,7 +113,7 @@ static token_t *handle_comment(lexer_t *lx)
         return NULL;
     }
     lexer_skip_comment(lx);
-    return lexer_next(lx);
+    return token_new(TOKEN_NEWLINE, NULL);
 }
 
 static token_t *handle_separator(lexer_t *lx)
@@ -120,11 +121,13 @@ static token_t *handle_separator(lexer_t *lx)
     if (lx->current == ';')
     {
         lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
         return token_new(TOKEN_SEMICOLON, NULL);
     }
     if (lx->current == '\n')
     {
         lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
         return token_new(TOKEN_NEWLINE, NULL);
     }
     return NULL;
@@ -135,7 +138,7 @@ static token_t *handle_redirection(lexer_t *lx)
     if (lx->current == '<')
     {
         lexer_next_char(lx);
-        lx->force_word = 1;
+        lx->condition = LEXER_FORCE_WORD;
         return token_new(TOKEN_LESS, NULL);
     }
     if (lx->current != '>')
@@ -143,7 +146,7 @@ static token_t *handle_redirection(lexer_t *lx)
         return NULL;
     }
     lexer_next_char(lx);
-    lx->force_word = 1;
+    lx->condition = LEXER_FORCE_WORD;
     if (lx->current == '>')
     {
         lexer_next_char(lx);
@@ -167,8 +170,10 @@ static token_t *handle_and_or(lexer_t *lx)
     if (lx->current == '&')
     {
         lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
         return token_new(TOKEN_AND_IF, NULL);
     }
+    lx->condition = LEXER_WORD_UNTIL;
     return token_new(TOKEN_WORD, "&");
 }
 
@@ -182,8 +187,10 @@ static token_t *handle_pipe_or(lexer_t *lx)
     if (lx->current == '|')
     {
         lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
         return token_new(TOKEN_OR_IF, NULL);
     }
+    lx->condition = LEXER_NORMAL;
     return token_new(TOKEN_PIPE, NULL);
 }
 
@@ -194,6 +201,7 @@ static token_t *handle_negation(lexer_t *lx)
         return NULL;
     }
     lexer_next_char(lx);
+    lx->condition = LEXER_NORMAL;
     return token_new(TOKEN_NEGATION, NULL);
 }
 
@@ -201,7 +209,7 @@ void lexer_init(lexer_t *lx, FILE *input)
 {
     lx->input = input;
     lx->current = fgetc(input);
-    lx->force_word = 0;
+    lx->condition = LEXER_NORMAL;
 }
 
 token_t *lexer_next(lexer_t *lx)
@@ -216,27 +224,41 @@ token_t *lexer_next(lexer_t *lx)
     }
     if ((token = handle_separator(lx)) != NULL)
     {
+        lx->condition = LEXER_NORMAL;
         return token;
     }
     if ((token = handle_redirection(lx)) != NULL)
     {
+        lx->condition = LEXER_FORCE_WORD;
         return token;
     }
     if ((token = handle_and_or(lx)) != NULL)
     {
+        if(token->type == TOKEN_AND_IF)
+        {
+            lx->condition = LEXER_NORMAL;
+        }
+        else
+        {
+            lx->condition = LEXER_WORD_UNTIL;
+        }
         return token;
     }
     if ((token = handle_pipe_or(lx)) != NULL)
     {
+        lx->condition = LEXER_NORMAL;
         return token;
     }
     if ((token = handle_negation(lx)) != NULL)
     {
+        lx->condition = LEXER_NORMAL;
         return token;
     }
     if (isdigit(lx->current))
     {
-        return lexer_ionumber(lx);
+        token = lexer_ionumber(lx);
+        lx->condition = LEXER_WORD_UNTIL;
+        return token;
     }
     if (lx->current == EOF)
     {

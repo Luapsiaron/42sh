@@ -1,4 +1,4 @@
-#include "ast_free.h"
+#include "ast.h"
 
 #include <stdlib.h>
 
@@ -122,4 +122,16 @@ void ast_free(ast_t *node)
         break;
     }
     free(node);
+}
+
+ast_t *ast_init(ast_type_t type)
+{
+    ast_t *new = calloc(1, sizeof(*new));
+    if (!new)
+    {
+        return NULL;
+    }
+
+    new->type = type;
+    return new;
 }

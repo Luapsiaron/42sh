@@ -12,7 +12,6 @@
 #include <unistd.h>
 
 #include "../ast/ast.h"
-#include "../ast/ast_free.h"
 #include "../builtins/echo.h"
 #include "redir_pipe.h"
 #include "loop.h"

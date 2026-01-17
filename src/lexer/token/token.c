@@ -37,67 +37,38 @@ void token_free(token_t *t)
     free(t);
 }
 
-int token_is_reserved_word(const char *s, token_type_t *out)
-{
-    if (!s || !out)
-    {
-        return 0;
-    }
-    if (!strcmp(s, "if"))
-    {
-        *out = TOKEN_IF;
-        return 1;
-    }
+struct reserved_word {
+    const char *word;
+    token_type_t type;
+};
 
-    if (!strcmp(s, "then"))
+static const struct reserved_word reserved_words[] = {
+    {"if", TOKEN_IF},
+    {"then", TOKEN_THEN},
+    {"else", TOKEN_ELSE},
+    {"elif", TOKEN_ELIF},
+    {"fi", TOKEN_FI},
+    {"for", TOKEN_FOR},
+    {"while", TOKEN_WHILE},
+    {"until", TOKEN_UNTIL},
+    {"in", TOKEN_IN},
+    {"do", TOKEN_DO},
+    {"done", TOKEN_DONE},
+};
+
+int token_is_reserved_word(const char *s, token_type_t *out_type)
+{
+    size_t n = sizeof(reserved_words) / sizeof(reserved_words[0]);
+    for (size_t i = 0; i < n; i++)
     {
-        *out = TOKEN_THEN;
-        return 1;
-    }
-    if (!strcmp(s, "else"))
-    {
-        *out = TOKEN_ELSE;
-        return 1;
-    }
-    if (!strcmp(s, "elif"))
-    {
-        *out = TOKEN_ELIF;
-        return 1;
-    }
-    if (!strcmp(s, "fi"))
-    {
-        *out = TOKEN_FI;
-        return 1;
-    }
-    if (!strcmp(s, "for"))
-    {
-        *out = TOKEN_FOR;
-        return 1;
-    }
-    if (!strcmp(s, "while"))
-    {
-        *out = TOKEN_WHILE;
-        return 1;
-    }
-    if (!strcmp(s, "until"))
-    {
-        *out = TOKEN_UNTIL;
-        return 1;
-    }
-    if (!strcmp(s, "in"))
-    {
-        *out = TOKEN_IN;
-        return 1;
-    }
-    if (!strcmp(s, "do"))
-    {
-        *out = TOKEN_DO;
-        return 1;
-    }
-    if (!strcmp(s, "done"))
-    {
-        *out = TOKEN_DONE;
-        return 1;
+        if (strcmp(s, reserved_words[i].word) == 0)
+        {
+            if (out_type)
+            {
+                *out_type = reserved_words[i].type;
+            }
+            return 1;
+        }
     }
     return 0;
 }

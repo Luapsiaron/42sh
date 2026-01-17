@@ -13,8 +13,8 @@ ast_t *parse_input(FILE *f)
         return NULL;
     }
 
-    skip_semicolon_newline(&p);
-    if (peek(&p) == TOKEN_EOF)
+    skip_newlines(&p);
+    if(peek(&p) == TOKEN_SEMICOLON || peek(&p) == TOKEN_NEWLINE)
     {
         token_free(p.current_token);
         p.current_token = NULL;

@@ -2,6 +2,10 @@
 #define AST_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "../utils/str/str.h"
 
 /* transform tokens into AST nodes */
 
@@ -142,6 +146,8 @@ typedef struct ast
     union ast_union data;
 } ast_t;
 
+ast_t *ast_init(ast_type_t type);
+
 ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body);
 ast_t *ast_cmd_init(char **argv);
 ast_t *ast_list_init(ast_t *next, ast_t *child);
@@ -157,5 +163,8 @@ int ast_redir_append(ast_t *cmd, ast_t *redir);
 
 ast_t *ast_assignment_init(const char *var, const char *value);
 int ast_assignment_append(ast_t *cmd, ast_t *assignment);
+
+void free_argv(char **argv);
+void ast_free(ast_t *node);
 
 #endif /* ! AST_H */
