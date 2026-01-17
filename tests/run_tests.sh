@@ -120,10 +120,10 @@ run_unit()
   fi
 
   if "$bin"; then
-    echo "[OK] $name"
+    echo -e "${GREEN}[OK] $name${CANCEL}"
     passed=$((passed + 1))
   else
-    echo "- FAILED: $name"
+    echo -e "${RED}- FAILED: $name${CANCEL}"
   fi
 }
 
@@ -242,7 +242,7 @@ if [ "$total" -gt 0 ]; then
 fi
 
 echo "----------------------------------------"
-echo "${YELLOW}Result: $passed / $total => $pct% ${CANCEL}"
+echo -e "${YELLOW}Result: $passed / $total => $pct% ${CANCEL}"
 
 if [ -n "$OUTPUT_FILE" ]; then
   printf "%d" "$pct" > "$OUTPUT_FILE"
