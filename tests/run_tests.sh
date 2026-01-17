@@ -207,8 +207,12 @@ run_test "OR false true" "false || true; echo after_or"
 run_test "OR false false" "false || false; echo after_or"
 
 # While loop
-run_test "Simple while false loop" "while false; do echo 1; done"
-run_test "While with false" "while false; do echo ShouldPrint; done; echo Done"
+run_test "Simple while loop" "A=0; while \$A == 3 ; do echo \$A; A=\$((A + 1)); done"
+run_test "While loop never true" "A=0; while \$A == 5 ; do echo \$A; A=\$((A + 1)); done; echo end"
+
+# For loop
+run_test "Simple for loop" "for I in 1 2 3 ; do echo \$I; done"
+run_test "For loop no iterations" "for I in 1; do echo \$I; done;"
 
 # ================= RUN SCRIPT ===================
 

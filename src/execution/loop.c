@@ -2,7 +2,7 @@
 #include "execution.h"
 #include "../ast/ast.h"
 #include "../expansion/hashmap.h"
-
+#include "../expansion/expand.h"
 
 static int loop_should_continue(loop_t type, int cond_status)
 {
@@ -38,8 +38,28 @@ int exec_while_until(ast_t *ast, struct hash_map *hm)
 
 int exec_for(ast_t *ast, struct hash_map *hm)
 {
-    // TODO
-    (void)ast;
-    (void)hm;
-    return 0;
+    if (!ast || ast->type != AST_FOR)
+        return 2;
+    struct ast_for *f = &ast->data.ast_for;
+    if (!f->first_arg || f->first_arg->type != AST_CMD
+        || !f->first_arg->data.ast_cmd.argv
+        || !f->first_arg->data.ast_cmd.argv[0])
+        return 2;
+    const char *var_name = f->first_arg->data.ast_cmd.argv[0];
+    int last_status = 0;
+    if (!f->second_arg)
+        return 0;
+
+    if (f->second_arg->type != AST_CMD || !f->second_arg->data.ast_cmd.argv)
+        return 2;
+    char **values = expand_argv(f->second_arg->data.ast_cmd.argv, hm);
+    if (!values)
+        return 2;
+    for (size_t i = 0; values[i]; i++)
+    {
+        hash_map_insert(hm, var_name, values[i], NULL);
+        last_status = exec_ast(f->body, hm);
+    }
+    
+    return last_status;
 }
