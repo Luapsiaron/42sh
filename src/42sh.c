@@ -82,8 +82,7 @@ static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close)
 
     if (c.command != NULL)
     {
-        if (remaining > 0)
-            error_usage("cannot use -c with a script file operand");
+        // With -c, the remaining operands are positional parameters ($1..$n).
         FILE *in = io_string_to_file(c.command);
         if (!in)
             error_usage("failed to open script string");
@@ -106,6 +105,29 @@ static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close)
         return in;
     }
     return stdin;
+}
+
+
+static void init_positional_params(struct hash_map *hm, int argc, char **argv,
+                                   int start_index)
+{
+    if (!hm)
+        return;
+    if (argv && argv[0])
+        hash_map_insert(hm, "0", argv[0], NULL);
+
+    if (start_index < 0)
+        start_index = 0;
+    if (!argv || start_index >= argc)
+        return;
+
+    int pos = 1;
+    for (int i = start_index; i < argc; i++, pos++)
+    {
+        char key[16];
+        snprintf(key, sizeof(key), "%d", pos);
+        hash_map_insert(hm, key, argv[i], NULL);
+    }
 }
 
 int main(int argc, char **argv, char **envp)
@@ -135,6 +157,14 @@ int main(int argc, char **argv, char **envp)
             error_usage("option -c requires an argument");
         else
             error_usage("invalid option");
+    if (command != NULL)
+    {
+        init_positional_params(hm, argc, argv, optind);
+    }
+    else if (argc - optind >= 1)
+    {
+        init_positional_params(hm, argc, argv, optind + 1);
+    }
 
     bool must_close = false;
     struct input_sel_ctx c = { argc, argv, command, hm };
@@ -146,3 +176,4 @@ int main(int argc, char **argv, char **envp)
     hash_map_free(hm);
     return status;
 }
+

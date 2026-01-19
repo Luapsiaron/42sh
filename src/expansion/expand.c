@@ -149,7 +149,7 @@ static void handle_dollar(buffer_t *buff, size_t *index, char *word,
         if (word[*index] == '}')
         {
             len_name = *index - start;
-            var_name = strndup(word + start, len_name); // STRNDUP a implem
+            var_name = strndup(word + start, len_name);
         }
         else
         {
@@ -158,7 +158,8 @@ static void handle_dollar(buffer_t *buff, size_t *index, char *word,
     }
     else // $VAR
     {
-        if (word[*index] == '?' || word[*index] == '!' || word[*index] == '$')
+        if (word[*index] == '?' || word[*index] == '!' || word[*index] == '$'
+            || word[*index] == '#' || word[*index] == '*' || word[*index] == '@')
         {
             len_name = 1;
             (*index)++;
@@ -179,7 +180,7 @@ static void handle_dollar(buffer_t *buff, size_t *index, char *word,
 
     if (var_name != NULL)
     {
-        char *value = handle_specials(hm, var_name); // GET VALUE
+        char *value = handle_specials(hm, var_name);
         if (value != NULL)
         {
             str_append(buff, value);
