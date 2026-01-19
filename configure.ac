@@ -13,6 +13,17 @@ AC_PROG_RANLIB
 AC_CONFIG_FILES([
   Makefile
   src/Makefile
+  src/ast/Makefile
+  src/builtins/Makefile
+  src/execution/Makefile
+  src/expansion/Makefile
+  src/io/Makefile
+  src/lexer/Makefile
+  src/parser/Makefile
+  src/utils/Makefile
+  src/utils/str/Makefile
+  src/utils/stack/Makefile
+  src/utils/parser/Makefile
   tests/Makefile
 ])
 AC_OUTPUT
