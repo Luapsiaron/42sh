@@ -1,5 +1,13 @@
 #include "parser_internal.h"
 
+/*
+    Parse a pipeline
+    Grammar: pipeline = [ '!' ] command { '|' { '\n' } command } ;
+
+    1. Optionally parses a negation operator '!'
+    2. Parses one or more commands separated by pipes '|'
+    3. Builds a left-associative AST_PIPELINE structure
+*/
 struct ast *parse_pipeline(struct parser *p)
 {
     int neg = 0;

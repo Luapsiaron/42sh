@@ -26,6 +26,24 @@ static enum redir_type token_to_redir_type(enum token_type type)
     return REDIR_CLOBBER;
 }
 
+/*
+    Parse a redirection
+    Grammar: redirection = [ IO_NUMBER ] redir_op WORD
+
+    1. Optionally parses an IO_NUMBER
+    2. Parses a redirection operator (e.g., <, >, >>, >|)
+    3. Parses a WORD token representing the file or descriptor
+
+    Examples:
+    - >out => io_number = 1, type = REDIR_OUT, word = "out"
+    - 2>err => io_number = 2, type = REDIR_OUT, word = "err"
+    - <in => io_number = 0, type = REDIR_IN, word = "in"
+    - 3>>log => io_number = 3, type = REDIR_APPEND, word = "log"
+
+    If no IO_NUMBER is provided:
+    - For input redirections (<), defaults to 0 (stdin)
+    - For output redirections (>, >>, >|), defaults to 1 (stdout)
+*/
 struct ast *parse_redirection(struct parser *p)
 {
     int io_number = -1;

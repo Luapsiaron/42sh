@@ -4,6 +4,10 @@
 #include "../utils/str/str.h"
 #include "parser_internal.h"
 
+/*
+    Append a string to the argv array, resizing if necessary
+    Used in parse_simple_command to build the argv list dynamically
+*/
 static int fill_argv(char ***argv, size_t *i, size_t *capacity, const char *s)
 {
     if (*i + 1 >= *capacity)
@@ -47,6 +51,11 @@ static int cmd_has_prefix(const struct ast *cmd)
     return cmd && (cmd->data.ast_cmd.redirs || cmd->data.ast_cmd.assignments);
 }
 
+/*
+    Parse the command prefix using their respective parsers
+    Grammar: { assignment_word | redirection }
+    Returns 1 on success, 0 on failure, -1 if no prefix found  
+*/
 static int parse_cmd_prefix(struct parser *p, struct ast *cmd)
 {
     while (1)
@@ -78,6 +87,10 @@ static int parse_cmd_prefix(struct parser *p, struct ast *cmd)
     return -1;
 }
 
+/*
+    Push the current token's lexeme into the argv array
+    Advances the parser to the next token
+*/
 static int push_argv_word(struct parser *p, char ***argv, size_t *i,
                           size_t *capacity)
 {
@@ -89,6 +102,11 @@ static int push_argv_word(struct parser *p, char ***argv, size_t *i,
     return 1;
 }
 
+/*
+    Parse the argv array for the simple command
+    Grammar: WORD { element }
+    Returns the argv array or NULL on error
+*/
 static char **parse_cmd_argv(struct parser *p, struct ast *cmd)
 {
     size_t i = 0;
@@ -130,7 +148,18 @@ static char **parse_cmd_argv(struct parser *p, struct ast *cmd)
     }
     return argv;
 }
+/*
+    Parse a simple command
+    Grammar: simple_command = { assignment_word | redirection } WORD { element }
+    Returns the AST node for the simple command or NULL on error
 
+    Valid examples:
+    echo hello world
+    A=1 B=2 echo ok
+    >out echo test
+    A=1 >out
+    ... etc
+*/
 struct ast *parse_simple_command(struct parser *p)
 {
     struct ast *cmd = ast_cmd_init(NULL);

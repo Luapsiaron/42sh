@@ -1,5 +1,21 @@
 #include "parser_internal.h"
 
+/*
+    Parse logical AND/OR operations
+    Grammar: and_or = pipeline { ( '&&' | '||' ) { '\n' } pipeline } ;
+
+    1. Parse the left pipeline
+    2. Folds successive AND/OR operations into a left-associative AST
+    3. Builds an AST_AND_OR node for each operation
+
+    Example: cmd1 && cmd2 || cmd3
+    AST representation:
+          OR_OP
+         /     \
+      AND_OP    cmd3
+      /    \
+   cmd1    cmd2
+*/
 struct ast *parse_and_or(struct parser *p)
 {
     struct ast *left = parse_pipeline(p);

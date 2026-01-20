@@ -1,5 +1,15 @@
 #include "parser_internal.h"
 
+/*
+    Parse a single command
+    Grammar: command = simple_command | if_command | while_command | for_command | until_command
+
+    Examples:
+    - if true; then echo A; fi -> TOKEN_IF -> parse_if
+    - while false; do echo B; done -> TOKEN_WHILE -> parse_while
+    - A=1 echo hello -> TOKEN_ASSIGNMENT_WORD -> parse_simple_command
+    - >out echo test -> TOKEN_GREAT -> parse_simple_command 
+*/
 struct ast *parse_command(struct parser *p)
 {
     if (peek(p) == TOKEN_IF)

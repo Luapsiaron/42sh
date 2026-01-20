@@ -1,5 +1,15 @@
 #include "parser_internal.h"
 
+/*
+    Parse a list of commands separated by semicolons or newlines
+    Grammar: list = and_or { separator and_or }
+
+    Examples:
+    - echo a
+    - echo a ; echo b
+    - echo a
+      echo b
+*/
 struct ast *parse_list(struct parser *p)
 {
     skip_newlines(p);

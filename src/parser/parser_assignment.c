@@ -4,6 +4,21 @@
 #include "../utils/str/str.h"
 #include "parser_internal.h"
 
+/*
+    Parse an assignment word
+    Grammar: NAME = VALUE
+
+    The lexer garantees that the token matches pattern [a-zA-Z_][a-zA-Z0-9_]*=.*
+    The parser does:
+    1. Split the lexeme at the '=' character
+    2. Create an AST_ASSIGNMENT node with variable name and value
+
+    Example:
+    - ASSIGNMENT_WORD("PATH=/bin")
+      AST_ASSIGNMENT
+        var = "PATH"
+        value = "/bin"
+*/
 struct ast *parse_assignment(struct parser *p)
 {
     if (peek(p) != TOKEN_ASSIGNMENT_WORD)
