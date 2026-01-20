@@ -90,3 +90,10 @@ config.h
 src/42sh
 tests/test_echo
 tests/test_io_string_to_file
+bin/42sh
+tests/test_ast
+tests/test_io
+tests/test_parser
+tests/test_lexer
+tests/test_builtins
+tests/test_execution

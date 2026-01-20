@@ -5,7 +5,7 @@
 #include "../expansion/hashmap.h"
 #include "execution.h"
 
-static int loop_should_continue(loop_t type, int cond_status)
+static int loop_should_continue(loop_t type, int cond_status) // determines if a loop should continue based on its type and condition status
 {
     if (type == LOOP_WHILE)
     {
@@ -18,7 +18,7 @@ static int loop_should_continue(loop_t type, int cond_status)
     return 0;
 }
 
-int exec_while_until(ast_t *ast, struct hash_map *hm)
+int exec_while_until(ast_t *ast, struct hash_map *hm) // executes a while or until loop AST node
 {
     if (!ast)
         return 0;
@@ -34,7 +34,7 @@ int exec_while_until(ast_t *ast, struct hash_map *hm)
     return last_status;
 }
 
-int exec_for(ast_t *ast, struct hash_map *hm)
+int exec_for(ast_t *ast, struct hash_map *hm) // executes a for loop AST node
 {
     if (!ast || ast->type != AST_FOR)
         return 2;

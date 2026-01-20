@@ -171,7 +171,7 @@ static int fork_pipeline_stage(struct pipe_stage_args a, int *next_read,
     return 0;
 }
 
-int exec_pipeline(ast_t *pipe_node, struct hash_map *hm)
+int exec_pipeline(ast_t *pipe_node, struct hash_map *hm) // Execute a pipeline of commands
 {
     ast_t *cmds[MAX_PIPELINE_CMDS];
     pid_t pids[MAX_PIPELINE_CMDS];

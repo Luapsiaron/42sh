@@ -1,8 +1,7 @@
 if true 
 then 
-echo coucou
-echo caca;
+echo coucou;
 else 
 false
-echo caca;
+echo salut;
 fi
