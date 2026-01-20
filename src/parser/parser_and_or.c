@@ -1,8 +1,8 @@
 #include "parser_internal.h"
 
-ast_t *parse_and_or(parser_t *p)
+struct ast *parse_and_or(struct parser *p)
 {
-    ast_t *left = parse_pipeline(p);
+    struct ast *left = parse_pipeline(p);
     if (!left)
     {
         return NULL;
@@ -10,7 +10,7 @@ ast_t *parse_and_or(parser_t *p)
 
     while (peek(p) == TOKEN_AND_IF || peek(p) == TOKEN_OR_IF)
     {
-        and_or_op_t operator;
+        enum and_or_op operator;
         if (peek(p) == TOKEN_AND_IF)
         {
             operator= AND_OP;
@@ -22,14 +22,14 @@ ast_t *parse_and_or(parser_t *p)
         pop(p);
         skip_newlines(p);
 
-        ast_t *right = parse_pipeline(p);
+        struct ast *right = parse_pipeline(p);
         if (!right)
         {
             ast_free(left);
             return NULL;
         }
 
-        ast_t *new_and_or = ast_and_or_init(operator, left, right);
+        struct ast *new_and_or = ast_and_or_init(operator, left, right);
         if (!new_and_or)
         {
             ast_free(left);

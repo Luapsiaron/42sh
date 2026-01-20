@@ -7,7 +7,6 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 
 42sh_SOURCES = 42sh.c
 
-# Ordre important (link statique = résolution de gauche -> droite)
 42sh_LDADD = \
   execution/libexecution.a \
   builtins/libbuiltins.a \

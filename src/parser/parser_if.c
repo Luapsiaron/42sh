@@ -18,22 +18,22 @@
     Used to determine when to stop parsing a specific part
     (e.g., condition, then body, else body)
 */
-static const token_type_t END_TOKENS_CONDITION[] = { TOKEN_THEN };
-static const token_type_t END_TOKENS_THEN[] = { TOKEN_FI, TOKEN_ELSE,
+static const enum token_type END_TOKENS_CONDITION[] = { TOKEN_THEN };
+static const enum token_type END_TOKENS_THEN[] = { TOKEN_FI, TOKEN_ELSE,
                                                 TOKEN_ELIF };
-static const token_type_t END_TOKENS_ELSE[] = { TOKEN_FI };
+static const enum token_type END_TOKENS_ELSE[] = { TOKEN_FI };
 
 /*
     Structure to hold the elif and else bodies
 */
 struct elif_else_body
 {
-    ast_t *elif_body;
-    ast_t *else_body;
+    struct ast *elif_body;
+    struct ast *else_body;
 };
 
 /* Forward declaration */
-static ast_t *parse_elif_command(parser_t *p);
+static struct ast *parse_elif_command(struct parser *p);
 
 /*
     Helper function to check if a token is a stop token
@@ -41,7 +41,7 @@ static ast_t *parse_elif_command(parser_t *p);
    3 is_stop_token(TOKEN_ELSE, end_token, end_token_count) -> 1
     is_stop_token(TOKEN_THEN, end_token, end_token_count) -> 0
 */
-static int is_stop_token(token_type_t token, const token_type_t *end_token,
+static int is_stop_token(enum token_type token, const enum token_type *end_token,
                          size_t end_token_count)
 {
     for (size_t i = 0; i < end_token_count; i++)
@@ -60,7 +60,7 @@ static int is_stop_token(token_type_t token, const token_type_t *end_token,
     Otherwise, it returns 0
     Used to simplify token expectation checks in the IF grammar parsing
 */
-static int expect_token(parser_t *p, token_type_t expected)
+static int expect_token(struct parser *p, enum token_type expected)
 {
     if (peek(p) != expected)
     {
@@ -74,7 +74,7 @@ static int expect_token(parser_t *p, token_type_t expected)
     Parse a compound list until one of the specified end tokens is encountered
     Returns a list of commands or NULL on error
 */
-ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token,
+struct ast *parse_compound_list(struct parser *p, const enum token_type *end_token,
                            size_t end_token_count)
 {
     skip_newlines(p);
@@ -87,19 +87,19 @@ ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token,
         return NULL;
     }
 
-    ast_t *first = parse_and_or(p);
+    struct ast *first = parse_and_or(p);
     if (!first)
     {
         return NULL;
     }
-    ast_t *list = ast_list_init(NULL, first);
+    struct ast *list = ast_list_init(NULL, first);
     if (!list)
     {
         ast_free(first);
         return NULL;
     }
 
-    ast_t *tmp = list;
+    struct ast *tmp = list;
 
     while (1)
     {
@@ -124,7 +124,7 @@ ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token,
             goto error;
         }
 
-        ast_t *cmd = parse_and_or(p);
+        struct ast *cmd = parse_and_or(p);
         if (!cmd)
         {
             goto error;
@@ -147,7 +147,7 @@ error:
 /*
     Parse the condition part of the if statement until TOKEN_THEN
 */
-static ast_t *parse_condition(parser_t *p)
+static struct ast *parse_condition(struct parser *p)
 {
     return parse_compound_list(p, END_TOKENS_CONDITION,
                                sizeof(END_TOKENS_CONDITION)
@@ -158,7 +158,7 @@ static ast_t *parse_condition(parser_t *p)
     Parse the then part of the if statement until TOKEN_FI, TOKEN_ELSE, or
    TOKEN_ELIF
 */
-static ast_t *parse_then(parser_t *p)
+static struct ast *parse_then(struct parser *p)
 {
     return parse_compound_list(
         p, END_TOKENS_THEN, sizeof(END_TOKENS_THEN) / sizeof(*END_TOKENS_THEN));
@@ -167,7 +167,7 @@ static ast_t *parse_then(parser_t *p)
 /*
     Parse the else part of the if statement until TOKEN_FI
 */
-static ast_t *parse_else(parser_t *p)
+static struct ast *parse_else(struct parser *p)
 {
     return parse_compound_list(
         p, END_TOKENS_ELSE, sizeof(END_TOKENS_ELSE) / sizeof(*END_TOKENS_ELSE));
@@ -182,8 +182,8 @@ static ast_t *parse_else(parser_t *p)
     If any parsing fails, it frees the previously allocated AST nodes and
    returns 0
 */
-static int parse_elif_else_body(parser_t *p, struct elif_else_body *body,
-                                ast_t *condition, ast_t *then_body)
+static int parse_elif_else_body(struct parser *p, struct elif_else_body *body,
+                                struct ast *condition, struct ast *then_body)
 {
     skip_newlines(p);
 
@@ -225,11 +225,11 @@ static int parse_elif_else_body(parser_t *p, struct elif_else_body *body,
    [else <else_body>;] Does not delete the FI token at the end Is deleted by
    parse_if
 */
-static ast_t *parse_elif(parser_t *p)
+static struct ast *parse_elif(struct parser *p)
 {
     pop(p);
 
-    ast_t *condition = parse_condition(p);
+    struct ast *condition = parse_condition(p);
     if (!condition)
     {
         return NULL;
@@ -242,7 +242,7 @@ static ast_t *parse_elif(parser_t *p)
         return NULL;
     }
 
-    ast_t *then_body = parse_then(p);
+    struct ast *then_body = parse_then(p);
     if (!then_body)
     {
         ast_free(condition);
@@ -262,7 +262,7 @@ static ast_t *parse_elif(parser_t *p)
     return ast_if_init(condition, then_body, body.else_body);
 }
 
-static ast_t *parse_elif_command(parser_t *p)
+static struct ast *parse_elif_command(struct parser *p)
 {
     if (peek(p) == TOKEN_ELIF)
     {
@@ -282,11 +282,11 @@ static ast_t *parse_elif_command(parser_t *p)
     - Constructs and returns the AST node for the if statement
     - On any error, frees allocated AST nodes and returns NULL
 */
-ast_t *parse_if(parser_t *p)
+struct ast *parse_if(struct parser *p)
 {
     pop(p);
 
-    ast_t *condition = parse_condition(p);
+    struct ast *condition = parse_condition(p);
     if (!condition)
     {
         return NULL;
@@ -299,7 +299,7 @@ ast_t *parse_if(parser_t *p)
         return NULL;
     }
 
-    ast_t *then_body = parse_then(p);
+    struct ast *then_body = parse_then(p);
     if (!then_body)
     {
         ast_free(condition);

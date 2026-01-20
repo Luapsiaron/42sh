@@ -4,7 +4,7 @@
 #include "../expansion/hashmap.h"
 #include "execution.h"
 
-int eval_condition(ast_t *condition, struct hash_map *hm) // evaluates a condition AST node
+int eval_condition(struct ast *condition, struct hash_map *hm) // evaluates a condition AST node
 {
     if (condition->data.ast_and_or.operator== AND_OP)
     {

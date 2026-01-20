@@ -1,9 +1,9 @@
 #include "ast.h"
 
-ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
-                      ast_t *next)
+struct ast *ast_redir_init(int io_number, enum redir_type type, const char *word,
+                      struct ast *next)
 {
-    ast_t *new = ast_init(AST_REDIR);
+    struct ast *new = ast_init(AST_REDIR);
     if (!new)
     {
         return NULL;
@@ -25,21 +25,21 @@ ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
     return new;
 }
 
-int ast_redir_append(ast_t *cmd, ast_t *redir)
+int ast_redir_append(struct ast *cmd, struct ast *redir)
 {
     if (!cmd || cmd->type != AST_CMD || !redir || redir->type != AST_REDIR)
     {
         return 0;
     }
 
-    ast_t **head = &cmd->data.ast_cmd.redirs;
+    struct ast **head = &cmd->data.ast_cmd.redirs;
     if (!*head)
     {
         *head = redir;
         return 1;
     }
 
-    ast_t *cur = *head;
+    struct ast *cur = *head;
     while (cur->data.ast_redir.next)
     {
         cur = cur->data.ast_redir.next;

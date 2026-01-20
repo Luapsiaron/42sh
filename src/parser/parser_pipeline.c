@@ -1,6 +1,6 @@
 #include "parser_internal.h"
 
-ast_t *parse_pipeline(parser_t *p)
+struct ast *parse_pipeline(struct parser *p)
 {
     int neg = 0;
     if (peek(p) == TOKEN_NEGATION)
@@ -10,7 +10,7 @@ ast_t *parse_pipeline(parser_t *p)
         neg = 1;
     }
 
-    ast_t *left = parse_command(p);
+    struct ast *left = parse_command(p);
     if (!left)
     {
         return NULL;
@@ -21,14 +21,14 @@ ast_t *parse_pipeline(parser_t *p)
         pop(p);
         skip_newlines(p);
 
-        ast_t *right = parse_command(p);
+        struct ast *right = parse_command(p);
         if (!right)
         {
             ast_free(left);
             return NULL;
         }
 
-        ast_t *pipeline = ast_pipeline_init(right, left);
+        struct ast *pipeline = ast_pipeline_init(right, left);
         if (!pipeline)
         {
             ast_free(left);
@@ -41,7 +41,7 @@ ast_t *parse_pipeline(parser_t *p)
 
     if (neg)
     {
-        ast_t *negation = ast_negation_init(left);
+        struct ast *negation = ast_negation_init(left);
         if (!negation)
         {
             ast_free(left);

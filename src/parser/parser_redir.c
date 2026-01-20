@@ -2,13 +2,13 @@
 
 #include "parser_internal.h"
 
-int is_redirection_token(token_type_t type)
+int is_redirection_token(enum token_type type)
 {
     return type == TOKEN_LESS || type == TOKEN_GREAT || type == TOKEN_DGREAT
         || type == TOKEN_CLOBBER;
 }
 
-static redir_type_t token_to_redir_type(token_type_t type)
+static enum redir_type token_to_redir_type(enum token_type type)
 {
     if (type == TOKEN_LESS)
     {
@@ -26,7 +26,7 @@ static redir_type_t token_to_redir_type(token_type_t type)
     return REDIR_CLOBBER;
 }
 
-ast_t *parse_redirection(parser_t *p)
+struct ast *parse_redirection(struct parser *p)
 {
     int io_number = -1;
 
@@ -41,7 +41,7 @@ ast_t *parse_redirection(parser_t *p)
         return NULL;
     }
 
-    redir_type_t type = token_to_redir_type(peek(p));
+    enum redir_type type = token_to_redir_type(peek(p));
     pop(p);
 
     if (peek(p) != TOKEN_WORD)
@@ -54,7 +54,7 @@ ast_t *parse_redirection(parser_t *p)
         io_number = (type == REDIR_IN) ? 0 : 1;
     }
 
-    ast_t *redir =
+    struct ast *redir =
         ast_redir_init(io_number, type, p->current_token->lexeme, NULL);
     if (!redir)
     {

@@ -6,9 +6,9 @@
 
 #include "../../utils/str/str.h"
 
-token_t *token_new(token_type_t type, const char *value)
+struct token *token_new(enum token_type type, const char *value)
 {
-    token_t *t = calloc(1, sizeof(*t));
+    struct token *t = calloc(1, sizeof(*t));
     if (!t)
     {
         return NULL;
@@ -27,7 +27,7 @@ token_t *token_new(token_type_t type, const char *value)
     return t;
 }
 
-void token_free(token_t *t)
+void token_free(struct token *t)
 {
     if (!t)
     {
@@ -44,7 +44,7 @@ static const struct reserved_word reserved_words[] = {
     { "do", TOKEN_DO },       { "done", TOKEN_DONE },
 };
 
-int token_is_reserved_word(const char *s, token_type_t *out_type)
+int token_is_reserved_word(const char *s, enum token_type *out_type)
 {
     size_t n = sizeof(reserved_words) / sizeof(reserved_words[0]);
     for (size_t i = 0; i < n; i++)
@@ -94,7 +94,7 @@ static const char *token_type_names[] = {
     [TOKEN_EOF] = "EOF",
 };
 
-const char *token_type_name(token_type_t t)
+const char *token_type_name(enum token_type t)
 {
     if (t < 0 || t >= sizeof(token_type_names) / sizeof(token_type_names[0]))
     {
@@ -103,7 +103,7 @@ const char *token_type_name(token_type_t t)
     return token_type_names[t];
 }
 
-void token_printer(const token_t *t)
+void token_printer(const struct token *t)
 {
     if (!t)
     {

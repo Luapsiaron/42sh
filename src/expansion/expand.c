@@ -15,7 +15,7 @@
 
 static struct exit_info exit_code = { .last = 0 };
 
-static void char_append(buffer_t *buff, char c)
+static void char_append(struct buffer *buff, char c)
 {
     if (buff->idx + 1 >= buff->capacity)
     {
@@ -27,7 +27,7 @@ static void char_append(buffer_t *buff, char c)
     buff->buff[buff->idx++] = c;
 }
 
-static void str_append(buffer_t *buff, char *str)
+static void str_append(struct buffer *buff, char *str)
 {
     if (!str)
         return;
@@ -128,7 +128,7 @@ static char *handle_specials(struct hash_map *hm,
     return NULL;
 }
 
-static void handle_dollar(buffer_t *buff, size_t *index, char *word,
+static void handle_dollar(struct buffer *buff, size_t *index, char *word,
                           struct hash_map *hm)
 {
     (*index)++; // skip first $
@@ -212,7 +212,7 @@ char **expand_argv(char **argv, struct hash_map *hm)
     return res;
 }
 
-static void handle_escaped(buffer_t *buff, char *word, size_t *i)
+static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 {
     if (word[*i + 1] == '\\' || word[*i + 1] == '$' || word[*i + 1] == '"'
         || word[*i + 1] == '\n')
@@ -230,7 +230,7 @@ char *expand_word(char *word, struct hash_map *hm)
     bool in_squote = false;
     bool in_dquote = false;
 
-    buffer_t buff;
+    struct buffer buff;
     buff.capacity = strlen(word) * 2;
     buff.buff = malloc(buff.capacity);
     buff.idx = 0;

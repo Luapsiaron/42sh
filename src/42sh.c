@@ -46,7 +46,7 @@ static int run_stream(FILE *input, int pretty_print, struct hash_map *hm)
 
     while (1)
     {
-        ast_t *tree = parse_input(input);
+        struct ast *tree = parse_input(input);
         // ast_printer(tree, 0);
         if (!tree)
             break;

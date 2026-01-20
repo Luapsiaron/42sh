@@ -13,13 +13,13 @@ struct saved_fd
 
 struct pipe_stage_args
 {
-    ast_t *cmd;
+    struct ast *cmd;
     struct hash_map *hm;
     int prev_read;
 };
 
 void restore_fds(struct saved_fd *s);
-int apply_redirs(ast_t *redir_list, struct saved_fd **saved);
-int exec_pipeline(ast_t *pipe_node, struct hash_map *hm);
+int apply_redirs(struct ast *redir_list, struct saved_fd **saved);
+int exec_pipeline(struct ast *pipe_node, struct hash_map *hm);
 
 #endif /* ! REDIR_PIPE_H */

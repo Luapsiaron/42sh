@@ -5,38 +5,38 @@
 #include "../lexer/lexer.h"
 #include "../lexer/token/token.h"
 
-typedef struct parser
+struct parser
 {
-    lexer_t lexer;
-    token_t *current_token;
-} parser_t;
+    struct lexer lexer;
+    struct token *current_token;
+};
 
-token_type_t peek(parser_t *parser);
-void pop(parser_t *parser);
+enum token_type peek(struct parser *parser);
+void pop(struct parser *parser);
 
-int remove_separator(parser_t *p);
-void skip_newlines(parser_t *p);
-void skip_semicolon_newline(parser_t *p);
+int remove_separator(struct parser *p);
+void skip_newlines(struct parser *p);
+void skip_semicolon_newline(struct parser *p);
 
-ast_t *parse_simple_command(parser_t *p);
-ast_t *parse_list(parser_t *p);
-ast_t *parse_command(parser_t *p);
+struct ast *parse_simple_command(struct parser *p);
+struct ast *parse_list(struct parser *p);
+struct ast *parse_command(struct parser *p);
 
-ast_t *parse_compound_list(parser_t *p, const token_type_t *end_token,
+struct ast *parse_compound_list(struct parser *p, const enum token_type *end_token,
                            size_t end_token_count);
 
-ast_t *parse_if(parser_t *p);
-ast_t *parse_while(parser_t *p);
-ast_t *parse_until(parser_t *p);
-ast_t *parse_for(parser_t *p);
+struct ast *parse_if(struct parser *p);
+struct ast *parse_while(struct parser *p);
+struct ast *parse_until(struct parser *p);
+struct ast *parse_for(struct parser *p);
 
-ast_t *parse_pipeline(parser_t *p);
+struct ast *parse_pipeline(struct parser *p);
 
-ast_t *parse_and_or(parser_t *p);
+struct ast *parse_and_or(struct parser *p);
 
-ast_t *parse_redirection(parser_t *p);
-int is_redirection_token(token_type_t type);
+struct ast *parse_redirection(struct parser *p);
+int is_redirection_token(enum token_type type);
 
-ast_t *parse_assignment(parser_t *p);
+struct ast *parse_assignment(struct parser *p);
 
 #endif /* ! PARSER_INTERNAL_H */

@@ -2,27 +2,27 @@
 
 struct parser_while_until
 {
-    ast_t *condition;
-    ast_t *body;
+    struct ast *condition;
+    struct ast *body;
 };
 
-static const token_type_t END_TOKENS_DONE[] = { TOKEN_DONE };
-static const token_type_t END_TOKENS_DO[] = { TOKEN_DO };
+static const enum token_type END_TOKENS_DONE[] = { TOKEN_DONE };
+static const enum token_type END_TOKENS_DO[] = { TOKEN_DO };
 
-static ast_t *parse_body(parser_t *p)
+static struct ast *parse_body(struct parser *p)
 {
     return parse_compound_list(
         p, END_TOKENS_DONE, sizeof(END_TOKENS_DONE) / sizeof(*END_TOKENS_DONE));
 }
 
-static ast_t *parse_condition(parser_t *p)
+static struct ast *parse_condition(struct parser *p)
 {
     return parse_compound_list(p, END_TOKENS_DO,
                                sizeof(END_TOKENS_DO) / sizeof(*END_TOKENS_DO));
 }
 
 static struct parser_while_until *
-parse_while_until(parser_t *p, struct parser_while_until *res)
+parse_while_until(struct parser *p, struct parser_while_until *res)
 {
     pop(p);
 
@@ -62,7 +62,7 @@ error:
     return NULL;
 }
 
-ast_t *parse_while(parser_t *p)
+struct ast *parse_while(struct parser *p)
 {
     struct parser_while_until res;
 
@@ -73,7 +73,7 @@ ast_t *parse_while(parser_t *p)
     return ast_while_until_init(res.condition, res.body, LOOP_WHILE);
 }
 
-ast_t *parse_until(parser_t *p)
+struct ast *parse_until(struct parser *p)
 {
     struct parser_while_until res;
 

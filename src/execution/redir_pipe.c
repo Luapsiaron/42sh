@@ -84,10 +84,10 @@ apply_one_redir(const struct ast_redir *r) // Apply a single redirection
 }
 
 int apply_redirs(
-    ast_t *redir_list,
+    struct ast *redir_list,
     struct saved_fd **saved) // Apply all redirections with save/restore
 {
-    for (ast_t *n = redir_list; n; n = n->data.ast_redir.next)
+    for (struct ast *n = redir_list; n; n = n->data.ast_redir.next)
     {
         const struct ast_redir *r = &n->data.ast_redir;
         int target = r->io_number;
@@ -107,7 +107,7 @@ int apply_redirs(
 }
 
 static void
-pipeline_collect(ast_t *p, ast_t **arr,
+pipeline_collect(struct ast *p, struct ast **arr,
                  int *len) // Collect commands from pipeline into array
 {
     if (!p)
@@ -171,9 +171,9 @@ static int fork_pipeline_stage(struct pipe_stage_args a, int *next_read,
     return 0;
 }
 
-int exec_pipeline(ast_t *pipe_node, struct hash_map *hm) // Execute a pipeline of commands
+int exec_pipeline(struct ast *pipe_node, struct hash_map *hm) // Execute a pipeline of commands
 {
-    ast_t *cmds[MAX_PIPELINE_CMDS];
+    struct ast *cmds[MAX_PIPELINE_CMDS];
     pid_t pids[MAX_PIPELINE_CMDS];
     int n = 0, prev_read = -1;
 

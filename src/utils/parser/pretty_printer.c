@@ -3,15 +3,15 @@
 #include <ctype.h>
 #include <string.h>
 
-static void pp_node(const ast_t *ast, FILE *out);
-static void pp_list(const ast_t *ast, FILE *out);
-static void pp_redir(const ast_t *ast, FILE *out);
-static void pp_cmd(const ast_t *ast, FILE *out);
-static void pp_pipeline(const ast_t *ast, FILE *out);
-static void pp_negation(const ast_t *ast, FILE *out);
-static void pp_if(const ast_t *ast, FILE *out);
-static void pp_and_or(const ast_t *ast, FILE *out);
-static void pp_while_until(const ast_t *ast, FILE *out);
+static void pp_node(const struct ast *ast, FILE *out);
+static void pp_list(const struct ast *ast, FILE *out);
+static void pp_redir(const struct ast *ast, FILE *out);
+static void pp_cmd(const struct ast *ast, FILE *out);
+static void pp_pipeline(const struct ast *ast, FILE *out);
+static void pp_negation(const struct ast *ast, FILE *out);
+static void pp_if(const struct ast *ast, FILE *out);
+static void pp_and_or(const struct ast *ast, FILE *out);
+static void pp_while_until(const struct ast *ast, FILE *out);
 
 static void pp_ignore_quotes(const char *str, FILE *out)
 {
@@ -27,16 +27,16 @@ static void pp_ignore_quotes(const char *str, FILE *out)
     fputc('"', out);
 }
 
-static void pp_braces(const ast_t *ast, FILE *out)
+static void pp_braces(const struct ast *ast, FILE *out)
 {
     fputs("{ ", out);
     pp_node(ast, out);
     fputs(" }", out);
 }
 
-static void pp_list(const ast_t *ast, FILE *out)
+static void pp_list(const struct ast *ast, FILE *out)
 {
-    const ast_t *cur = ast;
+    const struct ast *cur = ast;
     while (cur)
     {
         pp_node(cur->data.ast_list.child, out);
@@ -48,7 +48,7 @@ static void pp_list(const ast_t *ast, FILE *out)
     }
 }
 
-static void pp_redir(const ast_t *ast, FILE *out)
+static void pp_redir(const struct ast *ast, FILE *out)
 {
     const struct ast_redir *ast_tmp = &ast->data.ast_redir;
     if (ast_tmp->type == REDIR_IN)
@@ -80,7 +80,7 @@ static void pp_redir(const ast_t *ast, FILE *out)
     }
 }
 
-static void pp_cmd(const ast_t *ast, FILE *out)
+static void pp_cmd(const struct ast *ast, FILE *out)
 {
     char **argv = ast->data.ast_cmd.argv;
 
@@ -97,7 +97,7 @@ static void pp_cmd(const ast_t *ast, FILE *out)
     }
 }
 
-static void pp_pipeline(const ast_t *ast, FILE *out)
+static void pp_pipeline(const struct ast *ast, FILE *out)
 {
     fputs("pipeline { ", out);
     pp_node(ast->data.ast_pipeline.left, out);
@@ -106,13 +106,13 @@ static void pp_pipeline(const ast_t *ast, FILE *out)
     fputs(" }", out);
 }
 
-static void pp_negation(const ast_t *ast, FILE *out)
+static void pp_negation(const struct ast *ast, FILE *out)
 {
     fputs("negation ", out);
     pp_node(ast->data.ast_negation.child, out);
 }
 
-static void pp_if(const ast_t *ast, FILE *out)
+static void pp_if(const struct ast *ast, FILE *out)
 {
     const struct ast_if *if_node = &ast->data.ast_if;
     fputs("if ", out);
@@ -150,7 +150,7 @@ static void pp_if(const ast_t *ast, FILE *out)
     fputs("; fi", out);
 }
 
-static void pp_and_or(const ast_t *ast, FILE *out)
+static void pp_and_or(const struct ast *ast, FILE *out)
 {
     fputs("and_or { ", out);
     pp_node(ast->data.ast_and_or.left, out);
@@ -166,7 +166,7 @@ static void pp_and_or(const ast_t *ast, FILE *out)
     fputs(" }", out);
 }
 
-static void pp_while_until(const ast_t *ast, FILE *out)
+static void pp_while_until(const struct ast *ast, FILE *out)
 {
     const struct ast_while_until *ast_tmp = &ast->data.ast_while_until;
     if (ast_tmp->type == LOOP_WHILE)
@@ -183,7 +183,7 @@ static void pp_while_until(const ast_t *ast, FILE *out)
     fputs("; done ", out);
 }
 
-static void pp_for(const ast_t *ast, FILE *out)
+static void pp_for(const struct ast *ast, FILE *out)
 {
     const struct ast_for *ast_tmp = &ast->data.ast_for;
     fputs("for ", out);
@@ -198,7 +198,7 @@ static void pp_for(const ast_t *ast, FILE *out)
     fputs("; done ", out);
 }
 
-static void pp_assignment(const ast_t *ast, FILE *out)
+static void pp_assignment(const struct ast *ast, FILE *out)
 {
     const struct ast_assignment *ast_tmp = &ast->data.ast_assignment;
     fputs("assignment ", out);
@@ -212,7 +212,7 @@ static void pp_assignment(const ast_t *ast, FILE *out)
     }
 }
 
-static void pp_node(const ast_t *ast, FILE *out)
+static void pp_node(const struct ast *ast, FILE *out)
 {
     if (!ast)
     {
@@ -255,7 +255,7 @@ static void pp_node(const ast_t *ast, FILE *out)
     }
 }
 
-void ast_pretty_print(const ast_t *ast, FILE *out)
+void ast_pretty_print(const struct ast *ast, FILE *out)
 {
     pp_node(ast, out);
     fputc('\n', out);

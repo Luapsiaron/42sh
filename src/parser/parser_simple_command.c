@@ -31,29 +31,29 @@ static int fill_argv(char ***argv, size_t *i, size_t *capacity, const char *s)
     return 1;
 }
 
-static int is_prefix_token(token_type_t type)
+static int is_prefix_token(enum token_type type)
 {
     return type == TOKEN_IONUMBER || is_redirection_token(type)
         || type == TOKEN_ASSIGNMENT_WORD;
 }
 
-static int is_element_token(token_type_t type)
+static int is_element_token(enum token_type type)
 {
     return type == TOKEN_WORD || is_prefix_token(type);
 }
 
-static int cmd_has_prefix(const ast_t *cmd)
+static int cmd_has_prefix(const struct ast *cmd)
 {
     return cmd && (cmd->data.ast_cmd.redirs || cmd->data.ast_cmd.assignments);
 }
 
-static int parse_cmd_prefix(parser_t *p, ast_t *cmd)
+static int parse_cmd_prefix(struct parser *p, struct ast *cmd)
 {
     while (1)
     {
         if (peek(p) == TOKEN_ASSIGNMENT_WORD)
         {
-            ast_t *assignment = parse_assignment(p);
+            struct ast *assignment = parse_assignment(p);
             if (!assignment || !ast_assignment_append(cmd, assignment))
             {
                 ast_free(assignment);
@@ -64,7 +64,7 @@ static int parse_cmd_prefix(parser_t *p, ast_t *cmd)
 
         if (peek(p) == TOKEN_IONUMBER || is_redirection_token(peek(p)))
         {
-            ast_t *redir = parse_redirection(p);
+            struct ast *redir = parse_redirection(p);
             if (!redir || !ast_redir_append(cmd, redir))
             {
                 ast_free(redir);
@@ -78,7 +78,7 @@ static int parse_cmd_prefix(parser_t *p, ast_t *cmd)
     return -1;
 }
 
-static int push_argv_word(parser_t *p, char ***argv, size_t *i,
+static int push_argv_word(struct parser *p, char ***argv, size_t *i,
                           size_t *capacity)
 {
     if (!fill_argv(argv, i, capacity, p->current_token->lexeme))
@@ -89,7 +89,7 @@ static int push_argv_word(parser_t *p, char ***argv, size_t *i,
     return 1;
 }
 
-static char **parse_cmd_argv(parser_t *p, ast_t *cmd)
+static char **parse_cmd_argv(struct parser *p, struct ast *cmd)
 {
     size_t i = 0;
     size_t capacity = 16;
@@ -112,7 +112,7 @@ static char **parse_cmd_argv(parser_t *p, ast_t *cmd)
             continue;
         }
 
-        ast_t *redir = parse_redirection(p);
+        struct ast *redir = parse_redirection(p);
         if (!redir || !ast_redir_append(cmd, redir))
         {
             free_argv(argv);
@@ -131,9 +131,9 @@ static char **parse_cmd_argv(parser_t *p, ast_t *cmd)
     return argv;
 }
 
-ast_t *parse_simple_command(parser_t *p)
+struct ast *parse_simple_command(struct parser *p)
 {
-    ast_t *cmd = ast_cmd_init(NULL);
+    struct ast *cmd = ast_cmd_init(NULL);
     if (!cmd)
     {
         return NULL;

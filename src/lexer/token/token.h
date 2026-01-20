@@ -1,7 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-typedef enum token_type
+enum token_type
 {
     // POSIX Reserved word
     TOKEN_IF,
@@ -40,40 +40,40 @@ typedef enum token_type
 
     // End of input
     TOKEN_EOF
-} token_type_t;
+};
 
-typedef struct token
+struct token
 {
-    token_type_t type;
+    enum token_type type;
     char *lexeme; // token text
                   // Only for TOKEN_WORD, NULL for others
-} token_t;
+};
 
 struct reserved_word
 {
     const char *word;
-    token_type_t type;
+    enum token_type type;
 };
 
 // Allocate and initialize a new token
 // type: type of the token
 // value: lexeme of the token (Word copied with strdup or NULL)
 // The token must be free with token_free() at the end
-token_t *token_new(token_type_t type, const char *value);
+struct token *token_new(enum token_type type, const char *value);
 
-void token_free(token_t *t);
+void token_free(struct token *t);
 
 // Return a string correspond to the token type
 // Use for debugging
-const char *token_type_name(token_type_t t);
+const char *token_type_name(enum token_type t);
 
 // Check if it corresponds to a shell reserved word (If, else, etc.)
 // s: input string
 // out: output token type if s is a reserverd word
 // Return bool if s is a reserved word or not
-int token_is_reserved_word(const char *s, token_type_t *out);
+int token_is_reserved_word(const char *s, enum token_type *out);
 
 // DEBUG Function: print the token
-void token_printer(const token_t *t);
+void token_printer(const struct token *t);
 
 #endif /* ! TOKEN_H */

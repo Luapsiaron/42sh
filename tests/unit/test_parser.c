@@ -13,7 +13,7 @@ static FILE *fmem_from_str(const char *s)
 Test(parser, simple_command)
 {
     FILE *f = fmem_from_str("true\n");
-    ast_t *ast = parse_input(f);
+    struct ast *ast = parse_input(f);
     fclose(f);
 
     cr_assert_not_null(ast);
@@ -26,7 +26,7 @@ Test(parser, simple_command)
 Test(parser, command_list_two_cmds)
 {
     FILE *f = fmem_from_str("true; false\n");
-    ast_t *ast = parse_input(f);
+    struct ast *ast = parse_input(f);
     fclose(f);
 
     cr_assert_not_null(ast);
@@ -49,7 +49,7 @@ Test(parser, command_list_two_cmds)
 Test(parser, simple_if)
 {
     FILE *f = fmem_from_str("if true; then false\n fi");
-    parser_t p;
+    struct parser p;
     p.current_token = NULL;
 
     lexer_init(&p.lexer, f);
@@ -57,7 +57,7 @@ Test(parser, simple_if)
 
     cr_assert_not_null(p.current_token);
 
-    ast_t *ast = parse_if(&p);
+    struct ast *ast = parse_if(&p);
     fclose(f);
 
     cr_assert_not_null(ast);
@@ -86,7 +86,7 @@ Test(parser, simple_if)
 Test(parser, simple_if_else)
 {
     FILE *f = fmem_from_str("if true; then false\n else true; fi");
-    parser_t p;
+    struct parser p;
     p.current_token = NULL;
 
     lexer_init(&p.lexer, f);
@@ -96,7 +96,7 @@ Test(parser, simple_if_else)
         return;
     }
 
-    ast_t *ast = parse_if(&p);
+    struct ast *ast = parse_if(&p);
     fclose(f);
 
     cr_assert_not_null(ast);
@@ -133,7 +133,7 @@ Test(parser, simple_if_elif_else)
 {
     FILE *f = fmem_from_str(
         "if true; then false\n elif true; then false; else true; fi");
-    parser_t p;
+    struct parser p;
     p.current_token = NULL;
 
     lexer_init(&p.lexer, f);
@@ -143,7 +143,7 @@ Test(parser, simple_if_elif_else)
         return;
     }
 
-    ast_t *ast = parse_if(&p);
+    struct ast *ast = parse_if(&p);
     fclose(f);
 
     cr_assert_not_null(ast);
@@ -163,7 +163,7 @@ Test(parser, simple_if_elif_else)
 
     cr_assert_not_null(ast->data.ast_if.else_body);
 
-    ast_t *v_else = ast->data.ast_if.else_body;
+    struct ast *v_else = ast->data.ast_if.else_body;
 
     cr_assert_not_null(v_else->data.ast_if.condition);
     cr_assert_not_null(v_else->data.ast_if.then_body);
@@ -204,7 +204,7 @@ Test(parser, simple_if_elif_else)
 Test(parser, simple_if_multiple_condition)
 {
     FILE *f = fmem_from_str("if true; false; echo; then false\n fi");
-    parser_t p;
+    struct parser p;
     p.current_token = NULL;
 
     lexer_init(&p.lexer, f);
@@ -214,7 +214,7 @@ Test(parser, simple_if_multiple_condition)
         return;
     }
 
-    ast_t *ast = parse_if(&p);
+    struct ast *ast = parse_if(&p);
     fclose(f);
 
     cr_assert_not_null(ast);

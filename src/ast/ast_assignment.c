@@ -1,8 +1,8 @@
 #include "ast.h"
 
-ast_t *ast_assignment_init(const char *var, const char *value)
+struct ast *ast_assignment_init(const char *var, const char *value)
 {
-    ast_t *new = ast_init(AST_ASSIGNMENT);
+    struct ast *new = ast_init(AST_ASSIGNMENT);
     if (!new)
     {
         return NULL;
@@ -31,7 +31,7 @@ ast_t *ast_assignment_init(const char *var, const char *value)
     return new;
 }
 
-int ast_assignment_append(ast_t *cmd, ast_t *assignment)
+int ast_assignment_append(struct ast *cmd, struct ast *assignment)
 {
     if (!cmd || cmd->type != AST_CMD || !assignment
         || assignment->type != AST_ASSIGNMENT)
@@ -39,14 +39,14 @@ int ast_assignment_append(ast_t *cmd, ast_t *assignment)
         return 0;
     }
 
-    ast_t **head = &cmd->data.ast_cmd.assignments;
+    struct ast **head = &cmd->data.ast_cmd.assignments;
     if (!*head)
     {
         *head = assignment;
         return 1;
     }
 
-    ast_t *cur = *head;
+    struct ast *cur = *head;
     while (cur->data.ast_assignment.next)
     {
         cur = cur->data.ast_assignment.next;

@@ -1,14 +1,14 @@
 #include "parser_internal.h"
 
-static const token_type_t END_TOKENS_DONE[] = { TOKEN_DONE };
+static const enum token_type END_TOKENS_DONE[] = { TOKEN_DONE };
 
-static ast_t *parse_for_body(parser_t *p)
+static struct ast *parse_for_body(struct parser *p)
 {
     return parse_compound_list(
         p, END_TOKENS_DONE, sizeof(END_TOKENS_DONE) / sizeof(*END_TOKENS_DONE));
 }
 
-static ast_t *parse_for_condition(parser_t *p, ast_t *second_arg)
+static struct ast *parse_for_condition(struct parser *p, struct ast *second_arg)
 {
     if (peek(p) == TOKEN_NEWLINE)
     {
@@ -27,12 +27,12 @@ static ast_t *parse_for_condition(parser_t *p, ast_t *second_arg)
     return second_arg;
 }
 
-ast_t *parse_for(parser_t *p)
+struct ast *parse_for(struct parser *p)
 {
     pop(p);
 
-    ast_t *first_arg = parse_simple_command(p);
-    ast_t *second_arg = NULL;
+    struct ast *first_arg = parse_simple_command(p);
+    struct ast *second_arg = NULL;
     if (!first_arg)
     {
         goto error;
@@ -60,7 +60,7 @@ ast_t *parse_for(parser_t *p)
     }
     pop(p);
 
-    ast_t *body = parse_for_body(p);
+    struct ast *body = parse_for_body(p);
     if (!body)
     {
         goto error;

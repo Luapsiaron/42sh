@@ -6,12 +6,12 @@
 
 #include "../utils/stack/stack.h"
 
-static void lexer_next_char(lexer_t *lx)
+static void lexer_next_char(struct lexer *lx)
 {
     lx->current = fgetc(lx->input);
 }
 
-static void lexer_skip_comment(lexer_t *lx)
+static void lexer_skip_comment(struct lexer *lx)
 {
     while (lx->current != EOF && lx->current != '\n')
         lexer_next_char(lx);
@@ -22,7 +22,7 @@ static int is_redir_char(int c)
     return c == '>' || c == '<';
 }
 
-static token_t *lexer_ionumber(lexer_t *lx)
+static struct token *lexer_ionumber(struct lexer *lx)
 {
     char buffer[32];
     size_t i = 0;
@@ -71,7 +71,7 @@ static int append_buffer(char *buffer, size_t *index, size_t capacity, int c)
     return 1;
 }
 
-static int lexer_single_quotes(lexer_t *lx, char *buffer, size_t *index,
+static int lexer_single_quotes(struct lexer *lx, char *buffer, size_t *index,
                                size_t capacity)
 {
     if (!append_buffer(buffer, index, capacity, '\''))
@@ -102,7 +102,7 @@ static int lexer_single_quotes(lexer_t *lx, char *buffer, size_t *index,
     return 1;
 }
 
-static int lexer_double_quotes(lexer_t *lx, char *buffer, size_t *index,
+static int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
                                size_t capacity)
 {
     if (!append_buffer(buffer, index, capacity, '"'))
@@ -158,7 +158,7 @@ static int lexer_double_quotes(lexer_t *lx, char *buffer, size_t *index,
     return 1;
 }
 
-static token_t *lexer_is_word(lexer_t *lx)
+static struct token *lexer_is_word(struct lexer *lx)
 {
     char buffer[512];
     size_t i = 0;
@@ -205,7 +205,7 @@ static token_t *lexer_is_word(lexer_t *lx)
         return token_new(TOKEN_WORD, buffer);
     }
 
-    token_type_t type;
+    enum token_type type;
     if (!quote && lx->condition == LEXER_NORMAL
         && token_is_reserved_word(buffer, &type))
     {
@@ -216,7 +216,7 @@ static token_t *lexer_is_word(lexer_t *lx)
     return token_new(TOKEN_WORD, buffer);
 }
 
-static void skip_blanks(lexer_t *lx)
+static void skip_blanks(struct lexer *lx)
 {
     while (lx->current != EOF && isspace(lx->current) && lx->current != '\n')
     {
@@ -224,7 +224,7 @@ static void skip_blanks(lexer_t *lx)
     }
 }
 
-static token_t *handle_comment(lexer_t *lx)
+static struct token *handle_comment(struct lexer *lx)
 {
     if (lx->current != '#')
     {
@@ -234,7 +234,7 @@ static token_t *handle_comment(lexer_t *lx)
     return token_new(TOKEN_NEWLINE, NULL);
 }
 
-static token_t *handle_separator(lexer_t *lx)
+static struct token *handle_separator(struct lexer *lx)
 {
     if (lx->current == ';')
     {
@@ -251,7 +251,7 @@ static token_t *handle_separator(lexer_t *lx)
     return NULL;
 }
 
-static token_t *handle_redirection(lexer_t *lx)
+static struct token *handle_redirection(struct lexer *lx)
 {
     if (lx->current == '<')
     {
@@ -278,7 +278,7 @@ static token_t *handle_redirection(lexer_t *lx)
     return token_new(TOKEN_GREAT, NULL);
 }
 
-static token_t *handle_and_or(lexer_t *lx)
+static struct token *handle_and_or(struct lexer *lx)
 {
     if (lx->current != '&')
     {
@@ -295,7 +295,7 @@ static token_t *handle_and_or(lexer_t *lx)
     return token_new(TOKEN_WORD, "&");
 }
 
-static token_t *handle_pipe_or(lexer_t *lx)
+static struct token *handle_pipe_or(struct lexer *lx)
 {
     if (lx->current != '|')
     {
@@ -312,7 +312,7 @@ static token_t *handle_pipe_or(lexer_t *lx)
     return token_new(TOKEN_PIPE, NULL);
 }
 
-static token_t *handle_negation(lexer_t *lx)
+static struct token *handle_negation(struct lexer *lx)
 {
     if (lx->current != '!')
     {
@@ -323,16 +323,16 @@ static token_t *handle_negation(lexer_t *lx)
     return token_new(TOKEN_NEGATION, NULL);
 }
 
-void lexer_init(lexer_t *lx, FILE *input)
+void lexer_init(struct lexer *lx, FILE *input)
 {
     lx->input = input;
     lx->current = fgetc(input);
     lx->condition = LEXER_NORMAL;
 }
 
-token_t *lexer_next(lexer_t *lx)
+struct token *lexer_next(struct lexer *lx)
 {
-    token_t *token = NULL;
+    struct token *token = NULL;
 
     skip_blanks(lx);
 

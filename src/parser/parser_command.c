@@ -1,6 +1,6 @@
 #include "parser_internal.h"
 
-ast_t *parse_command(parser_t *p)
+struct ast *parse_command(struct parser *p)
 {
     if (peek(p) == TOKEN_IF)
     {

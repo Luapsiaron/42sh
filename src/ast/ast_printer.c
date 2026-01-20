@@ -10,7 +10,7 @@ static void print_indent(int indent)
     }
 }
 
-static const char *redir_name(redir_type_t type)
+static const char *redir_name(enum redir_type type)
 {
     switch (type)
     {
@@ -27,7 +27,7 @@ static const char *redir_name(redir_type_t type)
     }
 }
 
-static void print_redirs(const ast_t *redir, int depth)
+static void print_redirs(const struct ast *redir, int depth)
 {
     while (redir)
     {
@@ -39,7 +39,7 @@ static void print_redirs(const ast_t *redir, int depth)
     }
 }
 
-static void print_assignment(const ast_t *node, int depth)
+static void print_assignment(const struct ast *node, int depth)
 {
     while (node)
     {
@@ -50,7 +50,7 @@ static void print_assignment(const ast_t *node, int depth)
     }
 }
 
-static void print_cmd(const ast_t *node, int depth)
+static void print_cmd(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("CMD: ");
@@ -66,7 +66,7 @@ static void print_cmd(const ast_t *node, int depth)
     print_assignment(node->data.ast_cmd.assignments, depth + 1);
 }
 
-static void print_if(const ast_t *node, int depth)
+static void print_if(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("IF:\n");
@@ -82,7 +82,7 @@ static void print_if(const ast_t *node, int depth)
     }
 }
 
-static void print_list(const ast_t *node, int depth)
+static void print_list(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("LIST:\n");
@@ -90,7 +90,7 @@ static void print_list(const ast_t *node, int depth)
     ast_printer(node->data.ast_list.next, depth);
 }
 
-static void print_pipeline(const ast_t *node, int depth)
+static void print_pipeline(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("PIPELINE:\n");
@@ -98,14 +98,14 @@ static void print_pipeline(const ast_t *node, int depth)
     ast_printer(node->data.ast_pipeline.right, depth + 1);
 }
 
-static void print_negation(const ast_t *node, int depth)
+static void print_negation(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("NEGATION:\n");
     ast_printer(node->data.ast_negation.child, depth + 1);
 }
 
-static void print_and_or(const ast_t *node, int depth)
+static void print_and_or(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("AND_OR: %s\n",
@@ -114,7 +114,7 @@ static void print_and_or(const ast_t *node, int depth)
     ast_printer(node->data.ast_and_or.right, depth + 1);
 }
 
-static void print_while_until(const ast_t *node, int depth)
+static void print_while_until(const struct ast *node, int depth)
 {
     print_indent(depth);
     if (node->data.ast_while_until.type == LOOP_WHILE)
@@ -129,7 +129,7 @@ static void print_while_until(const ast_t *node, int depth)
     ast_printer(node->data.ast_while_until.body, depth + 1);
 }
 
-static void print_for(const ast_t *node, int depth)
+static void print_for(const struct ast *node, int depth)
 {
     print_indent(depth);
     printf("FOR:\n");
@@ -138,7 +138,7 @@ static void print_for(const ast_t *node, int depth)
     ast_printer(node->data.ast_for.body, depth + 1);
 }
 
-void ast_printer(const ast_t *node, int depth)
+void ast_printer(const struct ast *node, int depth)
 {
     if (!node)
     {

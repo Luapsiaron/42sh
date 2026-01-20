@@ -1,8 +1,8 @@
 #include "ast.h"
 
-ast_t *ast_cmd_init(char **argv)
+struct ast *ast_cmd_init(char **argv)
 {
-    ast_t *new = ast_init(AST_CMD);
+    struct ast *new = ast_init(AST_CMD);
     if (!new)
     {
         return NULL;
@@ -15,9 +15,9 @@ ast_t *ast_cmd_init(char **argv)
     return new;
 }
 
-ast_t *ast_list_init(ast_t *next, ast_t *child)
+struct ast *ast_list_init(struct ast *next, struct ast *child)
 {
-    ast_t *new = ast_init(AST_LIST);
+    struct ast *new = ast_init(AST_LIST);
     if (!new)
     {
         return NULL;

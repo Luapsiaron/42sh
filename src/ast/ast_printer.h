@@ -3,6 +3,6 @@
 
 #include "ast.h"
 
-void ast_printer(const ast_t *node, int depth);
+void ast_printer(const struct ast *node, int depth);
 
 #endif /* ! AST_PRINTER_H */

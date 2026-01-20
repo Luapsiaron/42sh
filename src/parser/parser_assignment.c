@@ -4,7 +4,7 @@
 #include "../utils/str/str.h"
 #include "parser_internal.h"
 
-ast_t *parse_assignment(parser_t *p)
+struct ast *parse_assignment(struct parser *p)
 {
     if (peek(p) != TOKEN_ASSIGNMENT_WORD)
     {
@@ -27,7 +27,7 @@ ast_t *parse_assignment(parser_t *p)
 
     const char *value = equal_sign + 1;
 
-    ast_t *assignment = ast_assignment_init(var_name, value);
+    struct ast *assignment = ast_assignment_init(var_name, value);
     free(var_name);
     if (!assignment)
     {

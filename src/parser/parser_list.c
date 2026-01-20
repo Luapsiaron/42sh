@@ -1,6 +1,6 @@
 #include "parser_internal.h"
 
-ast_t *parse_list(parser_t *p)
+struct ast *parse_list(struct parser *p)
 {
     skip_newlines(p);
     if (peek(p) == TOKEN_SEMICOLON)
@@ -8,19 +8,19 @@ ast_t *parse_list(parser_t *p)
         return NULL;
     }
 
-    ast_t *child = parse_and_or(p);
+    struct ast *child = parse_and_or(p);
     if (!child)
     {
         return NULL;
     }
-    ast_t *head = ast_list_init(NULL, child);
+    struct ast *head = ast_list_init(NULL, child);
     if (!head)
     {
         ast_free(child);
         return NULL;
     }
 
-    ast_t *tail = head;
+    struct ast *tail = head;
 
     while (1)
     {
@@ -38,14 +38,14 @@ ast_t *parse_list(parser_t *p)
             break;
         }
 
-        ast_t *next_child = parse_and_or(p);
+        struct ast *next_child = parse_and_or(p);
         if (!next_child)
         {
             ast_free(head);
             return NULL;
         }
 
-        ast_t *next_list = ast_list_init(NULL, next_child);
+        struct ast *next_list = ast_list_init(NULL, next_child);
         if (!next_list)
         {
             ast_free(next_child);

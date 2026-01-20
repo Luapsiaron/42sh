@@ -1,9 +1,9 @@
 #include "parser.h"
 #include "parser_internal.h"
 
-ast_t *parse_input(FILE *f)
+struct ast *parse_input(FILE *f)
 {
-    parser_t p;
+    struct parser p;
     p.current_token = NULL;
 
     lexer_init(&p.lexer, f);
@@ -21,7 +21,7 @@ ast_t *parse_input(FILE *f)
         return NULL;
     }
 
-    ast_t *root = parse_list(&p);
+    struct ast *root = parse_list(&p);
     if (!root)
     {
         if (p.current_token)

@@ -19,7 +19,7 @@
 // simple_command = WORD { element };
 // element = WORD;
 
-typedef enum ast_type
+enum ast_type
 {
     AST_INPUT,
     AST_LIST,
@@ -35,7 +35,7 @@ typedef enum ast_type
     AST_NEGATION,
     AST_REDIR,
     AST_ASSIGNMENT
-} ast_type_t;
+};
 
 struct ast_if
 {
@@ -58,18 +58,18 @@ struct ast_pipeline
     struct ast *left;
 };
 
-typedef enum redir_type
+enum redir_type
 {
     REDIR_OUT, // >
     REDIR_APPEND, // >>
     REDIR_CLOBBER, // >|
     REDIR_IN, // <
-} redir_type_t;
+};
 
 struct ast_redir
 {
     int io_number;
-    redir_type_t type; // IN/OUT/APPEND/CLOBBER
+    enum redir_type type; // IN/OUT/APPEND/CLOBBER
     char *word; // filename
     struct ast *next;
 };
@@ -93,28 +93,28 @@ struct ast_negation
     struct ast *child;
 };
 
-typedef enum and_or_op
+enum and_or_op
 {
     AND_OP, // &&
     OR_OP // ||
-} and_or_op_t;
+};
 
 struct ast_and_or
 {
-    and_or_op_t operator;
+    enum and_or_op operator;
     struct ast *left;
     struct ast *right;
 };
 
-typedef enum loop_type
+enum loop_type
 {
     LOOP_WHILE,
     LOOP_UNTIL
-} loop_t;
+};
 
 struct ast_while_until
 {
-    loop_t type; // WHILE/UNTIL
+    enum loop_type type; // WHILE/UNTIL
     struct ast *condition;
     struct ast *body;
 };
@@ -140,31 +140,31 @@ union ast_union
     struct ast_assignment ast_assignment;
 };
 
-typedef struct ast
+struct ast
 {
-    ast_type_t type;
+    enum ast_type type;
     union ast_union data;
-} ast_t;
+};
 
-ast_t *ast_init(ast_type_t type);
+struct ast *ast_init(enum ast_type type);
 
-ast_t *ast_if_init(ast_t *condition, ast_t *then_body, ast_t *else_body);
-ast_t *ast_cmd_init(char **argv);
-ast_t *ast_list_init(ast_t *next, ast_t *child);
-ast_t *ast_pipeline_init(ast_t *right, ast_t *left);
-ast_t *ast_negation_init(ast_t *child);
-ast_t *ast_and_or_init(and_or_op_t operator, ast_t * left, ast_t *right);
-ast_t *ast_while_until_init(ast_t *condition, ast_t *body, loop_t type);
-ast_t *ast_for_init(ast_t *first_arg, ast_t *second_arg, ast_t *body);
+struct ast *ast_if_init(struct ast *condition, struct ast *then_body, struct ast *else_body);
+struct ast *ast_cmd_init(char **argv);
+struct ast *ast_list_init(struct ast *next, struct ast *child);
+struct ast *ast_pipeline_init(struct ast *right, struct ast *left);
+struct ast *ast_negation_init(struct ast *child);
+struct ast *ast_and_or_init(enum and_or_op operator, struct ast * left, struct ast *right);
+struct ast *ast_while_until_init(struct ast *condition, struct ast *body, enum loop_type type);
+struct ast *ast_for_init(struct ast *first_arg, struct ast *second_arg, struct ast *body);
 
-ast_t *ast_redir_init(int io_number, redir_type_t type, const char *word,
-                      ast_t *next);
-int ast_redir_append(ast_t *cmd, ast_t *redir);
+struct ast *ast_redir_init(int io_number, enum redir_type type, const char *word,
+                      struct ast *next);
+int ast_redir_append(struct ast *cmd, struct ast *redir);
 
-ast_t *ast_assignment_init(const char *var, const char *value);
-int ast_assignment_append(ast_t *cmd, ast_t *assignment);
+struct ast *ast_assignment_init(const char *var, const char *value);
+int ast_assignment_append(struct ast *cmd, struct ast *assignment);
 
 void free_argv(char **argv);
-void ast_free(ast_t *node);
+void ast_free(struct ast *node);
 
 #endif /* ! AST_H */

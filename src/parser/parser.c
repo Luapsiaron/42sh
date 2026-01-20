@@ -1,6 +1,6 @@
 #include "parser_internal.h"
 
-token_type_t peek(parser_t *p)
+enum token_type peek(struct parser *p)
 {
     if (!p || !p->current_token)
     {
@@ -9,7 +9,7 @@ token_type_t peek(parser_t *p)
     return p->current_token->type;
 }
 
-void pop(parser_t *p)
+void pop(struct parser *p)
 {
     if (!p)
     {
@@ -24,7 +24,7 @@ void pop(parser_t *p)
     p->current_token = lexer_next(&p->lexer);
 }
 
-void skip_semicolon_newline(parser_t *p)
+void skip_semicolon_newline(struct parser *p)
 {
     while (peek(p) == TOKEN_NEWLINE || peek(p) == TOKEN_SEMICOLON)
     {
@@ -32,7 +32,7 @@ void skip_semicolon_newline(parser_t *p)
     }
 }
 
-void skip_newlines(parser_t *p)
+void skip_newlines(struct parser *p)
 {
     while (peek(p) == TOKEN_NEWLINE)
     {
@@ -40,7 +40,7 @@ void skip_newlines(parser_t *p)
     }
 }
 
-int remove_separator(parser_t *p)
+int remove_separator(struct parser *p)
 {
     if (peek(p) == TOKEN_SEMICOLON)
     {

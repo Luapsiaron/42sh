@@ -5,6 +5,6 @@
 
 #include "../../ast/ast.h"
 
-void ast_pretty_print(const ast_t *ast, FILE *out);
+void ast_pretty_print(const struct ast *ast, FILE *out);
 
 #endif /* ! PRETTY_PRINTER_H */

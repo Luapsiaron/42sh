@@ -3,6 +3,6 @@
 
 #include "../ast/ast.h"
 
-ast_t *parse_input(FILE *f);
+struct ast *parse_input(FILE *f);
 
 #endif /* ! PARSER_H */
