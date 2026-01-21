@@ -238,6 +238,15 @@ run_script "script test fill_nl" "script/script_fill_nl.sh"
 run_script "script test while" "script/script_while.sh"
 run_script "script test for 2 forms" "script/script_2_for.sh"
 
+run_script "script test if in if and elif" "script/if_in_if_elif.sh"
+
+run_script "script test var @ complex" "script/echo_var@_cplx.sh"
+run_script "script test var other" "script/echo_var_others.sh" 1 2 3
+run_script "script test var environment" "script/echo_var_env.sh"
+
+run_script "script test Piscine - tower" "script/tower.sh"
+run_script "script test Piscine - ascii house" "script/ascii_house.sh"
+
 # ================= RUN UNIT =====================
 
 if [ "$COVERAGE" = "yes" ]; then
