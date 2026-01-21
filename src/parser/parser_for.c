@@ -49,63 +49,21 @@ static struct ast *parse_for_name(struct parser *p)
 /*
     Parse the optional "in ..." part of the for statement
 */
-<<<<<<< HEAD
-static struct ast *parse_for_condition(struct parser *p,
-                                       struct ast **second_arg)
-{
-    if (peek(p) != TOKEN_WORD)
-=======
 static struct ast *parse_for_in_words(struct parser *p)
 {
     if(peek(p) != TOKEN_IN && !is_token_word_in(p))
->>>>>>> beb551e (fix: Multiple fixes for moulinette tests)
     {
         return NULL;
     }
-    char **argv = malloc(sizeof(char *) * 2);
-    if (!argv)
-    {
-        return NULL;
-    }
-    int len = strlen(p->current_token->lexeme);
-    argv[0] = malloc(sizeof(char) * len);
-    if (!argv[0])
-    {
-        free_argv(argv);
-        return NULL;
-    }
-    argv[0] = memcpy(argv[0], p->current_token->lexeme, len);
-    argv[1] = NULL;
-    struct ast *first = ast_cmd_init(argv);
 
     pop(p);
 
-<<<<<<< HEAD
-    if (peek(p) == TOKEN_IN)
-    {
-        *second_arg = parse_simple_command(p);
-    }
-
-    if (peek(p) == TOKEN_SEMICOLON)
-    {
-        pop(p);
-    }
-    while (peek(p) == TOKEN_NEWLINE)
-    {
-        pop(p);
-    }
-    if (peek(p) == TOKEN_SEMICOLON)
-=======
     struct ast *list = ast_cmd_init(NULL);
     if (!list)
->>>>>>> beb551e (fix: Multiple fixes for moulinette tests)
     {
         return NULL;
     }
 
-<<<<<<< HEAD
-    return first;
-=======
     size_t capacity = 8;
     size_t i = 0;
     char **argv = calloc(capacity, sizeof(char *));
@@ -152,7 +110,6 @@ error:
     free_argv(argv);
     ast_free(list);
     return NULL;
->>>>>>> beb551e (fix: Multiple fixes for moulinette tests)
 }
 
 /*
@@ -173,12 +130,8 @@ struct ast *parse_for(struct parser *p)
 {
     pop(p);
 
-<<<<<<< HEAD
-=======
     struct ast *first_arg = parse_for_name(p);
->>>>>>> beb551e (fix: Multiple fixes for moulinette tests)
     struct ast *second_arg = NULL;
-    struct ast *first_arg = parse_for_condition(p, &second_arg);
     if (!first_arg)
     {
         goto error;
@@ -186,11 +139,7 @@ struct ast *parse_for(struct parser *p)
 
     skip_newlines(p);
 
-<<<<<<< HEAD
-    /*if (peek(p) != TOKEN_SEMICOLON || peek(p) != TOKEN_NEWLINE)
-=======
     if(peek(p) == TOKEN_SEMICOLON)
->>>>>>> beb551e (fix: Multiple fixes for moulinette tests)
     {
         pop(p);
     }
@@ -202,14 +151,7 @@ struct ast *parse_for(struct parser *p)
             goto error;
         }
     }
-<<<<<<< HEAD
-    else
-    {
-        pop(p);
-    }*/
-=======
     skip_newlines(p);
->>>>>>> beb551e (fix: Multiple fixes for moulinette tests)
 
     if (peek(p) != TOKEN_DO)
     {
