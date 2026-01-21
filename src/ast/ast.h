@@ -126,6 +126,7 @@ struct ast_for
     struct ast *body;
 };
 
+// Union of all AST node types
 union ast_union
 {
     struct ast_cmd ast_cmd;
@@ -140,12 +141,16 @@ union ast_union
     struct ast_assignment ast_assignment;
 };
 
+// AST node structure
 struct ast
 {
     enum ast_type type;
     union ast_union data;
 };
 
+/*
+    Init of all AST nodes
+*/
 struct ast *ast_init(enum ast_type type);
 
 struct ast *ast_if_init(struct ast *condition, struct ast *then_body, struct ast *else_body);
@@ -164,6 +169,7 @@ int ast_redir_append(struct ast *cmd, struct ast *redir);
 struct ast *ast_assignment_init(const char *var, const char *value);
 int ast_assignment_append(struct ast *cmd, struct ast *assignment);
 
+// Free functions
 void free_argv(char **argv);
 void ast_free(struct ast *node);
 

@@ -22,6 +22,14 @@ static int is_redir_char(int c)
     return c == '>' || c == '<';
 }
 
+/*
+    Lex an IO_NUMBER token or a WORD token starting with digits
+    An IO_NUMBER is a sequence of digits followed by a redirection character
+    If the next character after the digits is not a redirection character,
+    it is treated as a WORD token
+    Examples:
+    - "2>" -> TOKEN_IONUMBER with lexeme "2"
+*/
 static struct token *lexer_ionumber(struct lexer *lx)
 {
     char buffer[32];
@@ -41,6 +49,12 @@ static struct token *lexer_ionumber(struct lexer *lx)
     return token_new(TOKEN_WORD, buffer);
 }
 
+/*
+    Check if the given string is a valid assignment word
+    An assignment word matches the pattern: NAME=VALUE
+    where NAME starts with a letter or underscore, followed by letters,
+    digits, or underscores, and is followed by an '=' character
+*/
 static int is_assignment_word(const char *s)
 {
     if (!s || !s[0])
@@ -71,6 +85,10 @@ static int append_buffer(char *buffer, size_t *index, size_t capacity, int c)
     return 1;
 }
 
+/*
+    Lex a single-quoted string, including the surrounding quotes
+    Returns 1 on success, 0 on failure (e.g., unmatched quote or buffer overflow)
+*/
 static int lexer_single_quotes(struct lexer *lx, char *buffer, size_t *index,
                                size_t capacity)
 {
@@ -102,6 +120,11 @@ static int lexer_single_quotes(struct lexer *lx, char *buffer, size_t *index,
     return 1;
 }
 
+/*
+    Lex a double-quoted string, including the surrounding quotes
+    Handles escape sequences within the double quotes
+    Returns 1 on success, 0 on failure (e.g., unmatched quote or buffer overflow)
+*/
 static int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
                                size_t capacity)
 {
@@ -158,6 +181,11 @@ static int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
     return 1;
 }
 
+/*
+    Lex a word token
+    A word can contain letters, digits, underscores, and quoted strings
+    It ends at whitespace, separators, or operators
+*/
 static struct token *lexer_is_word(struct lexer *lx)
 {
     char buffer[512];
@@ -330,6 +358,9 @@ void lexer_init(struct lexer *lx, FILE *input)
     lx->condition = LEXER_NORMAL;
 }
 
+/*
+    Return next token from input corresponding to his type
+*/
 struct token *lexer_next(struct lexer *lx)
 {
     struct token *token = NULL;

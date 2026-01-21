@@ -1,6 +1,10 @@
 #include "parser.h"
 #include "parser_internal.h"
 
+/*
+    Parse the entire input from the given file
+    Returns the root AST node or NULL on error
+*/
 struct ast *parse_input(FILE *f)
 {
     struct parser p;

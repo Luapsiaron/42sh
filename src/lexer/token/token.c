@@ -17,7 +17,7 @@ struct token *token_new(enum token_type type, const char *value)
     t->type = type;
     if (value)
     {
-        t->lexeme = xstrdup(value);
+        t->lexeme = xstrdup(value); // Works like strdup
         if (!t->lexeme)
         {
             free(t);
@@ -103,6 +103,9 @@ const char *token_type_name(enum token_type t)
     return token_type_names[t];
 }
 
+/*
+    Print a token for debugging purposes
+*/
 void token_printer(const struct token *t)
 {
     if (!t)

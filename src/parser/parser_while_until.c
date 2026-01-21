@@ -1,11 +1,17 @@
 #include "parser_internal.h"
 
+/*
+    Structure to hold the condition and body of while/until statements
+*/
 struct parser_while_until
 {
     struct ast *condition;
     struct ast *body;
 };
 
+/*
+    Tokens that signify the end of a while/until statement
+*/
 static const enum token_type END_TOKENS_DONE[] = { TOKEN_DONE };
 static const enum token_type END_TOKENS_DO[] = { TOKEN_DO };
 
@@ -21,6 +27,18 @@ static struct ast *parse_condition(struct parser *p)
                                sizeof(END_TOKENS_DO) / sizeof(*END_TOKENS_DO));
 }
 
+/*
+    Parse a while or until statement
+    Grammar:
+    while_command = 'while' compound_list 'do' compound_list 'done'
+    until_command = 'until' compound_list 'do' compound_list 'done'
+
+    1. Consumes the initial TOKEN_WHILE or TOKEN_UNTIL
+    2. Parses the condition compound list until TOKEN_DO
+    3. Parses the body compound list until TOKEN_DONE
+    4. Returns a struct parser_while_until containing the condition and body ASTs
+    5. On error, frees any allocated ASTs and returns NULL
+*/
 static struct parser_while_until *
 parse_while_until(struct parser *p, struct parser_while_until *res)
 {

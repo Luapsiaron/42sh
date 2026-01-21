@@ -2,6 +2,10 @@
 
 #include <stdio.h>
 
+/*
+    AST Printer for debugging purposes
+*/
+
 static void print_indent(int indent)
 {
     for (int i = 0; i < indent; i++)

@@ -70,7 +70,6 @@ struct ast *parse_compound_list(struct parser *p, const enum token_type *end_tok
 */                           
 struct ast *parse_if(struct parser *p);
 
-
 /*
     Parse a while statement
     Grammar: while_command = 'while' compound_list 'do' compound_list 'done'

@@ -8,6 +8,9 @@ static struct ast *parse_for_body(struct parser *p)
         p, END_TOKENS_DONE, sizeof(END_TOKENS_DONE) / sizeof(*END_TOKENS_DONE));
 }
 
+/*
+    Parse the optional "in ..." part of the for statement
+*/
 static struct ast *parse_for_condition(struct parser *p, struct ast *second_arg)
 {
     if (peek(p) == TOKEN_NEWLINE)
@@ -27,6 +30,18 @@ static struct ast *parse_for_condition(struct parser *p, struct ast *second_arg)
     return second_arg;
 }
 
+/*
+    Parse a for statement
+    Grammar: for_command = 'for' WORD 'in' WORD { WORD } 'do' compound_list 'done'
+
+    1. Consumes the initial TOKEN_FOR
+    2. Parses the first argument (the loop variable) as a simple command
+    3. Optionally parses the "in" condition part, which may include multiple words
+    4. Consumes the TOKEN_DO
+    5. Parses the loop body as a compound list until TOKEN_DONE
+    6. Constructs and returns an AST_FOR node with the parsed components
+    7. On error, frees any allocated AST nodes and returns NULL
+*/
 struct ast *parse_for(struct parser *p)
 {
     pop(p);

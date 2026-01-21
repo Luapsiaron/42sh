@@ -2,6 +2,9 @@
 
 #include "ast.h"
 
+/*
+    All the free functions for each AST node type
+*/
 void free_argv(char **argv)
 {
     if (!argv)

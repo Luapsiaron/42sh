@@ -1,5 +1,9 @@
 #include "ast.h"
 
+/*
+    Initialize an assignment AST node
+    Grammar: NAME=VALUE
+*/
 struct ast *ast_assignment_init(const char *var, const char *value)
 {
     struct ast *new = ast_init(AST_ASSIGNMENT);
@@ -31,6 +35,10 @@ struct ast *ast_assignment_init(const char *var, const char *value)
     return new;
 }
 
+/*
+    Append an assignment AST node to a command's assignment list
+    Returns 1 on success, 0 on failure
+*/
 int ast_assignment_append(struct ast *cmd, struct ast *assignment)
 {
     if (!cmd || cmd->type != AST_CMD || !assignment
