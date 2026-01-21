@@ -117,4 +117,10 @@ int is_redirection_token(enum token_type type);
 */
 struct ast *parse_assignment(struct parser *p);
 
+/*
+    Parse a block enclosed in braces
+    Grammar: block = '{' compound_list '}'
+*/
+struct ast *parse_block(struct parser *p);
+
 #endif /* ! PARSER_INTERNAL_H */

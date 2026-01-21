@@ -41,6 +41,9 @@ enum token_type
     TOKEN_AND_IF, // &&
     TOKEN_OR_IF, // ||
 
+    TOKEN_LBRACE, // {
+    TOKEN_RBRACE, // }
+
     // End of input
     TOKEN_EOF
 };

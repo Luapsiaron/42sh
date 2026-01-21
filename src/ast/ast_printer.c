@@ -54,6 +54,13 @@ static void print_assignment(const struct ast *node, int depth)
     }
 }
 
+static void print_block(const struct ast *node, int depth)
+{
+    print_indent(depth);
+    printf("BLOCK:\n");
+    ast_printer(node->data.ast_block.body, depth + 1);
+}
+
 static void print_cmd(const struct ast *node, int depth)
 {
     print_indent(depth);
@@ -148,22 +155,18 @@ void ast_printer(const struct ast *node, int depth)
     {
         return;
     }
-
-    for (int i = 0; i < depth; i++)
-    {
-        printf("  ");
-    }
-
+    
     switch (node->type)
     {
     case AST_CMD:
         print_cmd(node, depth);
         break;
-
+    case AST_BLOCK:
+        print_block(node, depth);
+        break;
     case AST_IF:
         print_if(node, depth);
         break;
-
     case AST_LIST:
         print_list(node, depth);
         break;

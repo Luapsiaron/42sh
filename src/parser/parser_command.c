@@ -28,6 +28,10 @@ struct ast *parse_command(struct parser *p)
     {
         return parse_for(p);
     }
+    if(peek(p) == TOKEN_LBRACE)
+    {
+        return parse_block(p);
+    }
     if (peek(p) == TOKEN_WORD || peek(p) == TOKEN_ASSIGNMENT_WORD
         || peek(p) == TOKEN_IONUMBER || is_redirection_token(peek(p)))
     {

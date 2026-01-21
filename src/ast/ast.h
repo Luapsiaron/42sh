@@ -34,7 +34,8 @@ enum ast_type
     AST_UNTIL,
     AST_NEGATION,
     AST_REDIR,
-    AST_ASSIGNMENT
+    AST_ASSIGNMENT,
+    AST_BLOCK
 };
 
 struct ast_if
@@ -129,6 +130,11 @@ struct ast_for
     struct ast *body;
 };
 
+struct ast_block
+{
+    struct ast *body;
+};
+
 // Union of all AST node types
 union ast_union
 {
@@ -142,6 +148,7 @@ union ast_union
     struct ast_for ast_for;
     struct ast_redir ast_redir;
     struct ast_assignment ast_assignment;
+    struct ast_block ast_block;
 };
 
 // AST node structure
@@ -171,6 +178,8 @@ int ast_redir_append(struct ast *cmd, struct ast *redir);
 
 struct ast *ast_assignment_init(const char *var, const char *value);
 int ast_assignment_append(struct ast *cmd, struct ast *assignment);
+
+struct ast *ast_block_init(struct ast *body);
 
 // Free functions
 void free_argv(char **argv);

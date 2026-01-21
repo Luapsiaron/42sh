@@ -194,7 +194,7 @@ static struct token *lexer_is_word(struct lexer *lx)
 
     while (lx->current != EOF && lx->current != ';' && lx->current != '|'
            && lx->current != '>' && lx->current != '<' && lx->current != '\n'
-           && !isspace(lx->current))
+           && lx->current != '{' && lx->current != '}' && !isspace(lx->current))
     {
         if (lx->current == '\'')
         {
@@ -267,6 +267,11 @@ static struct token *handle_comment(struct lexer *lx)
 
 static struct token *handle_separator(struct lexer *lx)
 {
+    if(lx->current != ';' && lx->current != '\n' && lx->current != '{' && lx->current != '}')
+    {
+        return NULL;
+    }
+    
     if (lx->current == ';')
     {
         lexer_next_char(lx);
@@ -278,6 +283,18 @@ static struct token *handle_separator(struct lexer *lx)
         lexer_next_char(lx);
         lx->condition = LEXER_NORMAL;
         return token_new(TOKEN_NEWLINE, NULL);
+    }
+    if (lx->current == '{')
+    {
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_LBRACE, NULL);
+    }
+    if( lx->current == '}')
+    {
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_RBRACE, NULL);
     }
     return NULL;
 }

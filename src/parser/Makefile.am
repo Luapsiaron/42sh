@@ -16,5 +16,6 @@ libparser_a_SOURCES = \
   parser_and_or.c \
   parser_redir.c \
   parser_assignment.c \
+  parser_shell_command.c \
   parser.h \
   parser_internal.h

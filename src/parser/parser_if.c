@@ -103,8 +103,12 @@ struct ast *parse_compound_list(struct parser *p, const enum token_type *end_tok
 
     while (1)
     {
-        if (is_stop_token(peek(p), end_token, end_token_count)
-            || peek(p) == TOKEN_EOF)
+        if (is_stop_token(peek(p), end_token, end_token_count))
+        {
+            break;
+        }
+
+        if (peek(p) == TOKEN_EOF)
         {
             goto error;
         }

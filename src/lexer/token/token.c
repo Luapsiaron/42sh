@@ -94,6 +94,9 @@ static const char *token_type_names[] = {
     [TOKEN_AND_IF] = "AND_IF",
     [TOKEN_OR_IF] = "OR_IF",
 
+    [TOKEN_LBRACE] = "{",
+    [TOKEN_RBRACE] = "}",
+
     [TOKEN_EOF] = "EOF",
 };
 

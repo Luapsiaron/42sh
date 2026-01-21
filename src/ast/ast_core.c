@@ -82,6 +82,11 @@ static void free_for(struct ast *node)
     ast_free(node->data.ast_for.body);
 }
 
+static void free_block(struct ast *node)
+{
+    ast_free(node->data.ast_block.body);
+}
+
 void ast_free(struct ast *node)
 {
     if (!node)
@@ -120,6 +125,9 @@ void ast_free(struct ast *node)
         break;
     case AST_FOR:
         free_for(node);
+        break;
+    case AST_BLOCK:
+        free_block(node);
         break;
     default:
         break;
