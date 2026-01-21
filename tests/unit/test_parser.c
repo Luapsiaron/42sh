@@ -46,7 +46,7 @@ Test(parser, command_list_two_cmds)
     ast_free(ast);
 }
 
-Test(parser, simple_if)
+Test(parse_if, simple_if)
 {
     FILE *f = fmem_from_str("if true; then false\n fi");
     struct parser p;
@@ -83,7 +83,7 @@ Test(parser, simple_if)
     ast_free(ast);
 }
 
-Test(parser, simple_if_else)
+Test(parse_if, simple_if_else)
 {
     FILE *f = fmem_from_str("if true; then false\n else true; fi");
     struct parser p;
@@ -129,7 +129,7 @@ Test(parser, simple_if_else)
     ast_free(ast);
 }
 
-Test(parser, simple_if_elif_else)
+Test(parse_if, simple_if_elif_else)
 {
     FILE *f = fmem_from_str(
         "if true; then false\n elif true; then false; else true; fi");
@@ -199,9 +199,8 @@ Test(parser, simple_if_elif_else)
 
     ast_free(ast);
 }
-// p
-// ast->data.ast_if.else_body->data.ast_list.child->data.ast_if.condition->data.ast_list.child->data.ast_cmd.argv[0]
-Test(parser, simple_if_multiple_condition)
+
+Test(parse_if, simple_if_multiple_condition)
 {
     FILE *f = fmem_from_str("if true; false; echo; then false\n fi");
     struct parser p;
@@ -255,6 +254,108 @@ Test(parser, simple_if_multiple_condition)
     cr_assert_str_eq(
         ast->data.ast_if.then_body->data.ast_list.child->data.ast_cmd.argv[0],
         "false");
+
+    ast_free(ast);
+}
+
+Test(parse_for, simple_for)
+{
+    FILE *f = fmem_from_str("for condition; do echo test\n echo pls; done");
+    struct parser p;
+    p.current_token = NULL;
+
+    lexer_init(&p.lexer, f);
+    p.current_token = lexer_next(&p.lexer);
+    if (!p.current_token)
+    {
+        return;
+    }
+
+    struct ast *ast = parse_for(&p);
+    fclose(f);
+
+    cr_assert_not_null(ast);
+
+    cr_assert_not_null(ast->data.ast_for.first_arg);
+    cr_assert_not_null(ast->data.ast_for.first_arg->data.ast_cmd.argv);
+    cr_assert_str_eq(ast->data.ast_for.first_arg->data.ast_cmd.argv[0],
+                     "condition");
+
+    cr_assert_not_null(ast->data.ast_for.body);
+    cr_assert_not_null(ast->data.ast_for.body->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_for.body->data.ast_list.next);
+    cr_assert_not_null(
+        ast->data.ast_for.body->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_for.body->data.ast_list.child->data.ast_cmd.argv[0],
+        "echo");
+    cr_assert_str_eq(
+        ast->data.ast_for.body->data.ast_list.child->data.ast_cmd.argv[1],
+        "test");
+
+    cr_assert_not_null(
+        ast->data.ast_for.body->data.ast_list.next->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_for.body->data.ast_list.next->data.ast_list
+                           .child->data.ast_cmd.argv);
+    cr_assert_str_eq(ast->data.ast_for.body->data.ast_list.next->data.ast_list
+                         .child->data.ast_cmd.argv[0],
+                     "echo");
+    cr_assert_str_eq(ast->data.ast_for.body->data.ast_list.next->data.ast_list
+                         .child->data.ast_cmd.argv[1],
+                     "pls");
+
+    ast_free(ast);
+}
+
+Test(parse_for, simple_for_in)
+{
+    FILE *f =
+        fmem_from_str("for var in sec_var; do echo test\n echo pls; done");
+    struct parser p;
+    p.current_token = NULL;
+
+    lexer_init(&p.lexer, f);
+    p.current_token = lexer_next(&p.lexer);
+    if (!p.current_token)
+    {
+        return;
+    }
+
+    struct ast *ast = parse_for(&p);
+    fclose(f);
+
+    cr_assert_not_null(ast);
+
+    cr_assert_not_null(ast->data.ast_for.first_arg);
+    cr_assert_not_null(ast->data.ast_for.first_arg->data.ast_cmd.argv);
+    cr_assert_str_eq(ast->data.ast_for.first_arg->data.ast_cmd.argv[0], "var");
+
+    cr_assert_not_null(ast->data.ast_for.second_arg);
+    cr_assert_not_null(ast->data.ast_for.second_arg->data.ast_cmd.argv);
+    cr_assert_str_eq(ast->data.ast_for.second_arg->data.ast_cmd.argv[0], "var");
+
+    cr_assert_not_null(ast->data.ast_for.body);
+    cr_assert_not_null(ast->data.ast_for.body->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_for.body->data.ast_list.next);
+    cr_assert_not_null(
+        ast->data.ast_for.body->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_for.body->data.ast_list.child->data.ast_cmd.argv[0],
+        "echo");
+    cr_assert_str_eq(
+        ast->data.ast_for.body->data.ast_list.child->data.ast_cmd.argv[1],
+        "test");
+
+    cr_assert_not_null(
+        ast->data.ast_for.body->data.ast_list.next->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_for.body->data.ast_list.next->data.ast_list
+                           .child->data.ast_cmd.argv);
+    cr_assert_str_eq(ast->data.ast_for.body->data.ast_list.next->data.ast_list
+                         .child->data.ast_cmd.argv[0],
+                     "echo");
+    cr_assert_str_eq(ast->data.ast_for.body->data.ast_list.next->data.ast_list
+                         .child->data.ast_cmd.argv[1],
+                     "pls");
 
     ast_free(ast);
 }

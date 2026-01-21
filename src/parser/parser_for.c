@@ -11,32 +11,61 @@ static struct ast *parse_for_body(struct parser *p)
 /*
     Parse the optional "in ..." part of the for statement
 */
-static struct ast *parse_for_condition(struct parser *p, struct ast *second_arg)
+static struct ast *parse_for_condition(struct parser *p,
+                                       struct ast **second_arg)
 {
-    if (peek(p) == TOKEN_NEWLINE)
-    {
-        skip_newlines(p);
-    }
-    if (peek(p) != TOKEN_IN)
+    if (peek(p) != TOKEN_WORD)
     {
         return NULL;
     }
+    char **argv = malloc(sizeof(char *) * 2);
+    if (!argv)
+    {
+        return NULL;
+    }
+    int len = strlen(p->current_token->lexeme);
+    argv[0] = malloc(sizeof(char) * len);
+    if (!argv[0])
+    {
+        free_argv(argv);
+        return NULL;
+    }
+    argv[0] = memcpy(argv[0], p->current_token->lexeme, len);
+    argv[1] = NULL;
+    struct ast *first = ast_cmd_init(argv);
+
     pop(p);
-    second_arg = parse_simple_command(p);
-    if (!remove_separator(p))
+
+    if (peek(p) == TOKEN_IN)
+    {
+        *second_arg = parse_simple_command(p);
+    }
+
+    if (peek(p) == TOKEN_SEMICOLON)
+    {
+        pop(p);
+    }
+    while (peek(p) == TOKEN_NEWLINE)
+    {
+        pop(p);
+    }
+    if (peek(p) == TOKEN_SEMICOLON)
     {
         return NULL;
     }
-    return second_arg;
+
+    return first;
 }
 
 /*
     Parse a for statement
-    Grammar: for_command = 'for' WORD 'in' WORD { WORD } 'do' compound_list 'done'
+    Grammar: for_command = 'for' WORD 'in' WORD { WORD } 'do' compound_list
+   'done'
 
     1. Consumes the initial TOKEN_FOR
     2. Parses the first argument (the loop variable) as a simple command
-    3. Optionally parses the "in" condition part, which may include multiple words
+    3. Optionally parses the "in" condition part, which may include multiple
+   words
     4. Consumes the TOKEN_DO
     5. Parses the loop body as a compound list until TOKEN_DONE
     6. Constructs and returns an AST_FOR node with the parsed components
@@ -46,8 +75,8 @@ struct ast *parse_for(struct parser *p)
 {
     pop(p);
 
-    struct ast *first_arg = parse_simple_command(p);
     struct ast *second_arg = NULL;
+    struct ast *first_arg = parse_for_condition(p, &second_arg);
     if (!first_arg)
     {
         goto error;
@@ -55,7 +84,7 @@ struct ast *parse_for(struct parser *p)
 
     skip_newlines(p);
 
-    if (peek(p) != TOKEN_SEMICOLON)
+    /*if (peek(p) != TOKEN_SEMICOLON || peek(p) != TOKEN_NEWLINE)
     {
         second_arg = parse_for_condition(p, second_arg);
         if (!second_arg)
@@ -66,8 +95,7 @@ struct ast *parse_for(struct parser *p)
     else
     {
         pop(p);
-    }
-    skip_newlines(p);
+    }*/
 
     if (peek(p) != TOKEN_DO)
     {
