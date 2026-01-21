@@ -5,4 +5,6 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 
 libbuiltins_a_SOURCES = \
   echo.c \
-  echo.h
+  echo.h \
+  cd.c \
+  cd.h

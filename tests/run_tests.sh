@@ -134,7 +134,13 @@ run_unit()
 run_test "LS" "ls"
 run_test "Tree -a" "tree -a"
 run_test "cat Makefile.am" "cat Makefile.am"
-run_test "Cd .. test" "cd .."
+run_test "Cd .." "cd ..; pwd"
+run_test "Cd -" " cd/; cd /tmp; cd -"
+run_test "Cd error no exist" "cd /coucou"
+run_test "cd too many args" "cd /tmp /var"
+run_test "Cd Home diff" "HOME=/tmp cd; pwd"
+run_test "Cd home" "cd ; pwd" 
+
 
 # Builtins
 run_test "true test" "true"

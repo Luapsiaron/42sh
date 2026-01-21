@@ -17,6 +17,8 @@
 #include "condition.h"
 #include "loop.h"
 #include "redir_pipe.h"
+#include "../builtins/cd.h"
+#include "../expansion/hashmap.h"
 
 // command not found = 127
 // command not executable = 126
@@ -25,10 +27,10 @@
 static bool is_builtin(char *str) // checks if command is a builtin
 {
     return (strcmp(str, "echo") == 0 || strcmp(str, "true") == 0
-            || strcmp(str, "false") == 0);
+            || strcmp(str, "false") == 0) || strcmp(str, "cd") == 0;
 }
 
-static int exec_builtin(char **argv) // executes a builtin command
+static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin command
 {
     if (strcmp(argv[0], "echo") == 0)
     {
@@ -41,6 +43,10 @@ static int exec_builtin(char **argv) // executes a builtin command
     else if (strcmp(argv[0], "false") == 0)
     {
         return 1;
+    }
+    else if(strcmp(argv[0], "cd") == 0)
+    {
+        return builtin_cd(argv, hm);
     }
     return 127;
 }
@@ -118,13 +124,13 @@ int exec_if(struct ast *ast, struct hash_map *hm) // executes an if AST node
     return 0; // false condition and no else, should continue
 }
 
-int exec_cmd(char **argv) // executes a command, handling builtins and external commands
+int exec_cmd(char **argv, struct hash_map *hm) // executes a command, handling builtins and external commands
 {
     if (!argv || !argv[0])
         return 0;
 
     if (is_builtin(argv[0]))
-        return exec_builtin(argv);
+        return exec_builtin(argv, hm);
 
     pid_t pid = fork();
     if (pid < 0)
@@ -204,7 +210,7 @@ int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AS
             free_argv(argv);
             return 1;
         }
-        int st = exec_builtin(argv);
+        int st = exec_builtin(argv, hm);
         fflush(stdout); // subject reminder for builtins
         restore_fds(saved);
 
@@ -244,7 +250,7 @@ int child_exec_command(struct ast *node, struct hash_map *hm) // executes a comm
         if (!argv || !argv[0])
             return 0;
         if (is_builtin(argv[0]))
-            return exec_builtin(argv);
+            return exec_builtin(argv, hm);
         execvp(argv[0], argv);
         // execvp failed:
         int err = errno;
