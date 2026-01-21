@@ -15,6 +15,9 @@
 
 static struct exit_info exit_code = { .last = 0 };
 
+/**
+ * Append a character to the buffer and resize the capacity when full
+ */
 static void char_append(struct buffer *buff, char c)
 {
     if (buff->idx + 1 >= buff->capacity)
@@ -37,6 +40,9 @@ static void str_append(struct buffer *buff, char *str)
     }
 }
 
+/**
+ * Count the number of arguments by iteration
+ */
 static char *dollar_hashtag(struct hash_map *hm)
 {
     int c = 0;
@@ -55,10 +61,13 @@ static char *dollar_hashtag(struct hash_map *hm)
     return res;
 }
 
+/**
+ * Handles special variables or look for them in the hash map
+ */
 static char *handle_specials(struct hash_map *hm,
                              char *var_name) // var name = key in hashmap
 {
-    if (strcmp(var_name, "?") == 0) // EXIT CODE
+    if (strcmp(var_name, "?") == 0) // Last exit code
     {
         char *res = malloc(16);
         sprintf(res, "%d", exit_code.last);
@@ -76,23 +85,23 @@ static char *handle_specials(struct hash_map *hm,
         sprintf(res, "%d", rand() % 32768); // 0-32767 range in bash rand
         return res;
     }
-    if (strcmp(var_name, "*") == 0) //
+    if (strcmp(var_name, "*") == 0) // al arguments concatenated
     {
     }
-    if (strcmp(var_name, "@") == 0) //
+    if (strcmp(var_name, "@") == 0) // all arguments, separated
     {
     }
     if (strcmp(var_name, "#") == 0) // ARG NUMBER
     {
         return dollar_hashtag(hm);
     }
-    if (strcmp(var_name, "UID") == 0)
+    if (strcmp(var_name, "UID") == 0) // user ID
     {
         char *res = malloc(16);
         sprintf(res, "%d", getuid());
         return res;
     }
-    if (strcmp(var_name, "IFS") == 0)
+    if (strcmp(var_name, "IFS") == 0) // Internal Field Separator
     {
         char *val = hash_map_get(hm, "IFS");
         if (val != NULL)
@@ -101,7 +110,7 @@ static char *handle_specials(struct hash_map *hm,
         }
         return xstrdup("");
     }
-    if (strcmp(var_name, "PWD") == 0)
+    if (strcmp(var_name, "PWD") == 0) // PWD - working directory
     {
         char *val = hash_map_get(hm, "PWD");
         if (val)
@@ -110,7 +119,7 @@ static char *handle_specials(struct hash_map *hm,
         }
         return xstrdup("");
     }
-    if (strcmp(var_name, "OLDPWD") == 0)
+    if (strcmp(var_name, "OLDPWD") == 0) // OLDPWD
     {
         char *val = hash_map_get(hm, "OLDPWD");
         if (val != NULL)
@@ -128,9 +137,16 @@ static char *handle_specials(struct hash_map *hm,
     return NULL;
 }
 
+
+/** 
+ * Parse variable tokens: $VAR or ${VAR}
+ * Updates buffer with expanded value / key
+ * 
+*/
 static void handle_dollar(struct buffer *buff, size_t *index, char *word,
                           struct hash_map *hm)
 {
+
     (*index)++; // skip first $
 
     size_t len_name = 0;
@@ -158,6 +174,7 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
     }
     else // $VAR
     {
+        // Check for special variables
         if (word[*index] == '?' || word[*index] == '!' || word[*index] == '$'
             || word[*index] == '#' || word[*index] == '*' || word[*index] == '@')
         {
@@ -166,6 +183,7 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
         }
         else
         {
+            // Check for "home-made" variables 
             while (word[*index] != '\0'
                    && (word[*index] == '_' || isalnum(word[*index])))
             {
@@ -178,6 +196,7 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
         (*index)--; // Expand word func do i++, so one too far
     }
 
+    // Get value and add it to the buffer
     if (var_name != NULL)
     {
         char *value = handle_specials(hm, var_name);
@@ -194,6 +213,10 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
     }
 }
 
+/**
+ * Expand a string (Null terminated)
+ * Go inside every string in argv  and expand variables and quotes in each word
+ */
 char **expand_argv(char **argv, struct hash_map *hm)
 {
     char **res = NULL;
@@ -212,8 +235,12 @@ char **expand_argv(char **argv, struct hash_map *hm)
     return res;
 }
 
+/**
+ *  Handle escaped characters in double quotes: $, '\n', '\', '"'  
+ */
 static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 {
+
     if (word[*i + 1] == '\\' || word[*i + 1] == '$' || word[*i + 1] == '"'
         || word[*i + 1] == '\n')
     {
@@ -225,6 +252,13 @@ static void handle_escaped(struct buffer *buff, char *word, size_t *i)
         char_append(buff, '\\');
     }
 }
+
+/**
+ * Expand a word string:
+ * Single quotes: preserve content
+ * Double quotes: allow variables expansion and escapes
+ * Variables: replace with the value from the hash map 
+ */
 char *expand_word(char *word, struct hash_map *hm)
 {
     bool in_squote = false;
@@ -238,9 +272,9 @@ char *expand_word(char *word, struct hash_map *hm)
     for (size_t i = 0; word[i] != '\0'; i++)
     {
         char c = word[i];
-        if (in_squote)
+        if (in_squote) // In single quotes
         {
-            if (c == '\'')
+            if (c == '\'') // close signe quote
             {
                 in_squote = false;
             }
@@ -249,15 +283,15 @@ char *expand_word(char *word, struct hash_map *hm)
                 char_append(&buff, c);
             }
         }
-        else if (in_dquote)
+        else if (in_dquote) // In double quotes
         {
-            if (c == '"')
+            if (c == '"') // close double quote
             {
                 in_dquote = false;
             }
             else if (c == '$')
             {
-                handle_dollar(&buff, &i, word, hm);
+                handle_dollar(&buff, &i, word, hm); // expand variable
             }
             else if (c == '\\')
             {
@@ -265,26 +299,26 @@ char *expand_word(char *word, struct hash_map *hm)
             }
             else
             {
-                char_append(&buff, c);
+                char_append(&buff, c); // "normal" character
             }
         }
-        else
+        else // "normal" mode / outside quotes
         {
-            if (c == '\'')
+            if (c == '\'') // enter single quote
             {
                 in_squote = true;
             }
-            else if (c == '"')
+            else if (c == '"') // enter double quote
             {
                 in_dquote = true;
             }
             else if (c == '$')
             {
-                handle_dollar(&buff, &i, word, hm);
+                handle_dollar(&buff, &i, word, hm); // expand variable
             }
             else if (c == '\\')
             {
-                if (word[i + 1] != '\0')
+                if (word[i + 1] != '\0') // escape next char if exists
                 {
                     i++;
                     char_append(&buff, word[i]);
