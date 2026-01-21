@@ -86,6 +86,9 @@ static const char *token_type_names[] = {
     [TOKEN_GREAT] = ">",
     [TOKEN_DGREAT] = ">>",
     [TOKEN_CLOBBER] = ">|",
+    [TOKEN_LESSAND] = "<&",
+    [TOKEN_GREATAND] = ">&",
+    [TOKEN_LESSGREAT] = "<>",
 
     [TOKEN_NEGATION] = "NEGATION",
     [TOKEN_AND_IF] = "AND_IF",

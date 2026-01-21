@@ -201,6 +201,7 @@ static struct token *lexer_is_word(struct lexer *lx)
             quote = 1;
             if (!lexer_single_quotes(lx, buffer, &i, sizeof(buffer)))
             {
+                lx->error = 1;
                 return NULL;
             }
             continue;
@@ -210,12 +211,14 @@ static struct token *lexer_is_word(struct lexer *lx)
             quote = 1;
             if (!lexer_double_quotes(lx, buffer, &i, sizeof(buffer)))
             {
+                lx->error = 1;
                 return NULL;
             }
             continue;
         }
         if (!append_buffer(buffer, &i, sizeof(buffer), lx->current))
         {
+            lx->error = 1;
             return NULL;
         }
         lexer_next_char(lx);
@@ -284,14 +287,33 @@ static struct token *handle_redirection(struct lexer *lx)
     if (lx->current == '<')
     {
         lexer_next_char(lx);
+        if (lx->current == '&')
+        {
+            lexer_next_char(lx);
+            lx->condition = LEXER_FORCE_WORD;
+            return token_new(TOKEN_LESSAND, NULL);
+        }
+
+        if(lx->current == '>')
+        {
+            lexer_next_char(lx);
+            lx->condition = LEXER_FORCE_WORD;
+            return token_new(TOKEN_LESSGREAT, NULL);
+        }
         lx->condition = LEXER_FORCE_WORD;
         return token_new(TOKEN_LESS, NULL);
     }
-    if (lx->current != '>')
+    if(lx->current != '>')
     {
         return NULL;
     }
     lexer_next_char(lx);
+    if(lx->current == '&')
+    {
+        lexer_next_char(lx);
+        lx->condition = LEXER_FORCE_WORD;
+        return token_new(TOKEN_GREATAND, NULL);
+    }
     lx->condition = LEXER_FORCE_WORD;
     if (lx->current == '>')
     {
@@ -356,6 +378,12 @@ void lexer_init(struct lexer *lx, FILE *input)
     lx->input = input;
     lx->current = fgetc(input);
     lx->condition = LEXER_NORMAL;
+    lx->error = 0;
+}
+
+int lexer_error_occured(const struct lexer *lx)
+{
+    return lx && lx->error;
 }
 
 /*
@@ -363,6 +391,11 @@ void lexer_init(struct lexer *lx, FILE *input)
 */
 struct token *lexer_next(struct lexer *lx)
 {
+    if(lx->error)
+    {
+        return NULL;
+    }
+
     struct token *token = NULL;
 
     skip_blanks(lx);

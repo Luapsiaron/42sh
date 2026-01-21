@@ -64,6 +64,9 @@ enum redir_type
     REDIR_APPEND, // >>
     REDIR_CLOBBER, // >|
     REDIR_IN, // <
+    REDIR_DUP_OUT, // >&
+    REDIR_DUP_IN, // <&
+    REDIR_INOUT // <>
 };
 
 struct ast_redir

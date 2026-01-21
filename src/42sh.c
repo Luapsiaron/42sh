@@ -49,7 +49,14 @@ static int run_stream(FILE *input, int pretty_print, struct hash_map *hm)
         struct ast *tree = parse_input(input);
         // ast_printer(tree, 0);
         if (!tree)
+        {
+            if (parse_error_occurred())
+            {
+                fprintf(stderr, "42sh: syntax error\n");
+                return 2;
+            }
             break;
+        }
         if (pretty_print)
         {
             ast_pretty_print(tree, stdout);

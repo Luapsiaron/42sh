@@ -5,25 +5,41 @@
 int is_redirection_token(enum token_type type)
 {
     return type == TOKEN_LESS || type == TOKEN_GREAT || type == TOKEN_DGREAT
-        || type == TOKEN_CLOBBER;
+        || type == TOKEN_CLOBBER || type == TOKEN_LESSAND || type == TOKEN_GREATAND
+        || type == TOKEN_LESSGREAT;
 }
 
 static enum redir_type token_to_redir_type(enum token_type type)
 {
-    if (type == TOKEN_LESS)
+    if(type == TOKEN_LESS)
     {
         return REDIR_IN;
     }
-    if (type == TOKEN_GREAT)
+    if(type == TOKEN_GREAT)
     {
         return REDIR_OUT;
     }
-    if (type == TOKEN_DGREAT)
+    if(type == TOKEN_DGREAT)
     {
         return REDIR_APPEND;
     }
-
-    return REDIR_CLOBBER;
+    if(type == TOKEN_CLOBBER)
+    {
+        return REDIR_CLOBBER;
+    }
+    if(type == TOKEN_GREATAND)
+    {
+        return REDIR_DUP_OUT;
+    }
+    if(type == TOKEN_LESSAND)
+    {
+        return REDIR_DUP_IN;
+    }
+    if(type == TOKEN_LESSGREAT)
+    {
+        return REDIR_INOUT;
+    }
+    return REDIR_OUT;
 }
 
 /*
@@ -69,7 +85,14 @@ struct ast *parse_redirection(struct parser *p)
 
     if (io_number < 0)
     {
-        io_number = (type == REDIR_IN) ? 0 : 1;
+        if(type == REDIR_IN || type == REDIR_DUP_IN || type == REDIR_INOUT)
+        {
+            io_number = 0;
+        }
+        else
+        {
+            io_number = 1;
+        }
     }
 
     struct ast *redir =

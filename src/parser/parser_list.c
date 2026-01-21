@@ -1,4 +1,5 @@
 #include "parser_internal.h"
+#include "parser.h"
 
 /*
     Parse a list of commands separated by semicolons or newlines
@@ -15,12 +16,17 @@ struct ast *parse_list(struct parser *p)
     skip_newlines(p);
     if (peek(p) == TOKEN_SEMICOLON)
     {
+        parse_set_error();
         return NULL;
     }
 
     struct ast *child = parse_and_or(p);
     if (!child)
     {
+        if(!parse_error_occurred())
+        {
+            parse_set_error();
+        }
         return NULL;
     }
     struct ast *head = ast_list_init(NULL, child);
@@ -34,12 +40,23 @@ struct ast *parse_list(struct parser *p)
 
     while (1)
     {
+        if(parse_error_occurred())
+        {
+            ast_free(head);
+            return NULL;
+        }
         if (!remove_separator(p))
         {
             break;
         }
+        if(parse_error_occurred())
+        {
+            ast_free(head);
+            return NULL;
+        }
         if (peek(p) == TOKEN_SEMICOLON)
         {
+            parse_set_error();
             ast_free(head);
             return NULL;
         }
@@ -51,6 +68,10 @@ struct ast *parse_list(struct parser *p)
         struct ast *next_child = parse_and_or(p);
         if (!next_child)
         {
+            if(!parse_error_occurred())
+            {
+                parse_set_error();
+            }
             ast_free(head);
             return NULL;
         }

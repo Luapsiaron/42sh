@@ -19,7 +19,10 @@ struct lexer
     FILE *input;
     int current;
     enum lexer_conditon condition;
+    int error;
 };
+
+int lexer_error_occured(const struct lexer *lx);
 
 // Initialize the lexer struct and read first character
 void lexer_init(struct lexer *lexer, FILE *input);

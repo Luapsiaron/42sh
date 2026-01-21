@@ -1,4 +1,6 @@
 #include "parser_internal.h"
+#include "../lexer/lexer.h"
+#include "parser.h"
 
 enum token_type peek(struct parser *p)
 {
@@ -11,17 +13,20 @@ enum token_type peek(struct parser *p)
 
 void pop(struct parser *p)
 {
-    if (!p)
+    if (!p || !p->current_token)
     {
         return;
     }
-
-    if (p->current_token)
-    {
-        token_free(p->current_token);
-    }
-
+    token_free(p->current_token);
     p->current_token = lexer_next(&p->lexer);
+    if (!p->current_token)
+    {
+        if(lexer_error_occured(&p->lexer))
+        {
+            parse_set_error();
+            p->current_token = token_new(TOKEN_EOF, NULL);
+        }
+    }
 }
 
 void skip_semicolon_newline(struct parser *p)

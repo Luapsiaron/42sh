@@ -73,6 +73,18 @@ static void pp_redir(const struct ast *ast, FILE *out)
     {
         fprintf(out, " >| ");
     }
+    else if (ast_tmp->type == REDIR_DUP_OUT)
+    {
+        fprintf(out, " >& ");
+    }
+    else if (ast_tmp->type == REDIR_DUP_IN)
+    {
+        fprintf(out, " <& ");
+    }
+    else if (ast_tmp->type == REDIR_INOUT)
+    {
+        fprintf(out, " <> ");
+    }
     fputs(ast_tmp->word, out);
     if (ast_tmp->next)
     {

@@ -31,6 +31,9 @@ enum token_type
     TOKEN_GREAT, // >
     TOKEN_DGREAT, // >>
     TOKEN_CLOBBER, // >|
+    TOKEN_LESSAND, // <&
+    TOKEN_GREATAND, // >&
+    TOKEN_LESSGREAT, // <>
     TOKEN_IONUMBER, // n>
 
     TOKEN_NEGATION, // !

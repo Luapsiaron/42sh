@@ -69,6 +69,15 @@ apply_one_redir(const struct ast_redir *r) // Apply a single redirection
     case REDIR_CLOBBER:
         fd = open(r->word, O_WRONLY | O_CREAT | O_TRUNC, 0644);
         break;
+    case REDIR_DUP_OUT:
+        fd = atoi(r->word);
+        break;
+    case REDIR_DUP_IN:
+        fd = atoi(r->word);
+        break;
+    case REDIR_INOUT:
+        fd = open(r->word, O_RDWR | O_CREAT, 0644);
+        break;
     }
     if (fd < 0)
     {
