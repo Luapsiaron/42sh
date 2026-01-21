@@ -166,6 +166,9 @@ run_test "SQuote + DQuote Concat" "echo 'Simple'\"Double\""
 run_test "Empty quotes" "echo '' \"\""
 run_test "Empty concat" "echo 'a'\"\"'b'"
 run_test "triple quoted mixed" "echo 'a'\"b\"C"
+run_test "Squote inside Dquote" "echo \"'\""
+run_test "Quote basckslashed" "echo \"\\\"\""
+run_test "Full escaped" "echo \" \\ \\ \\ \\ \\ \\ \\ \\ \""
 
 # Expansions
 run_test "Expand simple" "A=10; echo \$A"
@@ -174,6 +177,16 @@ run_test "Expand SQuote" "A=12; echo 'Res: \$A'"
 run_test "Expand concat" "A=12; echo q\$Aw"
 run_test "True Exit code" "true; echo \$?"
 run_test "False Exit code" "false; echo \$?"
+run_test "Var in quotes" "Thibaut=Audrey; echo \"\$Thibaut OUI\""
+run_test "Empty var in quotes" "A=; echo \"\$A\""
+run_test "Var stuck in quotes" "A=1; echo \"\$A\"'test'"
+run_test "Variable not defined" "echo [\$PASLA]"
+run_test "PWD" "echo \$PWD"
+run_test "IFS" "echo \$IFS"
+run_test "Exit code" "true; echo \$?; false; echo \$?"
+run_test "Arg numb" "echo \$#"
+run_test "PID" "echo \$$" 
+
 
 # Pipelines
 run_test "Simple pipe" "echo Hello World | cat -e"

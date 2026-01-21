@@ -16,7 +16,7 @@
 static struct exit_info exit_code = { .last = 0 };
 
 /**
- * Append a character to the buffer and resize the capacity when full
+ * Push char, realloc if needed
  */
 static void char_append(struct buffer *buff, char c)
 {
@@ -41,7 +41,7 @@ static void str_append(struct buffer *buff, char *str)
 }
 
 /**
- * Count the number of arguments by iteration
+ * Count the number of arguments by iterating, for $#
  */
 static char *dollar_hashtag(struct hash_map *hm)
 {
@@ -139,9 +139,7 @@ static char *handle_specials(struct hash_map *hm,
 
 
 /** 
- * Parse variable tokens: $VAR or ${VAR}
- * Updates buffer with expanded value / key
- * 
+ * Expand variables $VAR and ${VAR}
 */
 static void handle_dollar(struct buffer *buff, size_t *index, char *word,
                           struct hash_map *hm)
@@ -183,7 +181,7 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
         }
         else
         {
-            // Check for "home-made" variables 
+            // standard variables 
             while (word[*index] != '\0'
                    && (word[*index] == '_' || isalnum(word[*index])))
             {
@@ -214,8 +212,8 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
 }
 
 /**
- * Expand a string (Null terminated)
- * Go inside every string in argv  and expand variables and quotes in each word
+ * Expand a list of string
+ * Go inside every string in argv and expand variables and quotes in each word
  */
 char **expand_argv(char **argv, struct hash_map *hm)
 {
@@ -236,7 +234,7 @@ char **expand_argv(char **argv, struct hash_map *hm)
 }
 
 /**
- *  Handle escaped characters in double quotes: $, '\n', '\', '"'  
+ *  Escape handling in double quotes
  */
 static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 {
@@ -256,8 +254,7 @@ static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 /**
  * Expand a word string:
  * Single quotes: preserve content
- * Double quotes: allow variables expansion and escapes
- * Variables: replace with the value from the hash map 
+ * Double quotes: var expansions and escape
  */
 char *expand_word(char *word, struct hash_map *hm)
 {
@@ -302,7 +299,7 @@ char *expand_word(char *word, struct hash_map *hm)
                 char_append(&buff, c); // "normal" character
             }
         }
-        else // "normal" mode / outside quotes
+        else // outside quotes
         {
             if (c == '\'') // enter single quote
             {
