@@ -5,6 +5,10 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
 
 liblexer_a_SOURCES = \
   lexer.c \
+  lexer_helpers.c \
+  lexer_ops.c \
+  lexer_word.c \
   token/token.c \
   lexer.h \
+  lexer_internal.h \
   token/token.h
