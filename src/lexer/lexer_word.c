@@ -1,12 +1,8 @@
 #include "lexer_internal.h"
 
-/*
-    Check if the given string is a valid assignment word
-    An assignment word matches the pattern: NAME=VALUE
-    where NAME starts with a letter or underscore, followed by letters,
-    digits, or underscores, and is followed by an '=' character
-*/
-int is_assignment_word(const char *s)
+/* ----------------- Helpers -----------------*/
+
+static int is_assignment_word(const char *s)
 {
     if (!s || !s[0])
     {
@@ -26,7 +22,7 @@ int is_assignment_word(const char *s)
     return s[i] == '=';
 }
 
-int append_buffer(char *buffer, size_t *index, size_t capacity, int c)
+static int append_buffer(char *buffer, size_t *index, size_t capacity, int c)
 {
     if (*index >= capacity - 1)
     {
@@ -36,11 +32,7 @@ int append_buffer(char *buffer, size_t *index, size_t capacity, int c)
     return 1;
 }
 
-/*
-    Lex a single-quoted string, including the surrounding quotes
-    Returns 1 on success, 0 on failure (e.g., unmatched quote or buffer overflow)
-*/
-int lexer_single_quotes(struct lexer *lx, char *buffer, size_t *index,
+static int lexer_single_quotes(struct lexer *lx, char *buffer, size_t *index,
                                size_t capacity)
 {
     if (!append_buffer(buffer, index, capacity, '\''))
@@ -71,12 +63,7 @@ int lexer_single_quotes(struct lexer *lx, char *buffer, size_t *index,
     return 1;
 }
 
-/*
-    Lex a double-quoted string, including the surrounding quotes
-    Handles escape sequences within the double quotes
-    Returns 1 on success, 0 on failure (e.g., unmatched quote or buffer overflow)
-*/
-int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
+static int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
                                size_t capacity)
 {
     if (!append_buffer(buffer, index, capacity, '"'))
@@ -132,11 +119,8 @@ int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
     return 1;
 }
 
-/*
-    Lex a word token
-    A word can contain letters, digits, underscores, and quoted strings
-    It ends at whitespace, separators, or operators
-*/
+/* ----------------- Word -----------------*/
+
 struct token *lexer_is_word(struct lexer *lx)
 {
     char buffer[512];
