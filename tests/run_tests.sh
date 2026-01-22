@@ -235,23 +235,42 @@ run_test "For loop no iterations" "for I in 1; do echo \$I; done;"
 
 # ================= RUN SCRIPT ===================
 
-run_script "script test basic if" "script/script_basic_if.sh"
-run_script "script test multiple if" "script/script_mul_if.sh"
+# If
+run_script "script test basic if" "script/if/script_basic_if.sh"
+run_script "script test multiple if" "script/if/script_mul_if.sh"
+run_script "script test fill_nl" "script/if/script_fill_nl.sh"
+run_script "script test error nl_semi_nl" "script/if/script_nl_semi_nl.sh"
+run_script "script test if in if and elif" "script/if/if_in_if_elif.sh"
 
-run_script "script test error nl_semi_nl" "script/script_nl_semi_nl.sh"
-run_script "script test fill_nl" "script/script_fill_nl.sh"
+# Loop
+run_script "script test while" "script/loop/script_while.sh"
+run_script "script test until" "script/loop/script_until.sh"
+run_script "script test for 2 forms" "script/loop/script_2_for.sh"
 
-run_script "script test while" "script/script_while.sh"
-run_script "script test for 2 forms" "script/script_2_for.sh"
+# Variables
+run_script "script test var \$@" "script/variables/var_@.sh"
+run_script "script test var \$#" "script/variables/var_#.sh"
+run_script "script test var \$arguments" "script/variables/var_arg.sh" "first" "second" 3
+run_script "script test var \$$" "script/variables/var_dollar.sh"
+run_script "script test var \$?" "script/variables/var_question.sh"
+run_script "script test var \$RANDOM" "script/variables/var_random.sh"
+run_script "script test var \$*" "script/variables/var_star.sh"
+run_script "script test var \$UID" "script/variables/var_uid.sh"
 
-run_script "script test if in if and elif" "script/if_in_if_elif.sh"
+run_script "script test var environment \$OLDPWD" "script/variables/var_env.sh"
+run_script "script test var environment \$PWD" "script/variables/var_env2.sh"
 
-run_script "script test var @ complex" "script/echo_var@_cplx.sh"
-run_script "script test var other" "script/echo_var_others.sh" 1 2 3
-run_script "script test var environment" "script/echo_var_env.sh"
+run_script "script test var all in same file" "script/variables/echo_var_all.sh" 1 2 3
 
-run_script "script test Piscine - tower" "script/tower.sh"
-run_script "script test Piscine - ascii house" "script/ascii_house.sh"
+# Pipeline
+run_script "script test pipeline" "script/pipeline/pipeline.sh"
+
+# And
+run_script "script test and" "script/and/and.sh"
+
+# Piscine
+run_script "script test Piscine - tower" "script/piscine/tower.sh"
+run_script "script test Piscine - ascii house" "script/piscine/ascii_house.sh"
 
 # ================= RUN UNIT =====================
 

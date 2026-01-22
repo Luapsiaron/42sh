@@ -1,2 +1,0 @@
-echo $OLDPWD
-echo $PWD

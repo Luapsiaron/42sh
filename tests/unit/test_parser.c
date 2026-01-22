@@ -332,7 +332,7 @@ Test(parse_for, simple_for_in)
 
     cr_assert_not_null(ast->data.ast_for.second_arg);
     cr_assert_not_null(ast->data.ast_for.second_arg->data.ast_cmd.argv);
-    cr_assert_str_eq(ast->data.ast_for.second_arg->data.ast_cmd.argv[0], "var");
+    cr_assert_str_eq(ast->data.ast_for.second_arg->data.ast_cmd.argv[0], "sec_var");
 
     cr_assert_not_null(ast->data.ast_for.body);
     cr_assert_not_null(ast->data.ast_for.body->data.ast_list.child);
@@ -356,6 +356,106 @@ Test(parse_for, simple_for_in)
     cr_assert_str_eq(ast->data.ast_for.body->data.ast_list.next->data.ast_list
                          .child->data.ast_cmd.argv[1],
                      "pls");
+
+    ast_free(ast);
+}
+
+Test(parse_while, simple_while)
+{
+    FILE *f = fmem_from_str("while condition; do echo test\n echo pls; done");
+    struct parser p;
+    p.current_token = NULL;
+
+    lexer_init(&p.lexer, f);
+    p.current_token = lexer_next(&p.lexer);
+    if (!p.current_token)
+    {
+        return;
+    }
+
+    struct ast *ast = parse_while(&p);
+    fclose(f);
+
+    cr_assert_not_null(ast);
+
+    cr_assert_eq(ast->data.ast_while_until.type, LOOP_WHILE);
+
+    cr_assert_not_null(ast->data.ast_while_until.condition);
+    cr_assert_not_null(ast->data.ast_while_until.condition->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_while_until.condition->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_while_until.condition->data.ast_list.child->data.ast_cmd.argv[0],
+        "condition");
+
+    cr_assert_not_null(ast->data.ast_while_until.body);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv[0],
+        "echo");
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv[1],
+        "test");
+
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.next);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv[0],
+        "echo");
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv[1],
+        "pls");
+
+    ast_free(ast);
+}
+
+Test(parse_until, simple_until)
+{
+    FILE *f = fmem_from_str("until condition; do echo test\n echo pls; done");
+    struct parser p;
+    p.current_token = NULL;
+
+    lexer_init(&p.lexer, f);
+    p.current_token = lexer_next(&p.lexer);
+    if (!p.current_token)
+    {
+        return;
+    }
+
+    struct ast *ast = parse_until(&p);
+    fclose(f);
+
+    cr_assert_not_null(ast);
+
+    cr_assert_eq(ast->data.ast_while_until.type, LOOP_UNTIL);
+
+    cr_assert_not_null(ast->data.ast_while_until.condition);
+    cr_assert_not_null(ast->data.ast_while_until.condition->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_while_until.condition->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_while_until.condition->data.ast_list.child->data.ast_cmd.argv[0],
+        "condition");
+
+    cr_assert_not_null(ast->data.ast_while_until.body);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.child);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv[0],
+        "echo");
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv[1],
+        "test");
+
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.next);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_not_null(ast->data.ast_while_until.body->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv);
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv[0],
+        "echo");
+    cr_assert_str_eq(
+        ast->data.ast_while_until.body->data.ast_list.next->data.ast_list.child->data.ast_cmd.argv[1],
+        "pls");
 
     ast_free(ast);
 }
