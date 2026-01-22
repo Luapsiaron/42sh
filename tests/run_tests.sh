@@ -139,7 +139,9 @@ run_test "Cd -" " cd/; cd /tmp; cd -"
 run_test "Cd error no exist" "cd /coucou"
 run_test "cd too many args" "cd /tmp /var"
 run_test "Cd Home diff" "HOME=/tmp cd; pwd"
-run_test "Cd home" "cd ; pwd" 
+run_test "Cd home" "cd ; pwd"
+run_test "cd //" "cd //; pwd"
+run_test "cd PWD" "cd /tmp; echo \$PWD; cd /; echo \$PWD"
 
 
 # Builtins
@@ -163,6 +165,7 @@ run_test "if with list" "if echo cond; true; then echo body; fi"
 run_test "Simple double echo" "echo 1; echo 2;"
 run_test "Harder shell" "if true; then echo coco; echo mangue; else false; echo dragon; fi"
 run_test "If inside if" "if true; then if false; then echo no; else echo yes; fi; fi"
+run_test "sequence ';'" "echo banane; echo pomme; false; echo poire"
 
 # Quotes
 run_test "Simple quote test" "echo 'aaa;  simple quote'"
@@ -224,6 +227,10 @@ run_test "OR true true" "true || true; echo after_or"
 run_test "OR true false" "true || false; echo after_or"
 run_test "OR false true" "false || true; echo after_or"
 run_test "OR false false" "false || false; echo after_or"
+
+# AND and OR
+run_test "AND OR" "false && echo coco || echo nono"
+run_test "OR AND" " true || echo nono && echo coco"
 
 # While loop
 run_test "Simple while loop" "A=0; while \$A == 3 ; do echo \$A; A=\$((A + 1)); done"
