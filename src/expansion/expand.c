@@ -10,6 +10,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <time.h>
+
 #include "../utils/str/str.h"
 #include "hashmap.h"
 
@@ -61,12 +63,14 @@ static char *dollar_hashtag(struct hash_map *hm)
     return res;
 }
 
+
 /**
  * Handles special variables or look for them in the hash map
  */
 static char *handle_specials(struct hash_map *hm,
                              char *var_name) // var name = key in hashmap
 {
+    static bool seeded = false;
     if (strcmp(var_name, "?") == 0) // Last exit code
     {
         char *res = malloc(16);
@@ -81,6 +85,11 @@ static char *handle_specials(struct hash_map *hm,
     }
     if (strcmp(var_name, "RANDOM") == 0) // RANDOM VALUE
     {
+        if(seeded == false)
+        {
+            srand(getpid() ^ time(NULL));
+            seeded= true;
+        }
         char *res = malloc(16);
         sprintf(res, "%d", rand() % 32768); // 0-32767 range in bash rand
         return res;
