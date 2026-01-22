@@ -17,23 +17,39 @@ BLUE='\033[38;5;117m'
 YELLOW='\033[38;5;226m'
 CANCEL='\033[0m'
 
+# To use :
+# run_test "test name" "command to run" arg1 arg2 ... for string commands
+# run_test "test name" "./script/to/run.sh" arg1 arg2 ... for script files
 run_test() {
-  name="$1"
-  input="$2"
+  name=$1
+  cmd=$2
+  shift 2
 
   out_ref="/tmp/ref_$$.out"
   out_goat="/tmp/goat_$$.out"
 
-  touch "$out_ref"
-  touch "$out_goat"
+  : >"$out_ref"
+  : >"$out_goat"
 
   failed=0
 
-  printf "%s" "$input" | $REF_SH > "$out_ref"
-  code_ref=$?
-
-  printf "%s" "$input" | timeout 1s "$BIN_PATH" > "$out_goat"
-  code_goat=$?
+  if [ -f "$cmd" ] || [ -x "$cmd" ] || [ "${cmd#./}" != "$cmd" ] || [ "${cmd#/}" != "$cmd" ]; then
+    qargs=
+    for a in "$@"; do
+      qa=$(printf "%s" "$a" | sed "s/'/'\\\\''/g")
+      qargs="$qargs '$qa'"
+    done
+    line="$cmd$qargs"
+    printf "%s\n" "$line" | $REF_SH >"$out_ref"
+    code_ref=$?
+    printf "%s\n" "$line" | timeout 1s "$BIN_PATH" >"$out_goat"
+    code_goat=$?
+  else
+    printf "%s" "$cmd" | $REF_SH >"$out_ref"
+    code_ref=$?
+    printf "%s" "$cmd" | timeout 1s "$BIN_PATH" >"$out_goat"
+    code_goat=$?
+  fi
 
   if [ "$code_ref" -ne "$code_goat" ]; then
     failed=1
@@ -54,58 +70,14 @@ run_test() {
     passed=$((passed + 1))
   fi
 
-  if [ "$code_goat" -eq 124 ]; then #124 = $? of timeout
-	  echo -e "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
+  if [ "$code_goat" -eq 124 ]; then
+    echo -e "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
   fi
 
   total=$((total + 1))
   rm -f "$out_ref" "$out_goat"
-
 }
 
-
-run_script()
-{
-  name="$1"
-  script="$2"
-
-  total=$((total + 1))
-
-  out_ref="/tmp/ref_script_$$.out"
-  out_goat="/tmp/goat_script_$$.out"
-
-  printf "%s\n" "./$script" | $REF_SH > "$out_ref"
-  code_ref=$?
-
-  printf "%s\n" "./$script" | timeout 1s "$BIN_PATH" > "$out_goat"
-  code_goat=$?
-
-  failed=0
-
-  if [ "$code_ref" -ne "$code_goat" ]; then
-    failed=1
-    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
-  fi
-
-  if ! cmp -s "$out_ref" "$out_goat"; then
-    failed=1
-    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
-    echo -e "${YELLOW}Expected:${CANCEL}"
-    sed 's/^/  /' "$out_ref"
-    echo -e "${YELLOW}Got:${CANCEL}"
-    sed 's/^/  /' "$out_goat"
-  fi
-
-  if [ "$failed" -eq 0 ]; then
-    echo -e "[${GREEN}OK${CANCEL}] $name"
-    passed=$((passed + 1))
-  fi
-  
-  if [ "$code_goat" -eq 124 ]; then #124 = $? of timeout
-	  echo -e "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
-  fi
-  rm -f "$out_ref" "$out_goat"
-}
 
 run_unit()
 {
@@ -128,9 +100,10 @@ run_unit()
 }
 
 
-# ================= RUN STRING ===================
-
-# Simple commands
+echo ================= RUN STRING ===================
+echo ---------------
+echo Simple commands
+echo ---------------
 run_test "LS" "ls"
 run_test "Tree -a" "tree -a"
 run_test "cat Makefile.am" "cat Makefile.am"
@@ -142,9 +115,9 @@ run_test "Cd Home diff" "HOME=/tmp cd; pwd"
 run_test "Cd home" "cd ; pwd"
 run_test "cd //" "cd //; pwd"
 run_test "cd PWD" "cd /tmp; echo \$PWD; cd /; echo \$PWD"
-
-
-# Builtins
+echo --------
+echo Builtins
+echo --------
 run_test "true test" "true"
 run_test "false test" "false"
 run_test "simple echo" "echo HOMMERR"
@@ -156,8 +129,9 @@ run_test "Echo escaped" "echo \" \\n \\t \\\\\""
 run_test "Echo bad flags" "echo -n -E -e Machoire"
 run_test "Simple comment" "echo SUCRE # AU SUCRE"
 run_test "Comment inside" "echo thibault#bikini"
-
-# Lists and ifs
+echo -------------
+echo Lists and ifs
+echo -------------
 run_test "Simple list" "echo paul; echo baptiste"
 run_test "List newline" "echo a;
 echo b"
@@ -166,8 +140,9 @@ run_test "Simple double echo" "echo 1; echo 2;"
 run_test "Harder shell" "if true; then echo coco; echo mangue; else false; echo dragon; fi"
 run_test "If inside if" "if true; then if false; then echo no; else echo yes; fi; fi"
 run_test "sequence ';'" "echo banane; echo pomme; false; echo poire"
-
-# Quotes
+echo ------
+echo Quotes
+echo ------
 run_test "Simple quote test" "echo 'aaa;  simple quote'"
 run_test "quote inside" "echo a'b'c"
 run_test "triple simple" "echo 'a' 'b' 'c'"
@@ -178,8 +153,9 @@ run_test "triple quoted mixed" "echo 'a'\"b\"C"
 run_test "Squote inside Dquote" "echo \"'\""
 run_test "Quote basckslashed" "echo \"\\\"\""
 run_test "Full escaped" "echo \" \\ \\ \\ \\ \\ \\ \\ \\ \""
-
-# Expansions
+echo ----------
+echo Expansions
+echo ----------
 run_test "Expand simple" "A=10; echo \$A"
 run_test "Expand Dquote" "A=11; echo \"Res: \$A\""
 run_test "Expand SQuote" "A=12; echo 'Res: \$A'"
@@ -195,92 +171,103 @@ run_test "IFS" "echo \$IFS"
 run_test "Exit code" "true; echo \$?; false; echo \$?"
 run_test "Arg numb" "echo \$#"
 run_test "PID" "echo \$$" 
-
-
-# Pipelines
+echo ---------
+echo Pipelines
+echo ---------
 run_test "Simple pipe" "echo Hello World | cat -e"
 run_test "Pipe with spaces" "   echo    Hello    World    |    cat -e"
 run_test "Pipe multiple" "echo line1 line2 line3 | grep line2 | wc -l"
 run_test "Pipe with builtin" "! echo line1 line2 line3 | grep line2 | echo final"
 run_test "Pipe with exit code" "echo line1 line2 line3 | grep line2 | false; echo \$?"
-
-# Redirections
+echo ------------
+echo Redirections
+echo ------------
 run_test "Simple output redir" "echo Hello > /tmp/test_output_redir.txt; cat /tmp/test_output_redir.txt"
 run_test "Output redir append" "echo Line1 > /tmp/test_output_redir_append.txt; echo Line2 >> /tmp/test_output_redir_append.txt; cat /tmp/test_output_redir_append.txt"
 run_test "Input redir" "echo Line1 > /tmp/test_input_redir.txt; echo Line2 >> /tmp/test_input_redir.txt; cat < /tmp/test_input_redir.txt"
 run_test "Input redir with pipe" "echo Line1 > /tmp/test_input_redir_pipe.txt; echo Line2 >> /tmp/test_input_redir_pipe.txt; cat < /tmp/test_input_redir_pipe.txt | grep Line2"
-
-# Negation
+echo --------
+echo Negation
+echo --------
 run_test "Negation of true" " ! true;"
 run_test "Negation of false" " ! false;"
 run_test "Negation with if" " if ! false; then echo yes; else echo no; fi"
 run_test "Double negation" "! ! false"
-
-# And
+echo ---
+echo And
+echo ---
 run_test "AND true true" "true && true; echo after_and"
 run_test "AND true false" "true && false; echo after_and"
 run_test "AND false true" "false && true; echo after_and"
 run_test "AND false false" "false && false; echo after_and"
-
-# Or
+echo --
+echo Or
+echo --
 run_test "OR true true" "true || true; echo after_or"
 run_test "OR true false" "true || false; echo after_or"
 run_test "OR false true" "false || true; echo after_or"
 run_test "OR false false" "false || false; echo after_or"
-
-# AND and OR
+echo ----------
+echo AND and OR
+echo ----------
 run_test "AND OR" "false && echo coco || echo nono"
 run_test "OR AND" " true || echo nono && echo coco"
-
-# While loop
+echo ----------
+echo While loop
+echo ----------
 run_test "Simple while loop" "A=0; while \$A == 3 ; do echo \$A; A=\$((A + 1)); done"
 run_test "While loop never true" "A=0; while \$A == 5 ; do echo \$A; A=\$((A + 1)); done; echo end"
-
-# For loop
+echo --------
+echo For loop
+echo --------
 run_test "Simple for loop" "for I in 1 2 3 ; do echo \$I; done"
 run_test "For loop no iterations" "for I in 1; do echo \$I; done;"
-
-# ================= RUN SCRIPT ===================
-
-# If
-run_script "script test basic if" "script/if/script_basic_if.sh"
-run_script "script test multiple if" "script/if/script_mul_if.sh"
-run_script "script test fill_nl" "script/if/script_fill_nl.sh"
-run_script "script test error nl_semi_nl" "script/if/script_nl_semi_nl.sh"
-run_script "script test if in if and elif" "script/if/if_in_if_elif.sh"
-
-# Loop
-run_script "script test while" "script/loop/script_while.sh"
-run_script "script test until" "script/loop/script_until.sh"
-run_script "script test for 2 forms" "script/loop/script_2_for.sh"
-
-# Variables
-run_script "script test var \$@" "script/variables/var_@.sh"
-run_script "script test var \$#" "script/variables/var_#.sh"
-run_script "script test var \$arguments" "script/variables/var_arg.sh" "first" "second" 3
-run_script "script test var \$$" "script/variables/var_dollar.sh"
-run_script "script test var \$?" "script/variables/var_question.sh"
-run_script "script test var \$RANDOM" "script/variables/var_random.sh"
-run_script "script test var \$*" "script/variables/var_star.sh"
-run_script "script test var \$UID" "script/variables/var_uid.sh"
-
-run_script "script test var environment \$OLDPWD" "script/variables/var_env.sh"
-run_script "script test var environment \$PWD" "script/variables/var_env2.sh"
-
-run_script "script test var all in same file" "script/variables/echo_var_all.sh" 1 2 3
-
-# Pipeline
-run_script "script test pipeline" "script/pipeline/pipeline.sh"
-
-# And
-run_script "script test and" "script/and/and.sh"
-
-# Piscine
-run_script "script test Piscine - tower" "script/piscine/tower.sh"
-run_script "script test Piscine - ascii house" "script/piscine/ascii_house.sh"
-
-# ================= RUN UNIT =====================
-
+echo
+echo ================= RUN SCRIPT ===================
+echo --
+echo If
+echo --
+run_test "script test basic if" "./script/if/script_basic_if.sh"
+run_test "script test multiple if" "./script/if/script_mul_if.sh"
+run_test "script test fill_nl" "./script/if/script_fill_nl.sh"
+run_test "script test error nl_semi_nl" "./script/if/script_nl_semi_nl.sh"
+run_test "script test if in if and elif" "./script/if/if_in_if_elif.sh"
+echo ----
+echo Loop
+echo ----
+run_test "script test while" "./script/loop/script_while.sh"
+run_test "script test until" "./script/loop/script_until.sh"
+run_test "script test for 2 forms" "./script/loop/script_2_for.sh"
+echo ---------
+echo Variables
+echo ---------
+run_test "script test var \$@" "./script/variables/var_@.sh"
+run_test "script test var \$#" "./script/variables/var_#.sh"
+run_test "script test var \$arguments" "./script/variables/var_arg.sh" "first" "second" 3
+run_test "script test var \$$" "./script/variables/var_dollar.sh"
+run_test "script test var \$?" "./script/variables/var_question.sh"
+run_test "script test var \$RANDOM" "./script/variables/var_random.sh"
+run_test "script test var \$*" "./script/variables/var_star.sh"
+run_test "script test var \$UID" "./script/variables/var_uid.sh"
+run_test "script test var environment \$OLDPWD" "./script/variables/var_env.sh"
+run_test "script test var environment \$PWD" "./script/variables/var_env2.sh"
+run_test "script test var all in same file" "./script/variables/echo_var_all.sh" 1 2 3
+echo --------
+echo Pipeline
+echo --------
+run_test "script test pipeline" "./script/pipeline/pipeline.sh"
+echo ---
+echo And
+echo ---
+run_test "script test and" "./script/and/and.sh"
+echo -------
+echo Piscine
+echo -------
+run_test "script test Piscine - tower" "./script/piscine/tower.sh"
+run_test "script test Piscine - ascii house" "./script/piscine/ascii_house.sh"
+echo
+echo ================= RUN UNIT =====================
+echo
 if [ "$COVERAGE" = "yes" ]; then
   run_unit "unit: ast" "./test_ast"
   run_unit "unit: echo" "./test_builtins"
