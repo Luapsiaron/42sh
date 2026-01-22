@@ -15,7 +15,7 @@
 #include "../utils/str/str.h"
 #include "hashmap.h"
 
-static struct exit_info exit_code = { .last = 0 };
+int last_exit_code = 0;
 
 /**
  * Push char, realloc if needed
@@ -74,7 +74,7 @@ static char *handle_specials(struct hash_map *hm,
     if (strcmp(var_name, "?") == 0) // Last exit code
     {
         char *res = malloc(16);
-        sprintf(res, "%d", exit_code.last);
+        sprintf(res, "%d", last_exit_code);
         return res;
     }
     if (strcmp(var_name, "$") == 0) // PID

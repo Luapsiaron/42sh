@@ -3,10 +3,7 @@
 
 #include "hashmap.h"
 
-struct exit_info
-{
-    int last;
-};
+extern int last_exit_code;
 
 struct buffer
 {

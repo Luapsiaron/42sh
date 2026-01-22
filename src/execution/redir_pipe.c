@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include "../ast/ast.h"
+#include "../expansion/expand.h"
 #include "execution.h"
 
 #define MAX_PIPELINE_CMDS 128
@@ -210,5 +211,6 @@ int exec_pipeline(struct ast *pipe_node, struct hash_map *hm) // Execute a pipel
         if (i == n - 1)
             last_status = st;
     }
+    last_exit_code = last_status;
     return last_status;
 }

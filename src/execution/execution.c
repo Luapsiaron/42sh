@@ -215,6 +215,7 @@ int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AS
         restore_fds(saved);
 
         free_argv(argv);
+        last_exit_code = st;
         return st;
     }
 
@@ -237,7 +238,9 @@ int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AS
         _exit(errno == ENOENT ? 127 : 126);
     }
     free_argv(argv);
-    return wait_status(pid);
+    int status = wait_status(pid);
+    last_exit_code = status;
+    return status;
 }
 
 int child_exec_command(struct ast *node, struct hash_map *hm) // executes a command in a child process

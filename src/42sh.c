@@ -7,6 +7,7 @@
 #include <unistd.h>
 
 #include "execution/execution.h"
+#include "expansion/expand.h"
 #include "expansion/hashmap.h"
 #include "io/io.h"
 #include "parser/parser.h"
@@ -19,6 +20,7 @@ struct input_sel_ctx
     char *command;
     struct hash_map *hm;
 };
+
 
 static void usage(FILE *out)
 {
