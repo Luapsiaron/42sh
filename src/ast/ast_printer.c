@@ -149,6 +149,30 @@ static void print_for(const struct ast *node, int depth)
     ast_printer(node->data.ast_for.body, depth + 1);
 }
 
+static void print_funcdec(const struct ast *node, int depth)
+{
+    print_indent(depth);
+    printf("FUNCDEC: %s\n", node->data.ast_funcdec.name);
+    print_indent(depth);
+    printf("REDIRS:\n");
+    print_redirs(node->data.ast_funcdec.redirs, depth + 1);
+    print_indent(depth);
+    printf("BODY:\n");
+    ast_printer(node->data.ast_funcdec.body, depth + 1);
+}
+
+static void print_redirwrap(const struct ast *node, int depth)
+{
+    print_indent(depth);
+    printf("REDIRWRAP:\n");
+    print_indent(depth + 1);
+    printf("SHELL_COMMAND:\n");
+    ast_printer(node->data.ast_redirwrap.shell_command, depth + 2);
+    print_indent(depth + 1);
+    printf("REDIRECTIONS:\n");
+    print_redirs(node->data.ast_redirwrap.redirections, depth + 2);
+}
+
 void ast_printer(const struct ast *node, int depth)
 {
     if (!node)
@@ -187,6 +211,12 @@ void ast_printer(const struct ast *node, int depth)
         break;
     case AST_ASSIGNMENT:
         print_assignment(node, depth);
+        break;
+    case AST_FUNCDEC:
+        print_funcdec(node, depth);
+        break;
+    case AST_REDIRWRAP:
+        print_redirwrap(node, depth);
         break;
     default:
         print_indent(depth);

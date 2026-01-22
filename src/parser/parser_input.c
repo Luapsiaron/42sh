@@ -20,8 +20,10 @@ void parse_set_error(void)
 struct ast *parse_input(FILE *f)
 {
     parse_error = 0;
+
     struct parser p;
     p.current_token = NULL;
+    p.next_token = NULL;
 
     lexer_init(&p.lexer, f);
     p.current_token = lexer_next(&p.lexer);
@@ -38,41 +40,34 @@ struct ast *parse_input(FILE *f)
     if(peek(&p) == TOKEN_EOF)
     {
         token_free(p.current_token);
-        p.current_token = NULL;
+        token_free(p.next_token);
         return NULL;
     }
     if (peek(&p) == TOKEN_SEMICOLON)
     {
-        parse_error = 1;
-        token_free(p.current_token);
-        p.current_token = NULL;
-        return NULL;
+        goto error;
     }
 
     struct ast *root = parse_list(&p);
     if (!root)
     {
-        parse_error = 1;
-        if (p.current_token)
-        {
-            token_free(p.current_token);
-        }
-        return NULL;
+        goto error;
     }
 
     skip_semicolon_newline(&p);
     if (peek(&p) != TOKEN_EOF)
     {
-        parse_error = 1;
         ast_free(root);
-        if (p.current_token)
-        {
-            token_free(p.current_token);
-        }
-        return NULL;
+        goto error;
     }
 
     token_free(p.current_token);
-    p.current_token = NULL;
+    token_free(p.next_token);
     return root;
+
+error:
+    parse_error = 1;
+    token_free(p.current_token);
+    token_free(p.next_token);
+    return NULL;
 }

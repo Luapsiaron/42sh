@@ -44,6 +44,9 @@ enum token_type
     TOKEN_LBRACE, // {
     TOKEN_RBRACE, // }
 
+    TOKEN_LPAREN, // (
+    TOKEN_RPAREN, // )
+
     // End of input
     TOKEN_EOF
 };

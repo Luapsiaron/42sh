@@ -87,6 +87,19 @@ static void free_block(struct ast *node)
     ast_free(node->data.ast_block.body);
 }
 
+static void free_funcdec(struct ast *node)
+{
+    free(node->data.ast_funcdec.name);
+    ast_free(node->data.ast_funcdec.body);
+    ast_free(node->data.ast_funcdec.redirs);
+}
+
+static void free_redirwrap(struct ast *node)
+{
+    ast_free(node->data.ast_redirwrap.shell_command);
+    ast_free(node->data.ast_redirwrap.redirections);
+}
+
 void ast_free(struct ast *node)
 {
     if (!node)
@@ -128,6 +141,12 @@ void ast_free(struct ast *node)
         break;
     case AST_BLOCK:
         free_block(node);
+        break;
+    case AST_FUNCDEC:
+        free_funcdec(node);
+        break;
+    case AST_REDIRWRAP:
+        free_redirwrap(node);
         break;
     default:
         break;

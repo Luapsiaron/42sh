@@ -15,6 +15,7 @@ struct parser
 {
     struct lexer lexer;
     struct token *current_token;
+    struct token *next_token;
 };
 
 // Return the type of the current token without consuming it
@@ -122,5 +123,18 @@ struct ast *parse_assignment(struct parser *p);
     Grammar: block = '{' compound_list '}'
 */
 struct ast *parse_block(struct parser *p);
+
+struct ast *parse_shell_command(struct parser *p);
+struct ast *parse_redir_list(struct parser *p);
+/*
+    Parse a function declaration
+    Grammar: funcdec = WORD '(' ')' {'\n'} shell_command ;
+*/
+struct ast *parse_funcdec(struct parser *p);
+
+/*
+    Peek the next token type without consuming the current token
+*/
+enum token_type peek_next(struct parser *p);
 
 #endif /* ! PARSER_INTERNAL_H */

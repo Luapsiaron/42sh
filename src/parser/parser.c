@@ -18,14 +18,21 @@ void pop(struct parser *p)
         return;
     }
     token_free(p->current_token);
+    if(p->next_token)
+    {
+        p->current_token = p->next_token;
+        p->next_token = NULL;
+        return;
+    }
+
     p->current_token = lexer_next(&p->lexer);
-    if (!p->current_token)
+    if(!p->current_token)
     {
         if(lexer_error_occured(&p->lexer))
         {
             parse_set_error();
-            p->current_token = token_new(TOKEN_EOF, NULL);
         }
+        p->current_token = token_new(TOKEN_EOF, NULL);
     }
 }
 
@@ -59,4 +66,25 @@ int remove_separator(struct parser *p)
         return 1;
     }
     return 0;
+}
+
+enum token_type peek_next(struct parser *p)
+{
+    if(!p)
+    {
+        return TOKEN_EOF;
+    }
+    if(!p->next_token)
+    {
+        p->next_token = lexer_next(&p->lexer);
+        if(!p->next_token)
+        {
+            if(lexer_error_occured(&p->lexer))
+            {
+                parse_set_error();
+            }
+            p->next_token = token_new(TOKEN_EOF, NULL);
+        }
+    }
+    return p->next_token->type;
 }

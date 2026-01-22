@@ -12,28 +12,30 @@
 */
 struct ast *parse_command(struct parser *p)
 {
-    if (peek(p) == TOKEN_IF)
+    if(peek(p) == TOKEN_WORD && peek_next(p) == TOKEN_LPAREN)
     {
-        return parse_if(p);
+        return parse_funcdec(p);
     }
-    if (peek(p) == TOKEN_WHILE)
+    struct ast *shell_cmd = parse_shell_command(p);
+    if(shell_cmd)
     {
-        return parse_while(p);
+        struct ast *redirs = parse_redir_list(p);
+        if(redirs)
+        {
+            struct ast *wrap = ast_redirwrap_init(shell_cmd, redirs);
+            if(!wrap)
+            {
+                ast_free(shell_cmd);
+                ast_free(redirs);
+                return NULL;
+            }
+            return wrap;
+        }
+        return shell_cmd;
     }
-    if (peek(p) == TOKEN_UNTIL)
-    {
-        return parse_until(p);
-    }
-    if (peek(p) == TOKEN_FOR)
-    {
-        return parse_for(p);
-    }
-    if(peek(p) == TOKEN_LBRACE)
-    {
-        return parse_block(p);
-    }
-    if (peek(p) == TOKEN_WORD || peek(p) == TOKEN_ASSIGNMENT_WORD
-        || peek(p) == TOKEN_IONUMBER || is_redirection_token(peek(p)))
+    
+    if(peek(p) == TOKEN_WORD || peek(p) == TOKEN_ASSIGNMENT_WORD || peek(p) == TOKEN_IONUMBER
+       || is_redirection_token(peek(p)))
     {
         return parse_simple_command(p);
     }

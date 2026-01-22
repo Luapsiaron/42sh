@@ -194,7 +194,8 @@ static struct token *lexer_is_word(struct lexer *lx)
 
     while (lx->current != EOF && lx->current != ';' && lx->current != '|'
            && lx->current != '>' && lx->current != '<' && lx->current != '\n'
-           && lx->current != '{' && lx->current != '}' && !isspace(lx->current))
+           && lx->current != '{' && lx->current != '}' && lx->current != '(' 
+           && lx->current != ')' && !isspace(lx->current))
     {
         if (lx->current == '\'')
         {
@@ -267,36 +268,35 @@ static struct token *handle_comment(struct lexer *lx)
 
 static struct token *handle_separator(struct lexer *lx)
 {
-    if(lx->current != ';' && lx->current != '\n' && lx->current != '{' && lx->current != '}')
+    switch(lx->current)
     {
-        return NULL;
+        case ';':
+            lexer_next_char(lx);
+            lx->condition = LEXER_NORMAL;
+            return token_new(TOKEN_SEMICOLON, NULL);
+        case '\n':
+            lexer_next_char(lx);
+            lx->condition = LEXER_NORMAL;
+            return token_new(TOKEN_NEWLINE, NULL);
+        case '{':
+            lexer_next_char(lx);
+            lx->condition = LEXER_NORMAL;
+            return token_new(TOKEN_LBRACE, NULL);
+        case '}':
+            lexer_next_char(lx);
+            lx->condition = LEXER_NORMAL;
+            return token_new(TOKEN_RBRACE, NULL);
+        case '(':
+            lexer_next_char(lx);
+            lx->condition = LEXER_NORMAL;
+            return token_new(TOKEN_LPAREN, NULL);
+        case ')':
+            lexer_next_char(lx);
+            lx->condition = LEXER_NORMAL;
+            return token_new(TOKEN_RPAREN, NULL);
+        default:
+            return NULL;
     }
-    
-    if (lx->current == ';')
-    {
-        lexer_next_char(lx);
-        lx->condition = LEXER_NORMAL;
-        return token_new(TOKEN_SEMICOLON, NULL);
-    }
-    if (lx->current == '\n')
-    {
-        lexer_next_char(lx);
-        lx->condition = LEXER_NORMAL;
-        return token_new(TOKEN_NEWLINE, NULL);
-    }
-    if (lx->current == '{')
-    {
-        lexer_next_char(lx);
-        lx->condition = LEXER_NORMAL;
-        return token_new(TOKEN_LBRACE, NULL);
-    }
-    if( lx->current == '}')
-    {
-        lexer_next_char(lx);
-        lx->condition = LEXER_NORMAL;
-        return token_new(TOKEN_RBRACE, NULL);
-    }
-    return NULL;
 }
 
 static struct token *handle_redirection(struct lexer *lx)

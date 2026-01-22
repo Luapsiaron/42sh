@@ -97,6 +97,9 @@ static const char *token_type_names[] = {
     [TOKEN_LBRACE] = "{",
     [TOKEN_RBRACE] = "}",
 
+    [TOKEN_LPAREN] = "(",
+    [TOKEN_RPAREN] = ")",
+
     [TOKEN_EOF] = "EOF",
 };
 

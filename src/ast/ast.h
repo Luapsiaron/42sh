@@ -33,9 +33,11 @@ enum ast_type
     AST_FOR,
     AST_UNTIL,
     AST_NEGATION,
-    AST_REDIR,
+    AST_REDIR, // redirection node
     AST_ASSIGNMENT,
-    AST_BLOCK
+    AST_BLOCK,
+    AST_FUNCDEC,
+    AST_REDIRWRAP // wrapper: shell_command { redirection }
 };
 
 struct ast_if
@@ -135,6 +137,19 @@ struct ast_block
     struct ast *body;
 };
 
+struct ast_funcdec
+{
+    char *name;
+    struct ast *body; // shell_command
+    struct ast *redirs;
+};
+
+struct ast_redirwrap
+{
+    struct ast *shell_command; // BLOCK / IF / FOR / WHILE / UNTIL
+    struct ast *redirections; // linked list of redirections
+};
+
 // Union of all AST node types
 union ast_union
 {
@@ -149,6 +164,8 @@ union ast_union
     struct ast_redir ast_redir;
     struct ast_assignment ast_assignment;
     struct ast_block ast_block;
+    struct ast_funcdec ast_funcdec;
+    struct ast_redirwrap ast_redirwrap;
 };
 
 // AST node structure
@@ -180,6 +197,8 @@ struct ast *ast_assignment_init(const char *var, const char *value);
 int ast_assignment_append(struct ast *cmd, struct ast *assignment);
 
 struct ast *ast_block_init(struct ast *body);
+struct ast *ast_funcdec_init(const char *name, struct ast *body, struct ast *redirs);
+struct ast *ast_redirwrap_init(struct ast *shell_command, struct ast *redirections);
 
 // Free functions
 void free_argv(char **argv);

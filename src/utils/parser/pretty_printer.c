@@ -12,6 +12,11 @@ static void pp_negation(const struct ast *ast, FILE *out);
 static void pp_if(const struct ast *ast, FILE *out);
 static void pp_and_or(const struct ast *ast, FILE *out);
 static void pp_while_until(const struct ast *ast, FILE *out);
+static void pp_for(const struct ast *ast, FILE *out);
+static void pp_assignment(const struct ast *ast, FILE *out);
+static void pp_block(const struct ast *ast, FILE *out);
+static void pp_funcdec(const struct ast *ast, FILE *out);
+static void pp_redirwrap(const struct ast *ast, FILE *out);
 
 static void pp_ignore_quotes(const char *str, FILE *out)
 {
@@ -48,47 +53,41 @@ static void pp_list(const struct ast *ast, FILE *out)
     }
 }
 
+static const char *redir_op(enum redir_type type)
+{
+    switch (type)
+    {
+    case REDIR_IN:
+        return "<";
+    case REDIR_OUT:
+        return ">";
+    case REDIR_APPEND:
+        return ">>";
+    case REDIR_CLOBBER:
+        return ">|";
+    case REDIR_DUP_IN:
+        return "<&";
+    case REDIR_DUP_OUT:
+        return ">&";
+    case REDIR_INOUT:
+        return "<>";
+    default:
+        return "?";
+    }
+}
 static void pp_redir(const struct ast *ast, FILE *out)
 {
-    const struct ast_redir *ast_tmp = &ast->data.ast_redir;
-    if (ast_tmp->type == REDIR_IN)
+    const struct ast *cur = ast;
+    while (cur)
     {
-        if (ast_tmp->next)
-        {
-            pp_node(ast_tmp->next, out);
-        }
-        fprintf(out, " < ");
-        fputs(ast_tmp->word, out);
-        return;
-    }
-    else if (ast_tmp->type == REDIR_OUT)
-    {
-        fprintf(out, " > ");
-    }
-    else if (ast_tmp->type == REDIR_APPEND)
-    {
-        fprintf(out, " >> ");
-    }
-    else if (ast_tmp->type == REDIR_CLOBBER)
-    {
-        fprintf(out, " >| ");
-    }
-    else if (ast_tmp->type == REDIR_DUP_OUT)
-    {
-        fprintf(out, " >& ");
-    }
-    else if (ast_tmp->type == REDIR_DUP_IN)
-    {
-        fprintf(out, " <& ");
-    }
-    else if (ast_tmp->type == REDIR_INOUT)
-    {
-        fprintf(out, " <> ");
-    }
-    fputs(ast_tmp->word, out);
-    if (ast_tmp->next)
-    {
-        pp_node(ast_tmp->next, out);
+        const struct ast_redir *redir = &cur->data.ast_redir;
+        fputc(' ', out);
+
+        fprintf(out, "%d%s ", redir->io_number, redir_op(redir->type));
+        fputc(' ', out);
+        pp_ignore_quotes(redir->word, out);
+
+        cur = redir->next;
     }
 }
 
@@ -224,6 +223,39 @@ static void pp_assignment(const struct ast *ast, FILE *out)
     }
 }
 
+static void pp_block(const struct ast *ast, FILE *out)
+{
+    fputs("block { ", out);
+    pp_node(ast->data.ast_block.body, out);
+    fputs(" }", out);
+}
+
+static void pp_funcdec(const struct ast *ast, FILE *out)
+{
+    fputs("funcdec ", out);
+    pp_ignore_quotes(ast->data.ast_funcdec.name, out);
+    fputs(" () ", out);
+    
+    pp_node(ast->data.ast_funcdec.body, out);
+
+    if(ast->data.ast_funcdec.redirs)
+    {
+        pp_redir(ast->data.ast_funcdec.redirs, out);
+    }
+}
+
+static void pp_redirwrap(const struct ast *ast, FILE *out)
+{
+    fputs("redirwrap { ", out);
+    pp_node(ast->data.ast_redirwrap.shell_command, out);
+    fputs(" }", out);
+
+    if(ast->data.ast_redirwrap.redirections)
+    {
+        pp_redir(ast->data.ast_redirwrap.redirections, out);
+    }
+}
+
 static void pp_node(const struct ast *ast, FILE *out)
 {
     if (!ast)
@@ -260,6 +292,15 @@ static void pp_node(const struct ast *ast, FILE *out)
         break;
     case AST_ASSIGNMENT:
         pp_assignment(ast, out);
+        break;
+    case AST_BLOCK:
+        pp_block(ast, out);
+        break;
+    case AST_FUNCDEC:
+        pp_funcdec(ast, out);
+        break;
+    case AST_REDIRWRAP:
+        pp_redirwrap(ast, out);
         break;
     default:
         fputs("/* Unknown AST node */", out);
