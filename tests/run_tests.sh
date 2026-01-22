@@ -18,8 +18,8 @@ YELLOW='\033[38;5;226m'
 CANCEL='\033[0m'
 
 # To use :
-# run_test "test name" "command to run" arg1 arg2 ... for string commands
-# run_test "test name" "./script/to/run.sh" arg1 arg2 ... for script files
+# run_test "test name" "command to run" arg1 arg2 ...       for string commands
+# run_test "test name" "./script/to/run.sh" arg1 arg2 ...   for script files
 run_test() {
   name=$1
   cmd=$2
@@ -77,6 +77,55 @@ run_test() {
   total=$((total + 1))
   rm -f "$out_ref" "$out_goat"
 }
+# TO use :
+# run_stdin_file "test name" "script.sh"
+
+
+run_stdin_file() {
+  name="$1"
+  file="$2"
+
+  out_ref="/tmp/ref_$$.out"
+  out_goat="/tmp/goat_$$.out"
+
+  : >"$out_ref"
+  : >"$out_goat"
+
+  failed=0
+
+  $REF_SH < "$file" > "$out_ref"
+  code_ref=$?
+
+  timeout 1s "$BIN_PATH" < "$file" > "$out_goat"
+  code_goat=$?
+
+  if [ "$code_ref" -ne "$code_goat" ]; then
+    failed=1
+    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(EXIT CODE)${CANCEL}: ref=${GREEN}$code_ref${CANCEL}, loosers=${RED}$code_goat${CANCEL}"
+  fi
+
+  if ! cmp -s "$out_ref" "$out_goat"; then
+    failed=1
+    echo -e "[${RED}FAILED${CANCEL}]: $name ${ORANGE}(OUTPUT)${CANCEL}"
+    echo -e "${YELLOW}Expected:${CANCEL}"
+    sed 's/^/  /' "$out_ref"
+    echo -e "${YELLOW}Got:${CANCEL}"
+    sed 's/^/  /' "$out_goat"
+  fi
+
+  if [ "$failed" -eq 0 ]; then
+    echo -e "[${GREEN}OK${CANCEL}] $name"
+    passed=$((passed + 1))
+  fi
+
+  if [ "$code_goat" -eq 124 ]; then
+    echo -e "[${BLUE}TIMEOUT${CANCEL}] $name timeout !!!!!!!!!"
+  fi
+
+  total=$((total + 1))
+  rm -f "$out_ref" "$out_goat"
+}
+
 
 
 run_unit()
@@ -107,14 +156,6 @@ echo ---------------
 run_test "LS" "ls"
 run_test "Tree -a" "tree -a"
 run_test "cat Makefile.am" "cat Makefile.am"
-run_test "Cd .." "cd ..; pwd"
-run_test "Cd -" " cd/; cd /tmp; cd -"
-run_test "Cd error no exist" "cd /coucou"
-run_test "cd too many args" "cd /tmp /var"
-run_test "Cd Home diff" "HOME=/tmp cd; pwd"
-run_test "Cd home" "cd ; pwd"
-run_test "cd //" "cd //; pwd"
-run_test "cd PWD" "cd /tmp; echo \$PWD; cd /; echo \$PWD"
 echo --------
 echo Builtins
 echo --------
@@ -129,6 +170,14 @@ run_test "Echo escaped" "echo \" \\n \\t \\\\\""
 run_test "Echo bad flags" "echo -n -E -e Machoire"
 run_test "Simple comment" "echo SUCRE # AU SUCRE"
 run_test "Comment inside" "echo thibault#bikini"
+run_test "Cd .." "cd ..; pwd"
+run_test "Cd -" " cd/; cd /tmp; cd -"
+run_test "Cd error no exist" "cd /coucou"
+run_test "cd too many args" "cd /tmp /var"
+run_test "Cd Home diff" "HOME=/tmp cd; pwd"
+run_test "Cd home" "cd ; pwd"
+run_test "cd //" "cd //; pwd"
+run_test "cd PWD" "cd /tmp; echo \$PWD; cd /; echo \$PWD"
 echo -------------
 echo Lists and ifs
 echo -------------
@@ -266,6 +315,22 @@ echo -------
 run_test "script test Piscine - tower" "./script/piscine/tower.sh"
 run_test "script test Piscine - ascii house" "./script/piscine/ascii_house.sh"
 echo
+echo ================= RUN STDIN ===================
+echo --
+echo If
+echo --
+run_stdin_file "script test basic if" "./script/if/script_basic_if.sh"
+run_stdin_file "script test multiple if" "./script/if/script_mul_if.sh"
+run_stdin_file "script test fill_nl" "./script/if/script_fill_nl.sh"
+run_stdin_file "script test error nl_semi_nl" "./script/if/script_nl_semi_nl.sh"
+run_stdin_file "script test if in if and elif" "./script/if/if_in_if_elif.sh"
+echo ----
+echo Loop
+echo ----
+run_stdin_file "script test while" "./script/loop/script_while.sh"
+run_stdin_file "script test until" "./script/loop/script_until.sh"
+run_stdin_file "script test for 2 forms" "./script/loop/script_2_for.sh"
+echo 
 echo ================= RUN UNIT =====================
 echo
 if [ "$COVERAGE" = "yes" ]; then
