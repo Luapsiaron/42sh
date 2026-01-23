@@ -202,6 +202,13 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
             }
         }
         len_name = *index - start;
+        if (len_name == 0)
+        {
+            char_append(buff, '$');
+            (*index)--;
+            return;
+        }
+
         var_name = strndup(word + start, len_name);
 
         (*index)--; // Expand word func do i++, so one too far
@@ -240,7 +247,7 @@ char **expand_argv(char **argv, struct hash_map *hm)
         count++;
         res = realloc(res, sizeof(char *) * (count + 1));
         res[count - 1] = expanded;
-        res[count] = '\0';
+        res[count] = NULL;
     }
 
     return res;
