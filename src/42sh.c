@@ -21,7 +21,6 @@ struct input_sel_ctx
     struct hash_map *hm;
 };
 
-
 static void usage(FILE *out)
 {
     fprintf(out,
@@ -120,7 +119,6 @@ static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close)
     return stdin;
 }
 
-
 static void init_positional_params(struct hash_map *hm, int argc, char **argv,
                                    int start_index)
 {
@@ -145,7 +143,8 @@ static void init_positional_params(struct hash_map *hm, int argc, char **argv,
 
 int main(int argc, char **argv, char **envp)
 {
-    int opt, pretty_print = 0;
+    int opt;
+    int pretty_print = 0;
     char *command = NULL;
     struct hash_map *hm = hash_map_init(100);
 
@@ -193,4 +192,3 @@ int main(int argc, char **argv, char **envp)
     }
     return status;
 }
-

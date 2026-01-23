@@ -79,6 +79,8 @@ apply_one_redir(const struct ast_redir *r) // Apply a single redirection
     case REDIR_INOUT:
         fd = open(r->word, O_RDWR | O_CREAT, 0644);
         break;
+    default:
+        return 1;
     }
     if (fd < 0)
     {
@@ -131,8 +133,9 @@ pipeline_collect(struct ast *p, struct ast **arr,
     pipeline_collect(p->data.ast_pipeline.right, arr, len);
 }
 
-static int fork_pipeline_stage(struct pipe_stage_args a, int *next_read,
-                               pid_t *pid_out)
+static int
+fork_pipeline_stage(struct pipe_stage_args a, int *next_read,
+                    pid_t *pid_out) // Fork and set up a pipeline stage
 {
     int fds[2] = { -1, -1 };
     int is_last = (next_read == NULL);
@@ -181,11 +184,13 @@ static int fork_pipeline_stage(struct pipe_stage_args a, int *next_read,
     return 0;
 }
 
-int exec_pipeline(struct ast *pipe_node, struct hash_map *hm) // Execute a pipeline of commands
+int exec_pipeline(struct ast *pipe_node,
+                  struct hash_map *hm) // Execute a pipeline of commands
 {
     struct ast *cmds[MAX_PIPELINE_CMDS];
     pid_t pids[MAX_PIPELINE_CMDS];
-    int n = 0, prev_read = -1;
+    int n = 0;
+    int prev_read = -1;
 
     pipeline_collect(pipe_node, cmds, &n);
     if (n == 0)

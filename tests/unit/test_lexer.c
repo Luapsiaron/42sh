@@ -22,7 +22,8 @@ static void assert_tok(struct token *t, enum token_type ty, const char *val)
 
 Test(lexer, reserved_words_and_separators)
 {
-    FILE *f = fmem_from_str("if true; then\nfalse\nfi\n for while   until; do done");
+    FILE *f =
+        fmem_from_str("if true; then\nfalse\nfi\n for while   until; do done");
     cr_assert_not_null(f);
 
     struct lexer lx;

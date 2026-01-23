@@ -180,25 +180,31 @@ struct ast
 */
 struct ast *ast_init(enum ast_type type);
 
-struct ast *ast_if_init(struct ast *condition, struct ast *then_body, struct ast *else_body);
+struct ast *ast_if_init(struct ast *condition, struct ast *then_body,
+                        struct ast *else_body);
 struct ast *ast_cmd_init(char **argv);
 struct ast *ast_list_init(struct ast *next, struct ast *child);
 struct ast *ast_pipeline_init(struct ast *right, struct ast *left);
 struct ast *ast_negation_init(struct ast *child);
-struct ast *ast_and_or_init(enum and_or_op operator, struct ast * left, struct ast *right);
-struct ast *ast_while_until_init(struct ast *condition, struct ast *body, enum loop_type type);
-struct ast *ast_for_init(struct ast *first_arg, struct ast *second_arg, struct ast *body);
+struct ast *ast_and_or_init(enum and_or_op operator, struct ast * left,
+                            struct ast *right);
+struct ast *ast_while_until_init(struct ast *condition, struct ast *body,
+                                 enum loop_type type);
+struct ast *ast_for_init(struct ast *first_arg, struct ast *second_arg,
+                         struct ast *body);
 
-struct ast *ast_redir_init(int io_number, enum redir_type type, const char *word,
-                      struct ast *next);
+struct ast *ast_redir_init(int io_number, enum redir_type type,
+                           const char *word, struct ast *next);
 int ast_redir_append(struct ast *cmd, struct ast *redir);
 
 struct ast *ast_assignment_init(const char *var, const char *value);
 int ast_assignment_append(struct ast *cmd, struct ast *assignment);
 
 struct ast *ast_block_init(struct ast *body);
-struct ast *ast_funcdec_init(const char *name, struct ast *body, struct ast *redirs);
-struct ast *ast_redirwrap_init(struct ast *shell_command, struct ast *redirections);
+struct ast *ast_funcdec_init(const char *name, struct ast *body,
+                             struct ast *redirs);
+struct ast *ast_redirwrap_init(struct ast *shell_command,
+                               struct ast *redirections);
 
 // Free functions
 void free_argv(char **argv);

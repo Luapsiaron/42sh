@@ -290,7 +290,7 @@ static void pp_node(const struct ast *ast, FILE *out)
         return;
     }
     pp_func_t pp_func = pp_get_func(ast->type);
-    if(!pp_func)
+    if (!pp_func)
     {
         fputs("/* Unknown AST node */", out);
         return;

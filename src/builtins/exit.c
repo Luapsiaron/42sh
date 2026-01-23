@@ -1,7 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "exit.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "../expansion/expand.h"
 
 // change last_exit_code and return -3 to catch the exit after in the code

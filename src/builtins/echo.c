@@ -44,7 +44,7 @@ echo_print_escaped(const char *s) // Print string without \? transformed
 int builtin_echo(char **argv)
 {
     int argc = argc_count(argv);
-        bool opt_n = true;
+    bool opt_n = true;
     bool opt_e = false;
     int i = 1;
 

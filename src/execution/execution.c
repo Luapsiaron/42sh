@@ -12,16 +12,16 @@
 #include <unistd.h>
 
 #include "../ast/ast.h"
+#include "../builtins/break.h"
+#include "../builtins/cd.h"
 #include "../builtins/echo.h"
+#include "../builtins/exit.h"
 #include "../expansion/expand.h"
+#include "../expansion/hashmap.h"
 #include "condition.h"
+#include "functions.h"
 #include "loop.h"
 #include "redir_pipe.h"
-#include "../builtins/cd.h"
-#include "../builtins/exit.h"
-#include "../expansion/hashmap.h"
-#include "functions.h"
-#include "../builtins/break.h"
 // command not found = 127
 // command not executable = 126
 // else = 1-125
@@ -29,11 +29,13 @@
 static bool is_builtin(char *str) // checks if command is a builtin
 {
     return (strcmp(str, "echo") == 0 || strcmp(str, "true") == 0
-            || strcmp(str, "false") == 0) || strcmp(str, "cd") == 0
-             || strcmp(str, "exit") == 0 || strcmp(str, "break") == 0;
+            || strcmp(str, "false") == 0)
+        || strcmp(str, "cd") == 0 || strcmp(str, "exit") == 0
+        || strcmp(str, "break") == 0;
 }
 
-static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin command
+static int exec_builtin(char **argv,
+                        struct hash_map *hm) // executes a builtin command
 {
     if (strcmp(argv[0], "echo") == 0)
     {
@@ -47,11 +49,11 @@ static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin 
     {
         return 1;
     }
-    else if(strcmp(argv[0], "cd") == 0)
+    else if (strcmp(argv[0], "cd") == 0)
     {
         return builtin_cd(argv, hm);
     }
-    else if(strcmp(argv[0], "exit") == 0)
+    else if (strcmp(argv[0], "exit") == 0)
     {
         return builtin_exit(argv);
     }
@@ -62,7 +64,8 @@ static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin 
     return 127;
 }
 
-int wait_status(pid_t pid) // waits for a child process and returns its exit status
+int wait_status(
+    pid_t pid) // waits for a child process and returns its exit status
 {
     int st = 0;
     if (waitpid(pid, &st, 0) < 0)
@@ -74,7 +77,8 @@ int wait_status(pid_t pid) // waits for a child process and returns its exit sta
     return 1;
 }
 
-int exec_ast(struct ast *ast, struct hash_map *hm) // executes an AST node based on its type
+int exec_ast(struct ast *ast,
+             struct hash_map *hm) // executes an AST node based on its type
 {
     if (!ast)
         return 2;
@@ -102,9 +106,9 @@ int exec_ast(struct ast *ast, struct hash_map *hm) // executes an AST node based
             return 0;
         return st;
     }
-    case AST_FUNCDEC: 
+    case AST_FUNCDEC:
         return functions_register(ast);
-    case AST_BLOCK: 
+    case AST_BLOCK:
         return exec_ast(ast->data.ast_block.body, hm);
     default:
         fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
@@ -112,7 +116,8 @@ int exec_ast(struct ast *ast, struct hash_map *hm) // executes an AST node based
     }
 }
 
-int exec_list(struct ast *ast, struct hash_map *hm) // executes a list of AST nodes sequentially
+int exec_list(struct ast *ast,
+              struct hash_map *hm) // executes a list of AST nodes sequentially
 {
     int exit_code = 0;
     while (ast && ast->type == AST_LIST)
@@ -143,7 +148,8 @@ int exec_if(struct ast *ast, struct hash_map *hm) // executes an if AST node
     return 0; // false condition and no else, should continue
 }
 
-int exec_cmd(char **argv, struct hash_map *hm) // executes a command, handling builtins and external commands
+int exec_cmd(char **argv, struct hash_map *hm) // executes a command, handling
+                                               // builtins and external commands
 {
     if (!argv || !argv[0])
         return 0;
@@ -169,7 +175,9 @@ int exec_cmd(char **argv, struct hash_map *hm) // executes a command, handling b
     return wait_status(pid);
 }
 
-static void exec_assignments(struct ast *assn, struct hash_map *hm) // executes variable assignments
+static void
+exec_assignments(struct ast *assn,
+                 struct hash_map *hm) // executes variable assignments
 {
     while (assn)
     {
@@ -198,7 +206,6 @@ static void exec_assignments(struct ast *assn, struct hash_map *hm) // executes 
     }
 }
 
-
 static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm)
 {
     if (!cmd->data.ast_cmd.assignments)
@@ -215,12 +222,16 @@ static char **exec_cmd_expand(struct ast *cmd, struct hash_map *hm)
     return expand_argv(raw, hm);
 }
 
-static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm, char **argv)
+static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm,
+                                 char **argv)
 {
     const struct sh_function *fn = functions_lookup(argv[0]);
-    if (!fn) return -1;
+    if (!fn)
+        return -1;
 
-    struct fn_call call = { .hm = hm, .argv = argv, .redirs = cmd->data.ast_cmd.redirs };
+    struct fn_call call = { .hm = hm,
+                            .argv = argv,
+                            .redirs = cmd->data.ast_cmd.redirs };
     int st = exec_function_call(fn, &call);
     if (st == -3)
     {
@@ -230,7 +241,8 @@ static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm, char **ar
     return st;
 }
 
-static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm, char **argv)
+static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm,
+                                char **argv)
 {
     struct saved_fd *saved = NULL;
     if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
@@ -249,7 +261,8 @@ static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm, char **arg
 static int exec_cmd_run_external(struct ast *cmd, char **argv)
 {
     pid_t pid = fork();
-    if (pid < 0) return 1;
+    if (pid < 0)
+        return 1;
     if (pid == 0)
     {
         struct saved_fd *saved = NULL;
@@ -263,7 +276,8 @@ static int exec_cmd_run_external(struct ast *cmd, char **argv)
     return st;
 }
 
-int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AST node
+int exec_cmd_node(struct ast *cmd,
+                  struct hash_map *hm) // executes a command AST node
 /*
     If builtin: apply redirs in parent, run builtin, restore
     If external: fork, apply redirs in child, exec, wait
@@ -288,9 +302,12 @@ int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AS
     return st;
 }
 
-int child_exec_command(struct ast *node, struct hash_map *hm) // executes a command in a child process
+int child_exec_command(
+    struct ast *node,
+    struct hash_map *hm) // executes a command in a child process
 {
-    if (!node) return 0;
+    if (!node)
+        return 0;
     if (node->type != AST_CMD)
         return exec_ast(node, hm);
 

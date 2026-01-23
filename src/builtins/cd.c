@@ -1,16 +1,15 @@
+#include <limits.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <limits.h>
 
 #include "../expansion/hashmap.h"
 #include "../utils/str/str.h"
 
-
 #ifndef PATH_MAX
-#define PATH_MAX 4096
+#    define PATH_MAX 4096
 #endif
 
 static char *concatenate_path(char *curr, char *path)
@@ -97,7 +96,7 @@ static char *get_target(char *arg, struct hash_map *hm, bool *toprint)
             fprintf(stderr, "OLDPWD not found\n");
             return old;
         }
-        else 
+        else
         {
             *toprint = true;
         }

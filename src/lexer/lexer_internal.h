@@ -1,10 +1,10 @@
 #ifndef LEXER_INTERNAL_H
 #define LEXER_INTERNAL_H
 
-#include "lexer.h"
-
-#include <stddef.h>
 #include <ctype.h>
+#include <stddef.h>
+
+#include "lexer.h"
 
 void lexer_next_char(struct lexer *lx);
 void skip_blanks(struct lexer *lx);

@@ -104,11 +104,9 @@ static char *handle_specials(struct hash_map *hm,
         return random_value();
     }
     if (strcmp(var_name, "*") == 0) // al arguments concatenated
-    {
-    }
+    {}
     if (strcmp(var_name, "@") == 0) // all arguments, separated
-    {
-    }
+    {}
     if (strcmp(var_name, "#") == 0) // ARG NUMBER
     {
         return dollar_hashtag(hm);

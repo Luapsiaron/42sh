@@ -1,12 +1,14 @@
 #include "execution/loop.h"
 
 #include "../ast/ast.h"
+#include "../builtins/break.h"
 #include "../expansion/expand.h"
 #include "../expansion/hashmap.h"
 #include "execution.h"
-#include "../builtins/break.h"
 
-static int loop_should_continue(enum loop_type type, int cond_status) // determines if loop should continue
+static int
+loop_should_continue(enum loop_type type,
+                     int cond_status) // determines if loop should continue
 {
     if (type == LOOP_WHILE)
         return cond_status == 0;
@@ -52,7 +54,9 @@ static int break_propagate(int lvl) // propagates break level
     return RET_BREAK_BASE + (lvl - 2);
 }
 
-int exec_while_until(struct ast *ast, struct hash_map *hm) // executes a while/until loop AST node
+int exec_while_until(
+    struct ast *ast,
+    struct hash_map *hm) // executes a while/until loop AST node
 {
     if (!ast)
         return 0;
@@ -74,7 +78,8 @@ int exec_while_until(struct ast *ast, struct hash_map *hm) // executes a while/u
     return last_status;
 }
 
-int exec_for(struct ast *ast, struct hash_map *hm) // executes a for loop AST node
+int exec_for(struct ast *ast,
+             struct hash_map *hm) // executes a for loop AST node
 {
     if (!ast || ast->type != AST_FOR)
         return 2;

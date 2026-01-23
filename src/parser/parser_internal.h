@@ -57,18 +57,19 @@ struct ast *parse_command(struct parser *p);
 
 /*
     Parse a compound list
-    Grammar: compound_list = { \n } and_or { ( ';' | '\n' ) { '\n' } and_or } [ ';' ] { '\n' }
-    Stop when one of the given end tokens is encountered
+    Grammar: compound_list = { \n } and_or { ( ';' | '\n' ) { '\n' } and_or } [
+   ';' ] { '\n' } Stop when one of the given end tokens is encountered
 */
-struct ast *parse_compound_list(struct parser *p, const enum token_type *end_token,
-                           size_t end_token_count);
+struct ast *parse_compound_list(struct parser *p,
+                                const enum token_type *end_token,
+                                size_t end_token_count);
 
 /*
     Parse an if statement
     Grammar: if_command = 'if' compound_list 'then' compound_list
                           [ 'elif' compound_list 'then' compound_list ]*
                           [ 'else' compound_list ] 'fi'
-*/                           
+*/
 struct ast *parse_if(struct parser *p);
 
 /*
@@ -85,7 +86,8 @@ struct ast *parse_until(struct parser *p);
 
 /*
     Parse a for statement
-    Grammar: for_command = 'for' WORD 'in' WORD { WORD } 'do' compound_list 'done'
+    Grammar: for_command = 'for' WORD 'in' WORD { WORD } 'do' compound_list
+   'done'
 */
 struct ast *parse_for(struct parser *p);
 

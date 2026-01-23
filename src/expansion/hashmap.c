@@ -45,7 +45,7 @@ struct hash_map *hash_map_init(size_t size)
     struct hash_map *new_hash_map = malloc(sizeof(struct hash_map));
     if (!new_hash_map)
         return NULL;
-    
+
     // Allocate the array, everything is set to zero
     struct pair_list **pair_list = calloc(size, sizeof(struct pair_list *));
 
@@ -83,7 +83,7 @@ bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
         return true;
     }
 
-    //Key not found, insert new node at the beginning
+    // Key not found, insert new node at the beginning
     struct pair_list *new_pair_list = malloc(sizeof(struct pair_list));
     if (!new_pair_list)
         return false;
@@ -98,13 +98,11 @@ bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
     return true;
 }
 
-
 /**
- * Free all memory used/associated with the hash map 
+ * Free all memory used/associated with the hash map
  */
 void hash_map_free(struct hash_map *hash_map)
 {
-
     if (!hash_map)
         return;
 
