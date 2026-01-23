@@ -1,6 +1,8 @@
 #ifndef BREAK_H
 #define BREAK_H
 
+#include "../expansion/hashmap.h"
+
 #define RET_BREAK_BASE 200
 #define RET_BREAK_MAX 20
 
