@@ -10,7 +10,7 @@
 
 #ifndef PATH_MAX
 #    define PATH_MAX 4096
-#endif
+#endif /* ! PATH_MAX */
 
 static char *concatenate_path(char *curr, char *path)
 {
