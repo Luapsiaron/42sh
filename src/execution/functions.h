@@ -25,4 +25,4 @@ void functions_free_all(void);
 
 int exec_function_call(const struct sh_function *fn, struct fn_call *call);
 
-#endif
+#endif /* ! FUNCTIONS_H */
