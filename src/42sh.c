@@ -67,6 +67,10 @@ static int run_stream(FILE *input, int pretty_print, struct hash_map *hm)
         }
         status = exec_ast(tree, hm);
         ast_free(tree);
+        if (status == -3)
+        {
+            break;
+        }
     }
     return status;
 }
@@ -183,6 +187,10 @@ int main(int argc, char **argv, char **envp)
     if (must_close && input)
         fclose(input);
     hash_map_free(hm);
+    if (status == -3)
+    {
+        exit(last_exit_code);
+    }
     return status;
 }
 

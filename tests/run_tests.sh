@@ -232,7 +232,6 @@ run_test "lots_of_args" 'echo "$1 $9 ${10} ${11}"' a b c d e f g h i j k l
 run_test "all_args4" 'IFS=","; echo "Star: $*"' a b c
 run_test "sharp" 'echo $#' a b
 
-
 echo ---------
 echo Pipelines
 echo ---------
@@ -298,6 +297,13 @@ run_test "Function exit code" "my_func() { false; }; my_func; echo \$?"
 run_test "implicit_args" 'for i; do echo "Arg: $i"; done' 1 2 3
 
 echo
+echo --------
+echo exit
+echo --------
+run_test "exit 0" "exit 0"
+run_test "exit 1" "exit 1"
+# run_test "exit error < 0" "exit -1"
+# run_test "exit error > 255" "exit 256"
 echo ================= RUN SCRIPT ===================
 echo --
 echo If

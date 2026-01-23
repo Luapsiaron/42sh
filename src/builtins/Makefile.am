@@ -7,4 +7,6 @@ libbuiltins_a_SOURCES = \
   echo.c \
   echo.h \
   cd.c \
-  cd.h
+  cd.h \
+  exit.c \
+  exit.h

@@ -18,6 +18,7 @@
 #include "loop.h"
 #include "redir_pipe.h"
 #include "../builtins/cd.h"
+#include "../builtins/exit.h"
 #include "../expansion/hashmap.h"
 #include "functions.h"
 
@@ -28,7 +29,8 @@
 static bool is_builtin(char *str) // checks if command is a builtin
 {
     return (strcmp(str, "echo") == 0 || strcmp(str, "true") == 0
-            || strcmp(str, "false") == 0) || strcmp(str, "cd") == 0;
+            || strcmp(str, "false") == 0) || strcmp(str, "cd") == 0
+             || strcmp(str, "exit") == 0;
 }
 
 static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin command
@@ -48,6 +50,10 @@ static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin 
     else if(strcmp(argv[0], "cd") == 0)
     {
         return builtin_cd(argv, hm);
+    }
+    else if(strcmp(argv[0], "exit") == 0)
+    {
+        return builtin_exit(argv);
     }
     return 127;
 }
@@ -110,6 +116,10 @@ int exec_list(struct ast *ast, struct hash_map *hm) // executes a list of AST no
         if (ast->data.ast_list.child)
         {
             exit_code = exec_ast(ast->data.ast_list.child, hm);
+        }
+        if (exit_code == -3)
+        {
+            break;
         }
         ast = ast->data.ast_list.next;
     }
@@ -208,6 +218,10 @@ static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm, char **ar
 
     struct fn_call call = { .hm = hm, .argv = argv, .redirs = cmd->data.ast_cmd.redirs };
     int st = exec_function_call(fn, &call);
+    if (st == -3)
+    {
+        return last_exit_code;
+    }
     last_exit_code = st;
     return st;
 }
@@ -220,6 +234,10 @@ static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm, char **arg
     int st = exec_builtin(argv, hm);
     fflush(stdout);
     restore_fds(saved);
+    if (st == -3)
+    {
+        return last_exit_code;
+    }
     last_exit_code = st;
     return st;
 }
@@ -240,8 +258,6 @@ static int exec_cmd_run_external(struct ast *cmd, char **argv)
     last_exit_code = st;
     return st;
 }
-
-
 
 int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AST node
 /*
@@ -293,4 +309,3 @@ int child_exec_command(struct ast *node, struct hash_map *hm) // executes a comm
     execvp(argv[0], argv);
     _exit(errno == ENOENT ? 127 : 126);
 }
-
