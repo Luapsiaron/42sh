@@ -14,7 +14,7 @@ void skip_blanks(struct lexer *lx)
         lexer_next_char(lx);
     }
 }
-/*
+
 int lexer_peek_char(struct lexer *lx)
 {
     int c = fgetc(lx->input);
@@ -23,4 +23,4 @@ int lexer_peek_char(struct lexer *lx)
         ungetc(c, lx->input);
     }
     return c;
-}*/
+}

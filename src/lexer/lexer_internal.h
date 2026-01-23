@@ -19,6 +19,6 @@ struct token *lexer_ionumber(struct lexer *lx);
 
 struct token *lexer_is_word(struct lexer *lx);
 
-//int lexer_peek_char(struct lexer *lx);
+int lexer_peek_char(struct lexer *lx);
 
 #endif /* ! LEXER_INTERNAL_H */
