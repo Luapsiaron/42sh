@@ -1,6 +1,7 @@
 #include "ast.h"
 
-struct ast *ast_while_until_init(struct ast *condition, struct ast *body, enum loop_type type)
+struct ast *ast_while_until_init(struct ast *condition, struct ast *body,
+                                 enum loop_type type)
 {
     struct ast *new = ast_init(AST_WHILE_UNTIL);
     if (!new)
@@ -15,7 +16,8 @@ struct ast *ast_while_until_init(struct ast *condition, struct ast *body, enum l
     return new;
 }
 
-struct ast *ast_for_init(struct ast *first_arg, struct ast *second_arg, struct ast *body)
+struct ast *ast_for_init(struct ast *first_arg, struct ast *second_arg,
+                         struct ast *body)
 {
     struct ast *new = ast_init(AST_FOR);
     if (!new)
@@ -30,7 +32,8 @@ struct ast *ast_for_init(struct ast *first_arg, struct ast *second_arg, struct a
     return new;
 }
 
-struct ast *ast_if_init(struct ast *condition, struct ast *then_body, struct ast *else_body)
+struct ast *ast_if_init(struct ast *condition, struct ast *then_body,
+                        struct ast *else_body)
 {
     struct ast *new = ast_init(AST_IF);
     if (!new)

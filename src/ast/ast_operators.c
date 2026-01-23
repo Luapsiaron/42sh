@@ -27,7 +27,8 @@ struct ast *ast_negation_init(struct ast *child)
     return new;
 }
 
-struct ast *ast_and_or_init(enum and_or_op operator, struct ast * left, struct ast *right)
+struct ast *ast_and_or_init(enum and_or_op operator, struct ast * left,
+                            struct ast *right)
 {
     struct ast *new = ast_init(AST_AND_OR);
     if (!new)

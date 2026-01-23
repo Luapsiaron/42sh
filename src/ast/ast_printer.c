@@ -173,54 +173,46 @@ static void print_redirwrap(const struct ast *node, int depth)
     print_redirs(node->data.ast_redirwrap.redirections, depth + 2);
 }
 
+typedef void (*print_func_t)(const struct ast *node, int depth);
+
+static void print_unknown(const struct ast *node, int depth)
+{
+    (void)node;
+    print_indent(depth);
+    printf("Unknown AST node type\n");
+}
+
+static const print_func_t print_funcs[] = {
+    [AST_CMD] = print_cmd,
+    [AST_BLOCK] = print_block,
+    [AST_IF] = print_if,
+    [AST_LIST] = print_list,
+    [AST_PIPELINE] = print_pipeline,
+    [AST_NEGATION] = print_negation,
+    [AST_AND_OR] = print_and_or,
+    [AST_WHILE_UNTIL] = print_while_until,
+    [AST_FOR] = print_for,
+    [AST_ASSIGNMENT] = print_assignment,
+    [AST_FUNCDEC] = print_funcdec,
+    [AST_REDIRWRAP] = print_redirwrap,
+};
+
+static print_func_t get_print_func(enum ast_type type)
+{
+    size_t n = sizeof(print_funcs) / sizeof(print_funcs[0]);
+    if ((size_t)type < n && print_funcs[type])
+    {
+        return print_funcs[type];
+    }
+    return print_unknown;
+}
+
 void ast_printer(const struct ast *node, int depth)
 {
     if (!node)
     {
         return;
     }
-    
-    switch (node->type)
-    {
-    case AST_CMD:
-        print_cmd(node, depth);
-        break;
-    case AST_BLOCK:
-        print_block(node, depth);
-        break;
-    case AST_IF:
-        print_if(node, depth);
-        break;
-    case AST_LIST:
-        print_list(node, depth);
-        break;
-    case AST_PIPELINE:
-        print_pipeline(node, depth);
-        break;
-    case AST_NEGATION:
-        print_negation(node, depth);
-        break;
-    case AST_AND_OR:
-        print_and_or(node, depth);
-        break;
-    case AST_WHILE_UNTIL:
-        print_while_until(node, depth);
-        break;
-    case AST_FOR:
-        print_for(node, depth);
-        break;
-    case AST_ASSIGNMENT:
-        print_assignment(node, depth);
-        break;
-    case AST_FUNCDEC:
-        print_funcdec(node, depth);
-        break;
-    case AST_REDIRWRAP:
-        print_redirwrap(node, depth);
-        break;
-    default:
-        print_indent(depth);
-        printf("Unknown AST node type\n");
-        break;
-    }
+
+    get_print_func(node->type)(node, depth);
 }

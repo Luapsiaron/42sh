@@ -20,37 +20,36 @@ struct token *handle_comment(struct lexer *lx)
 
 /* ----------------- Separator -----------------*/
 
-
 struct token *handle_separator(struct lexer *lx)
 {
-    switch(lx->current)
+    switch (lx->current)
     {
-        case ';':
-            lexer_next_char(lx);
-            lx->condition = LEXER_NORMAL;
-            return token_new(TOKEN_SEMICOLON, NULL);
-        case '\n':
-            lexer_next_char(lx);
-            lx->condition = LEXER_NORMAL;
-            return token_new(TOKEN_NEWLINE, NULL);
-        case '{':
-            lexer_next_char(lx);
-            lx->condition = LEXER_NORMAL;
-            return token_new(TOKEN_LBRACE, NULL);
-        case '}':
-            lexer_next_char(lx);
-            lx->condition = LEXER_NORMAL;
-            return token_new(TOKEN_RBRACE, NULL);
-        case '(':
-            lexer_next_char(lx);
-            lx->condition = LEXER_NORMAL;
-            return token_new(TOKEN_LPAREN, NULL);
-        case ')':
-            lexer_next_char(lx);
-            lx->condition = LEXER_NORMAL;
-            return token_new(TOKEN_RPAREN, NULL);
-        default:
-            return NULL;
+    case ';':
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_SEMICOLON, NULL);
+    case '\n':
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_NEWLINE, NULL);
+    case '{':
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_LBRACE, NULL);
+    case '}':
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_RBRACE, NULL);
+    case '(':
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_LPAREN, NULL);
+    case ')':
+        lexer_next_char(lx);
+        lx->condition = LEXER_NORMAL;
+        return token_new(TOKEN_RPAREN, NULL);
+    default:
+        return NULL;
     }
 }
 /* ----------------- IO Number -----------------*/
@@ -93,7 +92,7 @@ struct token *handle_redirection(struct lexer *lx)
             return token_new(TOKEN_LESSAND, NULL);
         }
 
-        if(lx->current == '>')
+        if (lx->current == '>')
         {
             lexer_next_char(lx);
             lx->condition = LEXER_FORCE_WORD;
@@ -102,12 +101,12 @@ struct token *handle_redirection(struct lexer *lx)
         lx->condition = LEXER_FORCE_WORD;
         return token_new(TOKEN_LESS, NULL);
     }
-    if(lx->current != '>')
+    if (lx->current != '>')
     {
         return NULL;
     }
     lexer_next_char(lx);
-    if(lx->current == '&')
+    if (lx->current == '&')
     {
         lexer_next_char(lx);
         lx->condition = LEXER_FORCE_WORD;

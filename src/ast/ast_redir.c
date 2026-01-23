@@ -1,7 +1,7 @@
 #include "ast.h"
 
-struct ast *ast_redir_init(int io_number, enum redir_type type, const char *word,
-                      struct ast *next)
+struct ast *ast_redir_init(int io_number, enum redir_type type,
+                           const char *word, struct ast *next)
 {
     struct ast *new = ast_init(AST_REDIR);
     if (!new)

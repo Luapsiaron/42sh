@@ -1,6 +1,7 @@
-#include "parser_internal.h"
-#include "../lexer/lexer.h"
 #include "parser.h"
+
+#include "../lexer/lexer.h"
+#include "parser_internal.h"
 
 enum token_type peek(struct parser *p)
 {
@@ -18,7 +19,7 @@ void pop(struct parser *p)
         return;
     }
     token_free(p->current_token);
-    if(p->next_token)
+    if (p->next_token)
     {
         p->current_token = p->next_token;
         p->next_token = NULL;
@@ -26,9 +27,9 @@ void pop(struct parser *p)
     }
 
     p->current_token = lexer_next(&p->lexer);
-    if(!p->current_token)
+    if (!p->current_token)
     {
-        if(lexer_error_occured(&p->lexer))
+        if (lexer_error_occured(&p->lexer))
         {
             parse_set_error();
         }
@@ -70,16 +71,16 @@ int remove_separator(struct parser *p)
 
 enum token_type peek_next(struct parser *p)
 {
-    if(!p)
+    if (!p)
     {
         return TOKEN_EOF;
     }
-    if(!p->next_token)
+    if (!p->next_token)
     {
         p->next_token = lexer_next(&p->lexer);
-        if(!p->next_token)
+        if (!p->next_token)
         {
-            if(lexer_error_occured(&p->lexer))
+            if (lexer_error_occured(&p->lexer))
             {
                 parse_set_error();
             }

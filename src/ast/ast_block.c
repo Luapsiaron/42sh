@@ -12,7 +12,8 @@ struct ast *ast_block_init(struct ast *body)
     return new;
 }
 
-struct ast *ast_funcdec_init(const char *name, struct ast *body, struct ast *redirs)
+struct ast *ast_funcdec_init(const char *name, struct ast *body,
+                             struct ast *redirs)
 {
     struct ast *new = ast_init(AST_FUNCDEC);
     if (!new)
@@ -34,7 +35,8 @@ struct ast *ast_funcdec_init(const char *name, struct ast *body, struct ast *red
     return new;
 }
 
-struct ast *ast_redirwrap_init(struct ast *shell_command, struct ast *redirections)
+struct ast *ast_redirwrap_init(struct ast *shell_command,
+                               struct ast *redirections)
 {
     struct ast *new = ast_init(AST_REDIRWRAP);
     if (!new)

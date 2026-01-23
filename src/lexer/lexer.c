@@ -1,10 +1,10 @@
 #include "lexer.h"
-#include "lexer_internal.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 #include "../utils/stack/stack.h"
+#include "lexer_internal.h"
 
 void lexer_init(struct lexer *lx, FILE *input)
 {
@@ -24,7 +24,7 @@ int lexer_error_occured(const struct lexer *lx)
 */
 struct token *lexer_next(struct lexer *lx)
 {
-    if(lx->error)
+    if (lx->error)
     {
         return NULL;
     }

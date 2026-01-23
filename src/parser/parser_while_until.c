@@ -36,7 +36,8 @@ static struct ast *parse_condition(struct parser *p)
     1. Consumes the initial TOKEN_WHILE or TOKEN_UNTIL
     2. Parses the condition compound list until TOKEN_DO
     3. Parses the body compound list until TOKEN_DONE
-    4. Returns a struct parser_while_until containing the condition and body ASTs
+    4. Returns a struct parser_while_until containing the condition and body
+   ASTs
     5. On error, frees any allocated ASTs and returns NULL
 */
 static struct parser_while_until *

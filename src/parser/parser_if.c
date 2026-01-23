@@ -20,7 +20,7 @@
 */
 static const enum token_type END_TOKENS_CONDITION[] = { TOKEN_THEN };
 static const enum token_type END_TOKENS_THEN[] = { TOKEN_FI, TOKEN_ELSE,
-                                                TOKEN_ELIF };
+                                                   TOKEN_ELIF };
 static const enum token_type END_TOKENS_ELSE[] = { TOKEN_FI };
 
 /*
@@ -41,7 +41,8 @@ static struct ast *parse_elif_command(struct parser *p);
    3 is_stop_token(TOKEN_ELSE, end_token, end_token_count) -> 1
     is_stop_token(TOKEN_THEN, end_token, end_token_count) -> 0
 */
-static int is_stop_token(enum token_type token, const enum token_type *end_token,
+static int is_stop_token(enum token_type token,
+                         const enum token_type *end_token,
                          size_t end_token_count)
 {
     for (size_t i = 0; i < end_token_count; i++)
@@ -74,8 +75,9 @@ static int expect_token(struct parser *p, enum token_type expected)
     Parse a compound list until one of the specified end tokens is encountered
     Returns a list of commands or NULL on error
 */
-struct ast *parse_compound_list(struct parser *p, const enum token_type *end_token,
-                           size_t end_token_count)
+struct ast *parse_compound_list(struct parser *p,
+                                const enum token_type *end_token,
+                                size_t end_token_count)
 {
     skip_newlines(p);
 

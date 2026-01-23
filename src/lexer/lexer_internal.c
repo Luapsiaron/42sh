@@ -18,7 +18,7 @@ void skip_blanks(struct lexer *lx)
 int lexer_peek_char(struct lexer *lx)
 {
     int c = fgetc(lx->input);
-    if(c != EOF)
+    if (c != EOF)
     {
         ungetc(c, lx->input);
     }

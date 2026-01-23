@@ -29,7 +29,7 @@ struct ast *parse_input(FILE *f)
     p.current_token = lexer_next(&p.lexer);
     if (!p.current_token)
     {
-        if(lexer_error_occured(&p.lexer))
+        if (lexer_error_occured(&p.lexer))
         {
             parse_error = 1;
         }
@@ -37,7 +37,7 @@ struct ast *parse_input(FILE *f)
     }
 
     skip_newlines(&p);
-    if(peek(&p) == TOKEN_EOF)
+    if (peek(&p) == TOKEN_EOF)
     {
         token_free(p.current_token);
         token_free(p.next_token);

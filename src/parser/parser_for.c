@@ -10,8 +10,9 @@ static struct ast *parse_for_body(struct parser *p)
 
 static int is_token_word_in(const struct parser *p)
 {
-    return peek((struct parser *)p) == TOKEN_WORD && p->current_token && p->current_token->lexeme
-           && strcmp(p->current_token->lexeme, "in") == 0;
+    return peek((struct parser *)p) == TOKEN_WORD && p->current_token
+        && p->current_token->lexeme
+        && strcmp(p->current_token->lexeme, "in") == 0;
 }
 
 static struct ast *parse_for_name(struct parser *p)
@@ -51,7 +52,7 @@ static struct ast *parse_for_name(struct parser *p)
 */
 static struct ast *parse_for_in_words(struct parser *p)
 {
-    if(peek(p) != TOKEN_IN && !is_token_word_in(p))
+    if (peek(p) != TOKEN_IN && !is_token_word_in(p))
     {
         return NULL;
     }
@@ -72,7 +73,7 @@ static struct ast *parse_for_in_words(struct parser *p)
         ast_free(list);
         return NULL;
     }
-    while(peek(p) == TOKEN_WORD || peek(p) == TOKEN_ASSIGNMENT_WORD)
+    while (peek(p) == TOKEN_WORD || peek(p) == TOKEN_ASSIGNMENT_WORD)
     {
         if (i + 1 >= capacity)
         {
@@ -82,7 +83,7 @@ static struct ast *parse_for_in_words(struct parser *p)
             {
                 goto error;
             }
-            for(size_t j = i; j < capacity; ++j)
+            for (size_t j = i; j < capacity; ++j)
             {
                 new_argv[j] = NULL;
             }
@@ -98,7 +99,7 @@ static struct ast *parse_for_in_words(struct parser *p)
         pop(p);
     }
 
-    if(!remove_separator(p))
+    if (!remove_separator(p))
     {
         goto error;
     }
@@ -139,7 +140,7 @@ struct ast *parse_for(struct parser *p)
 
     skip_newlines(p);
 
-    if(peek(p) == TOKEN_SEMICOLON)
+    if (peek(p) == TOKEN_SEMICOLON)
     {
         pop(p);
     }

@@ -1,5 +1,5 @@
-#include "parser_internal.h"
 #include "parser.h"
+#include "parser_internal.h"
 
 /*
     Parse a list of commands separated by semicolons or newlines
@@ -23,7 +23,7 @@ struct ast *parse_list(struct parser *p)
     struct ast *child = parse_and_or(p);
     if (!child)
     {
-        if(!parse_error_occurred())
+        if (!parse_error_occurred())
         {
             parse_set_error();
         }
@@ -32,33 +32,29 @@ struct ast *parse_list(struct parser *p)
     struct ast *head = ast_list_init(NULL, child);
     if (!head)
     {
-        ast_free(child);
-        return NULL;
+        goto error;
     }
 
     struct ast *tail = head;
 
     while (1)
     {
-        if(parse_error_occurred())
+        if (parse_error_occurred())
         {
-            ast_free(head);
-            return NULL;
+            goto error;
         }
         if (!remove_separator(p))
         {
             break;
         }
-        if(parse_error_occurred())
+        if (parse_error_occurred())
         {
-            ast_free(head);
-            return NULL;
+            goto error;
         }
         if (peek(p) == TOKEN_SEMICOLON)
         {
             parse_set_error();
-            ast_free(head);
-            return NULL;
+            goto error;
         }
         if (peek(p) == TOKEN_EOF)
         {
@@ -68,24 +64,26 @@ struct ast *parse_list(struct parser *p)
         struct ast *next_child = parse_and_or(p);
         if (!next_child)
         {
-            if(!parse_error_occurred())
+            if (!parse_error_occurred())
             {
                 parse_set_error();
             }
-            ast_free(head);
-            return NULL;
+            goto error;
         }
 
         struct ast *next_list = ast_list_init(NULL, next_child);
         if (!next_list)
         {
             ast_free(next_child);
-            ast_free(head);
-            return NULL;
+            goto error;
         }
 
         tail->data.ast_list.next = next_list;
         tail = next_list;
     }
     return head;
+
+error:
+    ast_free(head);
+    return NULL;
 }

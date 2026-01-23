@@ -54,7 +54,7 @@ static int cmd_has_prefix(const struct ast *cmd)
 /*
     Parse the command prefix using their respective parsers
     Grammar: { assignment_word | redirection }
-    Returns 1 on success, 0 on failure, -1 if no prefix found  
+    Returns 1 on success, 0 on failure, -1 if no prefix found
 */
 static int parse_cmd_prefix(struct parser *p, struct ast *cmd)
 {

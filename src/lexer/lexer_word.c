@@ -124,8 +124,8 @@ static int lexer_double_quotes(struct lexer *lx, char *buffer, size_t *index,
     Stop on the first non-escaped backquote
     Returns 1 on success, 0 on failure
 */
-static int lexer_cmd_sub_backquotes(struct lexer *lx, char *buffer, size_t *index,
-                                   size_t capacity)
+static int lexer_cmd_sub_backquotes(struct lexer *lx, char *buffer,
+                                    size_t *index, size_t capacity)
 {
     if (!append_buffer(buffer, index, capacity, '`'))
     {
@@ -133,41 +133,95 @@ static int lexer_cmd_sub_backquotes(struct lexer *lx, char *buffer, size_t *inde
     }
     lexer_next_char(lx);
 
-    while(lx->current != EOF)
+    while (lx->current != EOF)
     {
         // Allow escaping characters (notably \` to avoid closing early)
-        if(lx->current == '\\')
+        if (lx->current == '\\')
         {
-            if(!append_buffer(buffer, index, capacity, '\\'))
+            if (!append_buffer(buffer, index, capacity, '\\'))
             {
                 return 0;
             }
             lexer_next_char(lx);
-            if(lx->current == EOF)
+            if (lx->current == EOF)
             {
                 return 0;
             }
-            if(!append_buffer(buffer, index, capacity, lx->current))
+            if (!append_buffer(buffer, index, capacity, lx->current))
             {
                 return 0;
             }
             lexer_next_char(lx);
             continue;
         }
-        if(lx->current == '`')
+        if (lx->current == '`')
         {
-            if(!append_buffer(buffer, index, capacity, '`'))
+            if (!append_buffer(buffer, index, capacity, '`'))
             {
                 return 0;
             }
             lexer_next_char(lx);
             return 1;
         }
-        if(!append_buffer(buffer, index, capacity, lx->current))
+        if (!append_buffer(buffer, index, capacity, lx->current))
         {
             return 0;
         }
         lexer_next_char(lx);
+    }
+    return 0;
+}
+
+/*
+    Parse inside command substitution $(...)
+    Return:
+        1 if it consumed something and the caller should continue the loop
+        0 if it did not consume anything
+       -1 on error
+*/
+static int lexer_cmd_sub_step(struct lexer *lx, char *buffer, size_t *index,
+                              size_t capacity, int *depth)
+{
+    if (lx->current == '\'')
+    {
+        return lexer_single_quotes(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '"')
+    {
+        return lexer_double_quotes(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '`')
+    {
+        return lexer_cmd_sub_backquotes(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '\\')
+    {
+        if (!append_buffer(buffer, index, capacity, '\\'))
+        {
+            return -1;
+        }
+        lexer_next_char(lx);
+        if (lx->current == EOF
+            || !append_buffer(buffer, index, capacity, lx->current))
+        {
+            return -1;
+        }
+        lexer_next_char(lx);
+        return 1;
+    }
+    if (lx->current == '$' && lexer_peek_char(lx) == '(')
+    {
+        ++(*depth);
+    }
+    if (lx->current == ')')
+    {
+        --(*depth);
+        if (!append_buffer(buffer, index, capacity, ')'))
+        {
+            return -1;
+        }
+        lexer_next_char(lx);
+        return 1;
     }
     return 0;
 }
@@ -180,99 +234,84 @@ static int lexer_cmd_sub_backquotes(struct lexer *lx, char *buffer, size_t *inde
 static int lexer_cmd_sub(struct lexer *lx, char *buffer, size_t *index,
                          size_t capacity)
 {
+    int depth = 1;
     if (!append_buffer(buffer, index, capacity, '$'))
     {
         return 0;
     }
     lexer_next_char(lx);
-    if (lx->current != '(')
-    {
-        return 0;
-    }
-    if (!append_buffer(buffer, index, capacity, '('))
+    if (lx->current != '(' || !append_buffer(buffer, index, capacity, '('))
     {
         return 0;
     }
     lexer_next_char(lx);
 
-    int depth = 1;
     while (lx->current != EOF && depth > 0)
     {
-        if (lx->current == '\'')
+        int step_result =
+            lexer_cmd_sub_step(lx, buffer, index, capacity, &depth);
+        if (step_result == -1)
         {
-            if(!lexer_single_quotes(lx, buffer, index, capacity))
-            {
-                return 0;
-            }
+            return 0;
+        }
+        if (step_result == 1)
+        {
             continue;
         }
-        if(lx->current == '"')
-        {
-            if(!lexer_double_quotes(lx, buffer, index, capacity))
-            {
-                return 0;
-            }
-            continue;
-        }
-        // Allow nesting `...` inside $(...)
-        if(lx->current == '`')
-        {
-            if(!lexer_cmd_sub_backquotes(lx, buffer, index, capacity))
-            {
-                return 0;
-            }
-            continue;
-        }
-
-        if(lx->current == '\\')
-        {
-            if(!append_buffer(buffer, index, capacity, '\\'))
-            {
-                return 0;
-            }
-            lexer_next_char(lx);
-            if(lx->current == EOF)
-            {
-                return 0;
-            }
-            if(!append_buffer(buffer, index, capacity, lx->current))
-            {
-                return 0;
-            }
-            lexer_next_char(lx);
-            continue;
-        }
-
-        // Nested $(...)
-        if(lx->current == '$' && lexer_peek_char(lx) == '(')
-        {
-            ++depth;
-        }
-
-        if(lx->current == ')')
-        {
-            --depth;
-            if(!append_buffer(buffer, index, capacity, ')'))
-            {
-                return 0;
-            }
-            lexer_next_char(lx);
-            if(depth == 0)
-            {
-                return 1;
-            }
-            continue;
-        }
-
-        if(!append_buffer(buffer, index, capacity, lx->current))
+        if (!append_buffer(buffer, index, capacity, lx->current))
         {
             return 0;
         }
         lexer_next_char(lx);
     }
+    return depth == 0;
+}
+
+/* ----------------- Word -----------------*/
+static int lexer_word_step(struct lexer *lx, char *buffer, size_t *index,
+                           size_t capacity, int *quote)
+{
+    if (lx->current == '`')
+    {
+        *quote = 1;
+        return lexer_cmd_sub_backquotes(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '$' && lexer_peek_char(lx) == '(')
+    {
+        *quote = 1;
+        return lexer_cmd_sub(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '\'')
+    {
+        *quote = 1;
+        return lexer_single_quotes(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '"')
+    {
+        *quote = 1;
+        return lexer_double_quotes(lx, buffer, index, capacity) ? 1 : -1;
+    }
+    if (lx->current == '\\')
+    {
+        lexer_next_char(lx);
+        if (lx->current == '\n')
+        {
+            lexer_next_char(lx);
+            return 1;
+        }
+        if (lx->current == EOF)
+        {
+            return -1;
+        }
+        if (!append_buffer(buffer, index, capacity, lx->current))
+        {
+            return -1;
+        }
+        lexer_next_char(lx);
+        return 1;
+    }
     return 0;
 }
-/* ----------------- Word -----------------*/
 
 struct token *lexer_is_word(struct lexer *lx)
 {
@@ -282,47 +321,18 @@ struct token *lexer_is_word(struct lexer *lx)
 
     while (lx->current != EOF && lx->current != ';' && lx->current != '|'
            && lx->current != '>' && lx->current != '<' && lx->current != '\n'
-           && lx->current != '{' && lx->current != '}' && lx->current != '(' 
+           && lx->current != '{' && lx->current != '}' && lx->current != '('
            && lx->current != ')' && !isspace(lx->current))
     {
-        if(lx->current == '`')
+        int step_result =
+            lexer_word_step(lx, buffer, &i, sizeof(buffer), &quote);
+        if (step_result == -1)
         {
-            quote = 1;
-            if(!lexer_cmd_sub_backquotes(lx, buffer, &i, sizeof(buffer)))
-            {
-                lx->error = 1;
-                return NULL;
-            }
-            continue;
+            lx->error = 1;
+            return NULL;
         }
-        if(lx->current == '$' && lexer_peek_char(lx) == '(')
+        if (step_result == 1)
         {
-            quote = 1;
-            if(!lexer_cmd_sub(lx, buffer, &i, sizeof(buffer)))
-            {
-                lx->error = 1;
-                return NULL;
-            }
-            continue;
-        }
-        if (lx->current == '\'')
-        {
-            quote = 1;
-            if (!lexer_single_quotes(lx, buffer, &i, sizeof(buffer)))
-            {
-                lx->error = 1;
-                return NULL;
-            }
-            continue;
-        }
-        if (lx->current == '"')
-        {
-            quote = 1;
-            if (!lexer_double_quotes(lx, buffer, &i, sizeof(buffer)))
-            {
-                lx->error = 1;
-                return NULL;
-            }
             continue;
         }
         if (!append_buffer(buffer, &i, sizeof(buffer), lx->current))
