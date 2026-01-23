@@ -153,7 +153,6 @@ static char *handle_specials(struct hash_map *hm,
 static void handle_dollar(struct buffer *buff, size_t *index, char *word,
                           struct hash_map *hm)
 {
-
     (*index)++; // skip first $
 
     size_t len_name = 0;
@@ -247,9 +246,8 @@ char **expand_argv(char **argv, struct hash_map *hm)
  */
 static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 {
-
     if (word[*i + 1] == '\\' || word[*i + 1] == '$' || word[*i + 1] == '"'
-        || word[*i + 1] == '\n')
+        || word[*i + 1] == '\n' || word[*i+1] == '`')
     {
         (*i)++;
         char_append(buff, word[*i]);

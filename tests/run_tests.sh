@@ -202,6 +202,11 @@ run_test "triple quoted mixed" "echo 'a'\"b\"C"
 run_test "Squote inside Dquote" "echo \"'\""
 run_test "Quote basckslashed" "echo \"\\\"\""
 run_test "Full escaped" "echo \" \\ \\ \\ \\ \\ \\ \\ \\ \""
+run_test "weird args" "echo % # ^ \\ : \\;"
+run_test "escape newline" "echo glaces \\
+bachir"
+run_test "double quotes :bad weak" "echo \"bad"
+
 echo ----------
 echo Expansions
 echo ----------
@@ -220,6 +225,14 @@ run_test "IFS" "echo \$IFS"
 run_test "Exit code" "true; echo \$?; false; echo \$?"
 run_test "Arg numb" "echo \$#"
 run_test "PID" "echo \$$" 
+run_test "escape_in_weak" "echo \"\\$ \\\` \\\" \\\\\""
+run_test "echo_E_backslash3" "echo -E '42\nsh'"
+run_test "embedded_quote_1" "echo c\\'est l \\' le bonheur"
+run_test "lots_of_args" 'echo "$1 $9 ${10} ${11}"' a b c d e f g h i j k l
+run_test "all_args4" 'IFS=","; echo "Star: $*"' a b c
+run_test "sharp" 'echo $#' a b
+
+
 echo ---------
 echo Pipelines
 echo ---------
@@ -267,6 +280,9 @@ echo While loop
 echo ----------
 run_test "Simple while loop" "A=0; while \$A == 3 ; do echo \$A; A=\$((A + 1)); done"
 run_test "While loop never true" "A=0; while \$A == 5 ; do echo \$A; A=\$((A + 1)); done; echo end"
+run_test "Until true initial" 'until true; do echo "NOO"; done; echo "ok"'
+run_test "While false initial" 'while false; do echo "NOOO"; done; echo "ok"'
+
 echo --------
 echo For loop
 echo --------
@@ -279,6 +295,8 @@ run_test "Simple function" "my_func() { echo Hello from function; }; my_func"
 run_test "Function with args" "my_func() { echo Arg1: \$1; echo Arg2: \$2; }; my_func first second"
 run_test "Function within function" "outer_func() { inner_func() { echo Inner; }; echo Outer; inner_func; }; outer_func"
 run_test "Function exit code" "my_func() { false; }; my_func; echo \$?"
+run_test "implicit_args" 'for i; do echo "Arg: $i"; done' 1 2 3
+
 echo
 echo ================= RUN SCRIPT ===================
 echo --
@@ -309,6 +327,7 @@ run_test "script test var \$UID" "./script/variables/var_uid.sh"
 run_test "script test var environment \$OLDPWD" "./script/variables/var_env.sh"
 run_test "script test var environment \$PWD" "./script/variables/var_env2.sh"
 run_test "script test var all in same file" "./script/variables/echo_var_all.sh" 1 2 3
+run_test "Test UID" "echo \$UID"
 echo --------
 echo Pipeline
 echo --------
