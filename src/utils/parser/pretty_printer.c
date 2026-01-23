@@ -235,10 +235,10 @@ static void pp_funcdec(const struct ast *ast, FILE *out)
     fputs("funcdec ", out);
     pp_ignore_quotes(ast->data.ast_funcdec.name, out);
     fputs(" () ", out);
-    
+
     pp_node(ast->data.ast_funcdec.body, out);
 
-    if(ast->data.ast_funcdec.redirs)
+    if (ast->data.ast_funcdec.redirs)
     {
         pp_redir(ast->data.ast_funcdec.redirs, out);
     }
@@ -250,10 +250,36 @@ static void pp_redirwrap(const struct ast *ast, FILE *out)
     pp_node(ast->data.ast_redirwrap.shell_command, out);
     fputs(" }", out);
 
-    if(ast->data.ast_redirwrap.redirections)
+    if (ast->data.ast_redirwrap.redirections)
     {
         pp_redir(ast->data.ast_redirwrap.redirections, out);
     }
+}
+
+typedef void (*pp_func_t)(const struct ast *ast, FILE *out);
+
+static pp_func_t pp_get_func(enum ast_type type)
+{
+    static const pp_func_t pp_funcs[] = {
+        [AST_CMD] = pp_cmd,
+        [AST_LIST] = pp_list,
+        [AST_PIPELINE] = pp_pipeline,
+        [AST_NEGATION] = pp_negation,
+        [AST_IF] = pp_if,
+        [AST_AND_OR] = pp_and_or,
+        [AST_WHILE_UNTIL] = pp_while_until,
+        [AST_FOR] = pp_for,
+        [AST_ASSIGNMENT] = pp_assignment,
+        [AST_BLOCK] = pp_block,
+        [AST_FUNCDEC] = pp_funcdec,
+        [AST_REDIRWRAP] = pp_redirwrap,
+    };
+
+    if (type < 0 || type >= sizeof(pp_funcs) / sizeof(pp_funcs[0]))
+    {
+        return NULL;
+    }
+    return pp_funcs[type];
 }
 
 static void pp_node(const struct ast *ast, FILE *out)
@@ -263,49 +289,13 @@ static void pp_node(const struct ast *ast, FILE *out)
         fputs("/* NULL AST node */", out);
         return;
     }
-
-    switch (ast->type)
+    pp_func_t pp_func = pp_get_func(ast->type);
+    if(!pp_func)
     {
-    case AST_CMD:
-        pp_cmd(ast, out);
-        break;
-    case AST_LIST:
-        pp_list(ast, out);
-        break;
-    case AST_PIPELINE:
-        pp_pipeline(ast, out);
-        break;
-    case AST_NEGATION:
-        pp_negation(ast, out);
-        break;
-    case AST_IF:
-        pp_if(ast, out);
-        break;
-    case AST_AND_OR:
-        pp_and_or(ast, out);
-        break;
-    case AST_WHILE_UNTIL:
-        pp_while_until(ast, out);
-        break;
-    case AST_FOR:
-        pp_for(ast, out);
-        break;
-    case AST_ASSIGNMENT:
-        pp_assignment(ast, out);
-        break;
-    case AST_BLOCK:
-        pp_block(ast, out);
-        break;
-    case AST_FUNCDEC:
-        pp_funcdec(ast, out);
-        break;
-    case AST_REDIRWRAP:
-        pp_redirwrap(ast, out);
-        break;
-    default:
         fputs("/* Unknown AST node */", out);
-        break;
+        return;
     }
+    pp_func(ast, out);
 }
 
 void ast_pretty_print(const struct ast *ast, FILE *out)
