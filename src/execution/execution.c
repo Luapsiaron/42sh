@@ -21,7 +21,7 @@
 #include "../builtins/exit.h"
 #include "../expansion/hashmap.h"
 #include "functions.h"
-
+#include "../builtins/break.h"
 // command not found = 127
 // command not executable = 126
 // else = 1-125
@@ -30,7 +30,7 @@ static bool is_builtin(char *str) // checks if command is a builtin
 {
     return (strcmp(str, "echo") == 0 || strcmp(str, "true") == 0
             || strcmp(str, "false") == 0) || strcmp(str, "cd") == 0
-             || strcmp(str, "exit") == 0;
+             || strcmp(str, "exit") == 0 || strcmp(str, "break") == 0;
 }
 
 static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin command
@@ -54,6 +54,10 @@ static int exec_builtin(char **argv, struct hash_map *hm) // executes a builtin 
     else if(strcmp(argv[0], "exit") == 0)
     {
         return builtin_exit(argv);
+    }
+    else if (strcmp(argv[0], "break") == 0)
+    {
+        return builtin_break(argv, hm);
     }
     return 127;
 }

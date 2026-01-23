@@ -9,4 +9,6 @@ libbuiltins_a_SOURCES = \
   cd.c \
   cd.h \
   exit.c \
-  exit.h
+  exit.h \
+  break.c \
+  break.h

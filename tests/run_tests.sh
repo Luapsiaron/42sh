@@ -206,7 +206,6 @@ run_test "weird args" "echo % # ^ \\ : \\;"
 run_test "escape newline" "echo glaces \\
 bachir"
 run_test "double quotes :bad weak" "echo \"bad"
-
 echo ----------
 echo Expansions
 echo ----------
@@ -231,7 +230,6 @@ run_test "embedded_quote_1" "echo c\\'est l \\' le bonheur"
 run_test "lots_of_args" 'echo "$1 $9 ${10} ${11}"' a b c d e f g h i j k l
 run_test "all_args4" 'IFS=","; echo "Star: $*"' a b c
 run_test "sharp" 'echo $#' a b
-
 echo ---------
 echo Pipelines
 echo ---------
@@ -295,7 +293,6 @@ run_test "Function with args" "my_func() { echo Arg1: \$1; echo Arg2: \$2; }; my
 run_test "Function within function" "outer_func() { inner_func() { echo Inner; }; echo Outer; inner_func; }; outer_func"
 run_test "Function exit code" "my_func() { false; }; my_func; echo \$?"
 run_test "implicit_args" 'for i; do echo "Arg: $i"; done' 1 2 3
-
 echo
 echo --------
 echo exit
@@ -304,6 +301,12 @@ run_test "exit 0" "exit 0"
 run_test "exit 1" "exit 1"
 # run_test "exit error < 0" "exit -1"
 # run_test "exit error > 255" "exit 256"
+echo -----
+echo Break
+echo -----
+run_test "break in for loop" "for i in 1 2 3 4 5; do echo aa; break; done"
+run_test "break in while loop" "while true; do break; done"
+run_test "break with level 2 in nested loops" "for i in 1 2 3; do echo outer; for j in a b c; do echo inner; break 2; done; echo after inner; done; echo after outer"
 echo ================= RUN SCRIPT ===================
 echo --
 echo If
