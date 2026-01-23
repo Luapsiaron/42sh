@@ -235,6 +235,7 @@ run_test "Simple output redir" "echo Hello > /tmp/test_output_redir.txt; cat /tm
 run_test "Output redir append" "echo Line1 > /tmp/test_output_redir_append.txt; echo Line2 >> /tmp/test_output_redir_append.txt; cat /tmp/test_output_redir_append.txt"
 run_test "Input redir" "echo Line1 > /tmp/test_input_redir.txt; echo Line2 >> /tmp/test_input_redir.txt; cat < /tmp/test_input_redir.txt"
 run_test "Input redir with pipe" "echo Line1 > /tmp/test_input_redir_pipe.txt; echo Line2 >> /tmp/test_input_redir_pipe.txt; cat < /tmp/test_input_redir_pipe.txt | grep Line2"
+run_test "Bad redirection" "ls > <"
 echo --------
 echo Negation
 echo --------
@@ -331,6 +332,39 @@ run_stdin_file "script test while" "./script/loop/script_while.sh"
 run_stdin_file "script test until" "./script/loop/script_until.sh"
 run_stdin_file "script test for 2 forms" "./script/loop/script_2_for.sh"
 echo 
+echo ================ RUN MOULINETTE ================
+echo
+run_test "echo weird flag and \\" "echo -eEe \\\\"
+run_test "embedded if" "if true; then
+  if true; then
+    echo cond1
+  fi
+  echo cond2
+fi
+echo congrats"
+run_test "bad beginning pipe" "| echo foo"
+run_test "pipe redir3" "echo toto | cat > file
+echo sagamore
+echo $?"
+run_test "invalid 2 pipe" "echo foo ||| echo bar"
+run_test "invalid 2 and" "echo foo &&& echo bar"
+run_test "pipe redir 1" "echo 'lalali' | cat
+echo ' lalala'"
+run_test "badending lessgreat" "echo foo <"
+run_test "echo "on dit chiffrer" >file.txt
+cat <file.txt"
+run_test "badending input redirection" "cat <"
+run_test "badending input clobber" "cat <<"
+run_test "great and out to err" "echo foo >&2"
+run_test "only redir 1" "> file.txt"
+run_test "only clobber" ">> file.txt"
+run_test "script if vs operation" "script/moulinette/if_vs_operation.sh"
+run_test "sort file" "ls | sort"
+run_test "quote var 1" "titi=hello
+echo '\$titi'"
+run_test "multiple def on line" "K=A YA"
+run_test "hard var 3" "echo takebon \"le 42\"sh"
+echo 
 echo ================= RUN UNIT =====================
 echo
 if [ "$COVERAGE" = "yes" ]; then
@@ -353,5 +387,9 @@ echo -e "${YELLOW}Result: $passed / $total => $pct% ${CANCEL}"
 if [ -n "$OUTPUT_FILE" ]; then
   printf "%d" "$pct" > "$OUTPUT_FILE"
 fi
+
+# Delete files created during tests
+rm file
+rm file.txt
 
 exit 0
