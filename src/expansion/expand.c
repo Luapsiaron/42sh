@@ -8,9 +8,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-
 #include <time.h>
+#include <unistd.h>
 
 #include "../utils/str/str.h"
 #include "hashmap.h"
@@ -63,6 +62,28 @@ static char *dollar_hashtag(struct hash_map *hm)
     return res;
 }
 
+static char *format_out(int n)
+{
+    char *res = malloc(16);
+    if (res == NULL)
+    {
+        return NULL;
+    }
+    sprintf(res, "%d", n);
+    return res;
+}
+
+static char *random_value(void)
+{
+    static bool seeded = false;
+    if (seeded == false)
+    {
+        srand(getpid() ^ time(NULL));
+        seeded = true;
+    }
+    // 0-32767 range in bash rand
+    return format_out(rand() % 32768);
+}
 
 /**
  * Handles special variables or look for them in the hash map
@@ -70,29 +91,17 @@ static char *dollar_hashtag(struct hash_map *hm)
 static char *handle_specials(struct hash_map *hm,
                              char *var_name) // var name = key in hashmap
 {
-    static bool seeded = false;
     if (strcmp(var_name, "?") == 0) // Last exit code
     {
-        char *res = malloc(16);
-        sprintf(res, "%d", last_exit_code);
-        return res;
+        return format_out(last_exit_code);
     }
     if (strcmp(var_name, "$") == 0) // PID
     {
-        char *res = malloc(16);
-        sprintf(res, "%d", getpid());
-        return res;
+        return format_out(getpid());
     }
     if (strcmp(var_name, "RANDOM") == 0) // RANDOM VALUE
     {
-        if(seeded == false)
-        {
-            srand(getpid() ^ time(NULL));
-            seeded= true;
-        }
-        char *res = malloc(16);
-        sprintf(res, "%d", rand() % 32768); // 0-32767 range in bash rand
-        return res;
+        return random_value();
     }
     if (strcmp(var_name, "*") == 0) // al arguments concatenated
     {
@@ -106,9 +115,7 @@ static char *handle_specials(struct hash_map *hm,
     }
     if (strcmp(var_name, "UID") == 0) // user ID
     {
-        char *res = malloc(16);
-        sprintf(res, "%d", getuid());
-        return res;
+        return format_out(getuid());
     }
     if (strcmp(var_name, "IFS") == 0) // Internal Field Separator
     {
@@ -146,10 +153,9 @@ static char *handle_specials(struct hash_map *hm,
     return NULL;
 }
 
-
-/** 
+/**
  * Expand variables $VAR and ${VAR}
-*/
+ */
 static void handle_dollar(struct buffer *buff, size_t *index, char *word,
                           struct hash_map *hm)
 {
@@ -182,14 +188,15 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
     {
         // Check for special variables
         if (word[*index] == '?' || word[*index] == '!' || word[*index] == '$'
-            || word[*index] == '#' || word[*index] == '*' || word[*index] == '@')
+            || word[*index] == '#' || word[*index] == '*'
+            || word[*index] == '@')
         {
             len_name = 1;
             (*index)++;
         }
         else
         {
-            // standard variables 
+            // standard variables
             while (word[*index] != '\0'
                    && (word[*index] == '_' || isalnum(word[*index])))
             {
@@ -247,7 +254,7 @@ char **expand_argv(char **argv, struct hash_map *hm)
 static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 {
     if (word[*i + 1] == '\\' || word[*i + 1] == '$' || word[*i + 1] == '"'
-        || word[*i + 1] == '\n' || word[*i+1] == '`')
+        || word[*i + 1] == '\n' || word[*i + 1] == '`')
     {
         (*i)++;
         char_append(buff, word[*i]);
