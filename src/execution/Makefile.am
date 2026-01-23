@@ -8,7 +8,9 @@ libexecution_a_SOURCES = \
   redir_pipe.c \
   loop.c \
   condition.c \
+  functions.c \
   execution.h \
   redir_pipe.h \
   loop.h \
-  condition.h
+  condition.h \
+  functions.h

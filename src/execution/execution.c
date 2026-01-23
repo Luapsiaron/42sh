@@ -19,6 +19,7 @@
 #include "redir_pipe.h"
 #include "../builtins/cd.h"
 #include "../expansion/hashmap.h"
+#include "functions.h"
 
 // command not found = 127
 // command not executable = 126
@@ -91,6 +92,10 @@ int exec_ast(struct ast *ast, struct hash_map *hm) // executes an AST node based
             return 0;
         return st;
     }
+    case AST_FUNCDEC: 
+        return functions_register(ast);
+    case AST_BLOCK: 
+        return exec_ast(ast->data.ast_block.body, hm);
     default:
         fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
         return 2;
@@ -179,87 +184,113 @@ static void exec_assignments(struct ast *assn, struct hash_map *hm) // executes 
     }
 }
 
+
+static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm)
+{
+    if (!cmd->data.ast_cmd.assignments)
+        return 0;
+    exec_assignments(cmd->data.ast_cmd.assignments, hm);
+    return 0;
+}
+
+static char **exec_cmd_expand(struct ast *cmd, struct hash_map *hm)
+{
+    char **raw = cmd->data.ast_cmd.argv;
+    if (!raw || !raw[0])
+        return NULL;
+    return expand_argv(raw, hm);
+}
+
+static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm, char **argv)
+{
+    const struct sh_function *fn = functions_lookup(argv[0]);
+    if (!fn) return -1;
+
+    struct fn_call call = { .hm = hm, .argv = argv, .redirs = cmd->data.ast_cmd.redirs };
+    int st = exec_function_call(fn, &call);
+    last_exit_code = st;
+    return st;
+}
+
+static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm, char **argv)
+{
+    struct saved_fd *saved = NULL;
+    if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
+        return restore_fds(saved), 1;
+    int st = exec_builtin(argv, hm);
+    fflush(stdout);
+    restore_fds(saved);
+    last_exit_code = st;
+    return st;
+}
+
+static int exec_cmd_run_external(struct ast *cmd, char **argv)
+{
+    pid_t pid = fork();
+    if (pid < 0) return 1;
+    if (pid == 0)
+    {
+        struct saved_fd *saved = NULL;
+        if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
+            _exit(1);
+        execvp(argv[0], argv);
+        _exit(errno == ENOENT ? 127 : 126);
+    }
+    int st = wait_status(pid);
+    last_exit_code = st;
+    return st;
+}
+
+
+
 int exec_cmd_node(struct ast *cmd, struct hash_map *hm) // executes a command AST node
 /*
     If builtin: apply redirs in parent, run builtin, restore
     If external: fork, apply redirs in child, exec, wait
 */
 {
-    if (cmd->data.ast_cmd.assignments)
-    {
-        exec_assignments(cmd->data.ast_cmd.assignments, hm);
-    }
+    exec_cmd_apply_assign(cmd, hm);
 
-    char **before_argv = cmd->data.ast_cmd.argv;
-    if (!before_argv || !before_argv[0])
-        return 0;
-
-    char **argv = expand_argv(before_argv, hm);
+    char **argv = exec_cmd_expand(cmd, hm);
     if (!argv || !argv[0])
-    {
-        free_argv((argv));
-        return 0;
-    }
+        return free_argv(argv), 0;
+
+    int st = exec_cmd_try_function(cmd, hm, argv);
+    if (st != -1)
+        return free_argv(argv), st;
 
     if (is_builtin(argv[0]))
-    {
-        struct saved_fd *saved = NULL;
-        if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
-        {
-            restore_fds(saved);
-            free_argv(argv);
-            return 1;
-        }
-        int st = exec_builtin(argv, hm);
-        fflush(stdout); // subject reminder for builtins
-        restore_fds(saved);
+        st = exec_cmd_run_builtin(cmd, hm, argv);
+    else
+        st = exec_cmd_run_external(cmd, argv);
 
-        free_argv(argv);
-        last_exit_code = st;
-        return st;
-    }
-
-    pid_t pid = fork();
-    if (pid < 0)
-        return 1;
-
-    if (pid == 0)
-    {
-        // child: apply redirs, no need to restore
-        struct saved_fd *saved = NULL;
-        if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
-        {
-            free_argv(argv);
-            _exit(1);
-        }
-
-        execvp(argv[0], argv);
-        free_argv(argv);
-        _exit(errno == ENOENT ? 127 : 126);
-    }
     free_argv(argv);
-    int status = wait_status(pid);
-    last_exit_code = status;
-    return status;
+    return st;
 }
 
 int child_exec_command(struct ast *node, struct hash_map *hm) // executes a command in a child process
 {
-    if (!node)
-        return 0;
-    if (node->type == AST_CMD)
+    if (!node) return 0;
+    if (node->type != AST_CMD)
+        return exec_ast(node, hm);
+
+    char **argv = expand_argv(node->data.ast_cmd.argv, hm);
+    if (!argv || !argv[0])
+        return free_argv(argv), 0;
+
+    const struct sh_function *fn = functions_lookup(argv[0]);
+    if (fn)
     {
-        char **argv = node->data.ast_cmd.argv;
-        if (!argv || !argv[0])
-            return 0;
-        if (is_builtin(argv[0]))
-            return exec_builtin(argv, hm);
-        execvp(argv[0], argv);
-        // execvp failed:
-        int err = errno;
-        if (err == ENOENT)
-            _exit(127);
-        _exit(126);
+        struct fn_call call = { .hm = hm, .argv = argv, .redirs = NULL };
+        int st = exec_function_call(fn, &call);
+        free_argv(argv);
+        return st;
     }
-    return exec_ast(node, hm);
+
+    if (is_builtin(argv[0]))
+        return exec_builtin(argv, hm);
+
+    execvp(argv[0], argv);
+    _exit(errno == ENOENT ? 127 : 126);
 }
+

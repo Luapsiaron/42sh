@@ -23,5 +23,6 @@ bool hash_map_insert(struct hash_map *hash_map, const char *key, char *value,
 void hash_map_free(struct hash_map *hash_map);
 char *hash_map_get(const struct hash_map *hash_map, const char *key);
 void hash_map_dump(struct hash_map *hash_map);
+bool hash_map_remove(struct hash_map *hash_map, const char *key);
 
 #endif /* ! HASHMAP_H */

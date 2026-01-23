@@ -272,6 +272,13 @@ echo For loop
 echo --------
 run_test "Simple for loop" "for I in 1 2 3 ; do echo \$I; done"
 run_test "For loop no iterations" "for I in 1; do echo \$I; done;"
+echo ---------
+echo Functions
+echo ---------
+run_test "Simple function" "my_func() { echo Hello from function; }; my_func"
+run_test "Function with args" "my_func() { echo Arg1: \$1; echo Arg2: \$2; }; my_func first second"
+run_test "Function within function" "outer_func() { inner_func() { echo Inner; }; echo Outer; inner_func; }; outer_func"
+run_test "Function exit code" "my_func() { false; }; my_func; echo \$?"
 echo
 echo ================= RUN SCRIPT ===================
 echo --
