@@ -172,6 +172,12 @@ static int lexer_cmd_sub_backquotes(struct lexer *lx, char *buffer,
     return 0;
 }
 
+struct lexer_word_ctx
+{
+    char *buffer;
+    size_t index;
+    size_t capacity;
+};
 /*
     Parse inside command substitution $(...)
     Return:
@@ -179,30 +185,29 @@ static int lexer_cmd_sub_backquotes(struct lexer *lx, char *buffer,
         0 if it did not consume anything
        -1 on error
 */
-static int lexer_cmd_sub_step(struct lexer *lx, char *buffer, size_t *index,
-                              size_t capacity, int *depth)
+static int lexer_cmd_sub_step(struct lexer *lx, struct lexer_word_ctx *ctx, int *depth)
 {
     if (lx->current == '\'')
     {
-        return lexer_single_quotes(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_single_quotes(lx, ctx->buffer, &ctx->index, ctx->capacity) ? 1 : -1;
     }
     if (lx->current == '"')
     {
-        return lexer_double_quotes(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_double_quotes(lx, ctx->buffer, &ctx->index, ctx->capacity) ? 1 : -1;
     }
     if (lx->current == '`')
     {
-        return lexer_cmd_sub_backquotes(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_cmd_sub_backquotes(lx, ctx->buffer, &ctx->index, ctx->capacity) ? 1 : -1;
     }
     if (lx->current == '\\')
     {
-        if (!append_buffer(buffer, index, capacity, '\\'))
+        if (!append_buffer(ctx->buffer, &ctx->index, ctx->capacity, '\\'))
         {
             return -1;
         }
         lexer_next_char(lx);
         if (lx->current == EOF
-            || !append_buffer(buffer, index, capacity, lx->current))
+            || !append_buffer(ctx->buffer, &ctx->index, ctx->capacity, lx->current))
         {
             return -1;
         }
@@ -216,7 +221,7 @@ static int lexer_cmd_sub_step(struct lexer *lx, char *buffer, size_t *index,
     if (lx->current == ')')
     {
         --(*depth);
-        if (!append_buffer(buffer, index, capacity, ')'))
+        if (!append_buffer(ctx->buffer, &ctx->index, ctx->capacity, ')'))
         {
             return -1;
         }
@@ -231,16 +236,15 @@ static int lexer_cmd_sub_step(struct lexer *lx, char *buffer, size_t *index,
     Support nesting $( ... $( ... ) ... ) using a depth counter
     Returns 1 on success, 0 on failure
 */
-static int lexer_cmd_sub(struct lexer *lx, char *buffer, size_t *index,
-                         size_t capacity)
+static int lexer_cmd_sub(struct lexer *lx, struct lexer_word_ctx *ctx)
 {
     int depth = 1;
-    if (!append_buffer(buffer, index, capacity, '$'))
+    if (!append_buffer(ctx->buffer, &ctx->index, ctx->capacity, '$'))
     {
         return 0;
     }
     lexer_next_char(lx);
-    if (lx->current != '(' || !append_buffer(buffer, index, capacity, '('))
+    if (lx->current != '(' || !append_buffer(ctx->buffer, &ctx->index, ctx->capacity, '('))
     {
         return 0;
     }
@@ -249,7 +253,7 @@ static int lexer_cmd_sub(struct lexer *lx, char *buffer, size_t *index,
     while (lx->current != EOF && depth > 0)
     {
         int step_result =
-            lexer_cmd_sub_step(lx, buffer, index, capacity, &depth);
+            lexer_cmd_sub_step(lx, ctx, &depth);
         if (step_result == -1)
         {
             return 0;
@@ -258,7 +262,7 @@ static int lexer_cmd_sub(struct lexer *lx, char *buffer, size_t *index,
         {
             continue;
         }
-        if (!append_buffer(buffer, index, capacity, lx->current))
+        if (!append_buffer(ctx->buffer, &ctx->index, ctx->capacity, lx->current))
         {
             return 0;
         }
@@ -268,28 +272,27 @@ static int lexer_cmd_sub(struct lexer *lx, char *buffer, size_t *index,
 }
 
 /* ----------------- Word -----------------*/
-static int lexer_word_step(struct lexer *lx, char *buffer, size_t *index,
-                           size_t capacity, int *quote)
+static int lexer_word_step(struct lexer *lx, struct lexer_word_ctx *ctx, int *quote)
 {
     if (lx->current == '`')
     {
         *quote = 1;
-        return lexer_cmd_sub_backquotes(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_cmd_sub_backquotes(lx, ctx->buffer, &ctx->index, ctx->capacity) ? 1 : -1;
     }
     if (lx->current == '$' && lexer_peek_char(lx) == '(')
     {
         *quote = 1;
-        return lexer_cmd_sub(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_cmd_sub(lx, ctx) ? 1 : -1;
     }
     if (lx->current == '\'')
     {
         *quote = 1;
-        return lexer_single_quotes(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_single_quotes(lx, ctx->buffer, &ctx->index, ctx->capacity) ? 1 : -1;
     }
     if (lx->current == '"')
     {
         *quote = 1;
-        return lexer_double_quotes(lx, buffer, index, capacity) ? 1 : -1;
+        return lexer_double_quotes(lx, ctx->buffer, &ctx->index, ctx->capacity) ? 1 : -1;
     }
     if (lx->current == '\\')
     {
@@ -303,7 +306,7 @@ static int lexer_word_step(struct lexer *lx, char *buffer, size_t *index,
         {
             return -1;
         }
-        if (!append_buffer(buffer, index, capacity, lx->current))
+        if (!append_buffer(ctx->buffer, &ctx->index, ctx->capacity, lx->current))
         {
             return -1;
         }
@@ -316,8 +319,13 @@ static int lexer_word_step(struct lexer *lx, char *buffer, size_t *index,
 struct token *lexer_is_word(struct lexer *lx)
 {
     char buffer[512];
-    size_t i = 0;
     int quote = 0;
+
+    struct lexer_word_ctx ctx = {
+        .buffer = buffer,
+        .index = 0,
+        .capacity = sizeof(buffer),
+    };
 
     while (lx->current != EOF && lx->current != ';' && lx->current != '|'
            && lx->current != '>' && lx->current != '<' && lx->current != '\n'
@@ -325,7 +333,7 @@ struct token *lexer_is_word(struct lexer *lx)
            && lx->current != ')' && !isspace(lx->current))
     {
         int step_result =
-            lexer_word_step(lx, buffer, &i, sizeof(buffer), &quote);
+            lexer_word_step(lx, &ctx, &quote);
         if (step_result == -1)
         {
             lx->error = 1;
@@ -335,14 +343,14 @@ struct token *lexer_is_word(struct lexer *lx)
         {
             continue;
         }
-        if (!append_buffer(buffer, &i, sizeof(buffer), lx->current))
+        if (!append_buffer(ctx.buffer, &ctx.index, ctx.capacity, lx->current))
         {
             lx->error = 1;
             return NULL;
         }
         lexer_next_char(lx);
     }
-    buffer[i] = '\0';
+    buffer[ctx.index] = '\0';
 
     if (is_assignment_word(buffer))
     {
