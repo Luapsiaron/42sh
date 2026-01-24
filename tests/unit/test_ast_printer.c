@@ -105,13 +105,17 @@ Test(ast_printer, until_loop, .init = redirect_all_stdout)
 
 Test(ast_printer, redirection, .init = redirect_all_stdout)
 {
-    FILE *f = fmem_from_str("echo oui > file; echo non >> file2; echo 1 >| non; 1 <& 2; 1 >& 2; un <> deux;");
+    FILE *f = fmem_from_str("echo oui > file; echo non >> file2; echo 1 >| "
+                            "non; 1 <& 2; 1 >& 2; un <> deux;");
     struct ast *ast = parse_input(f);
 
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("command \"echo\" \"oui\" 1>  \"file\"; command \"echo\" \"non\" 1>>  \"file2\"; command \"echo\" \"1\" 1>|  \"non\"; command \"1\" 0<&  \"2\"; command \"1\" 1>&  \"2\"; command \"un\" 0<>  \"deux\"\n");
+    cr_assert_stdout_eq_str(
+        "command \"echo\" \"oui\" 1>  \"file\"; command \"echo\" \"non\" 1>>  "
+        "\"file2\"; command \"echo\" \"1\" 1>|  \"non\"; command \"1\" 0<&  "
+        "\"2\"; command \"1\" 1>&  \"2\"; command \"un\" 0<>  \"deux\"\n");
 
     ast_free(ast);
 }
