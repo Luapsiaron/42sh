@@ -27,7 +27,7 @@ static char **argv_dup(char **argv) // duplicates an argv array
 static struct ast *redir_dup(struct ast *r) // duplicates a redirection AST list
 {
     struct ast *head = NULL;
-    struct ast *tail = &head;
+    struct ast *tail = head;
     for (; r; r = r->data.ast_redir.next)
     {
         struct ast *n =
