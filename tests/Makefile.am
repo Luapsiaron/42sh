@@ -7,7 +7,8 @@ check_PROGRAMS = \
   test_io \
   test_lexer \
   test_execution \
-  test_parser
+  test_parser \
+  test_ast_printer
 
 TESTS = run_tests.sh
 EXTRA_DIST = run_tests.sh
@@ -46,3 +47,7 @@ test_parser_LDFLAGS = -lcriterion
 test_execution_SOURCES = unit/test_execution.c
 test_execution_LDADD   = $(LIB42SH) $(CRITERION_LIBS)
 test_execution_LDFLAGS = -lcriterion
+
+test_ast_printer_SOURCES = unit/test_ast_printer.c
+test_ast_printer_LDADD   = $(LIB42SH) $(CRITERION_LIBS)
+test_ast_printer_LDFLAGS = -lcriterion

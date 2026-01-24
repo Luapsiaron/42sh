@@ -409,6 +409,7 @@ if [ "$COVERAGE" = "yes" ]; then
   run_unit "unit: lexer" "./test_lexer"
   run_unit "unit: parser" "./test_parser"
   run_unit "unit: execution" "./test_execution"
+  run_unit "unit: pretty print" "./test_ast_printer"
 fi
 
 pct=0
