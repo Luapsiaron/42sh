@@ -1,4 +1,4 @@
-#include "execution/loop.h"
+#include "loop.h"
 
 #include "../ast/ast.h"
 #include "../builtins/break.h"
@@ -17,7 +17,7 @@ loop_should_continue(enum loop_type type,
 
 static int depth_get(struct hash_map *hm) // gets current loop depth
 {
-    char *v = hash_map_get(hm, "__loop_depth");
+    char *v = hash_map_get(hm, "loop_depth");
     return v ? atoi(v) : 0;
 }
 
@@ -25,7 +25,7 @@ static void depth_set(struct hash_map *hm, int d) // sets current loop depth
 {
     char buf[32];
     snprintf(buf, sizeof(buf), "%d", d);
-    hash_map_insert(hm, "__loop_depth", buf, NULL);
+    hash_map_insert(hm, "loop_depth", buf, NULL);
 }
 
 static void depth_enter(struct hash_map *hm) // increments loop depth

@@ -12,6 +12,13 @@
 #    define PATH_MAX 4096
 #endif /* ! PATH_MAX */
 
+/**
+ * @brief Builds an absolute path
+ *
+ * @param curr the current path, logical PWD
+ * @param path the target path
+ * @return A new string containing the full path or NULL on fail
+ */
 static char *concatenate_path(char *curr, char *path)
 {
     if (path != NULL && path[0] == '/') // already absolute
@@ -29,6 +36,13 @@ static char *concatenate_path(char *curr, char *path)
     return res;
 }
 
+/**
+ * @brief Normalizes a path logically by resolving '.' and '..' components.
+ *
+ * @param path path to normalize.
+ *
+ * @return A new normalized path.
+ */
 static char *normalize_logical(char *path)
 {
     char buff[PATH_MAX];
@@ -76,6 +90,14 @@ static char *normalize_logical(char *path)
     return res;
 }
 
+/**
+ * @brief Resolves the target directory based on the argument provided
+ *
+ * @param arg Argument passed to cd
+ * @param hm environment variables hashmap
+ * @param toprint boolean set to true if path should be printed for 'cd -'
+ * @return target path string or NULL
+ */
 static char *get_target(char *arg, struct hash_map *hm, bool *toprint)
 {
     if (arg == NULL)
@@ -105,6 +127,13 @@ static char *get_target(char *arg, struct hash_map *hm, bool *toprint)
     return arg;
 }
 
+/**
+ * @brief Executes the cd builtin command
+ *
+ * @param argv array of arguments
+ * @param hm environment variables hashmap
+ * @return 0 on success or 1 on failure
+ */
 int builtin_cd(char **argv, struct hash_map *hm)
 {
     if (argv[1] != NULL && argv[2] != NULL)

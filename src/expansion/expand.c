@@ -31,6 +31,11 @@ static void char_append(struct buffer *buff, char c)
     buff->buff[buff->idx++] = c;
 }
 
+/**
+ * @brief Appends a char to a dynamic buffer
+ * @param buff Buffer struct where we append the char
+ * @param c char to append
+ */
 static void str_append(struct buffer *buff, char *str)
 {
     if (!str)
@@ -42,7 +47,10 @@ static void str_append(struct buffer *buff, char *str)
 }
 
 /**
- * Count the number of arguments by iterating, for $#
+ * @brief Count the number of arguments by iterating, for $#
+ *
+ * @param hm Environment variales hashmap
+ * @return a string with the number of arguments 
  */
 static char *dollar_hashtag(struct hash_map *hm)
 {
@@ -61,7 +69,11 @@ static char *dollar_hashtag(struct hash_map *hm)
     sprintf(res, "%d", c);
     return res;
 }
-
+/**
+ * @brief Formats an integer into string
+ * @param n int value
+ * @return new string with the int value
+ */
 static char *format_out(int n)
 {
     char *res = malloc(16);
@@ -72,21 +84,29 @@ static char *format_out(int n)
     sprintf(res, "%d", n);
     return res;
 }
-
+/**
+ * @brief Generate a random value
+ * @return a string with the random value
+ */
 static char *random_value(void)
 {
     static bool seeded = false;
     if (seeded == false)
     {
-        srand(getpid() ^ time(NULL));
+        srand(getpid() ^ time(NULL)); // based on time + pid to have a random val everytime
         seeded = true;
     }
     // 0-32767 range in bash rand
     return format_out(rand() % 32768);
 }
 
-
-static char *dollar_arobase(char *sep, struct hash_map *hm) // Concatenate the arguments
+/**
+ * @brief Concatenate arguments for $@
+ * @param sep Separator string
+ * @param hm Environment variables hashmap
+ * @return a new string with the arguments concatenated
+ */
+static char *dollar_arobase(char *sep, struct hash_map *hm)
 {
     struct buffer buff;
     buff.capacity = 128;
@@ -120,6 +140,11 @@ static char *dollar_arobase(char *sep, struct hash_map *hm) // Concatenate the a
     return buff.buff;
 }
 
+/**
+ * @brief Expand $* following SCL
+ * @param hm Environment variables hashmap
+ * @return new string with concatenated arguments separated
+ */
 static char *dollar_star(struct hash_map *hm)
 {
     char *ifs = hash_map_get(hm,"IFS");
@@ -139,7 +164,10 @@ static char *dollar_star(struct hash_map *hm)
 
 }
 /**
- * Handles special variables or look for them in the hash map
+ * @brief Handles special shell variables or look for them in the hash map
+ * @param hm Environment variables hashmap
+ * @param var_name variable name
+ * @return a new string with the value associated to the key or NULL on failure 
  */
 static char *handle_specials(struct hash_map *hm,
                              char *var_name) // var name = key in hashmap
@@ -209,7 +237,12 @@ static char *handle_specials(struct hash_map *hm,
 }
 
 /**
- * Expand variables $VAR and ${VAR}
+ * @brief Expand variables $VAR and ${VAR}
+ *
+ * @param buff Output buffer
+ * @param index Current parsing index
+ * @param word Input word
+ * @param hm Environment variables hashmap
  */
 static void handle_dollar(struct buffer *buff, size_t *index, char *word,
                           struct hash_map *hm)
@@ -289,8 +322,11 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
 }
 
 /**
- * Expand a list of string
+ * @brief Expand a list of string
  * Go inside every string in argv and expand variables and quotes in each word
+ * @param argv List of arguments
+ * @param hm Environment variables hashmap
+ * @return a new string with expanded arguments
  */
 char **expand_argv(char **argv, struct hash_map *hm)
 {
@@ -311,7 +347,10 @@ char **expand_argv(char **argv, struct hash_map *hm)
 }
 
 /**
- *  Escape handling in double quotes
+ * @brief Escape handling in double quotes
+ * @param buff Output buffer
+ * @param word Input word
+ * @param i current parsing index
  */
 static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 {
@@ -328,9 +367,12 @@ static void handle_escaped(struct buffer *buff, char *word, size_t *i)
 }
 
 /**
- * Expand a word string:
+ * @brief Expand a word string:
  * Single quotes: preserve content
  * Double quotes: var expansions and escape
+ * @param word Input word
+ * @param hm Environment variables hashmap
+ * @return a new expanded string 
  */
 char *expand_word(char *word, struct hash_map *hm)
 {

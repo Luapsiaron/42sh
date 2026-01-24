@@ -1,1 +1,1 @@
-SUBDIRS = str stack parser
+SUBDIRS = str parser

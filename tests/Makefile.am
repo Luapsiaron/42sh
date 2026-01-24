@@ -21,7 +21,6 @@ LIB42SH = \
   $(top_builddir)/src/ast/libast.a \
   $(top_builddir)/src/lexer/liblexer.a \
   $(top_builddir)/src/utils/parser/libpretty_printer.a \
-  $(top_builddir)/src/utils/stack/libstack.a \
   $(top_builddir)/src/utils/str/libstr.a
 
 test_ast_SOURCES = unit/test_ast.c

@@ -6,7 +6,7 @@
 
 #include "../../utils/str/str.h"
 
-struct token *token_new(enum token_type type, const char *value)
+struct token *token_new(enum token_type type, const char *value) // creates a new token
 {
     struct token *t = calloc(1, sizeof(*t));
     if (!t)
@@ -27,7 +27,7 @@ struct token *token_new(enum token_type type, const char *value)
     return t;
 }
 
-void token_free(struct token *t)
+void token_free(struct token *t) // frees a token
 {
     if (!t)
     {
@@ -44,7 +44,7 @@ static const struct reserved_word reserved_words[] = {
     { "do", TOKEN_DO },       { "done", TOKEN_DONE },
 };
 
-int token_is_reserved_word(const char *s, enum token_type *out_type)
+int token_is_reserved_word(const char *s, enum token_type *out_type) // checks if a string is a reserved word
 {
     size_t n = sizeof(reserved_words) / sizeof(reserved_words[0]);
     for (size_t i = 0; i < n; i++)
@@ -103,7 +103,7 @@ static const char *token_type_names[] = {
     [TOKEN_EOF] = "EOF",
 };
 
-const char *token_type_name(enum token_type t)
+const char *token_type_name(enum token_type t) // returns the name of a token type
 {
     if (t < 0 || t >= sizeof(token_type_names) / sizeof(token_type_names[0]))
     {
@@ -115,7 +115,7 @@ const char *token_type_name(enum token_type t)
 /*
     Print a token for debugging purposes
 */
-void token_printer(const struct token *t)
+void token_printer(const struct token *t) // display tokens
 {
     if (!t)
     {

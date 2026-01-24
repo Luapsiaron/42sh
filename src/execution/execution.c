@@ -116,23 +116,32 @@ int exec_ast(struct ast *ast,
     }
 }
 
+static int is_break_status(int st) // checks if status code indicates a break
+{
+    return st >= RET_BREAK_BASE && st < RET_BREAK_BASE + RET_BREAK_MAX;
+}
+
 int exec_list(struct ast *ast,
               struct hash_map *hm) // executes a list of AST nodes sequentially
 {
-    int exit_code = 0;
-    while (ast && ast->type == AST_LIST)
+    int last = 0;
+    struct ast *it = ast;
+
+    while (it && it->type == AST_LIST)
     {
-        if (ast->data.ast_list.child)
-        {
-            exit_code = exec_ast(ast->data.ast_list.child, hm);
-        }
-        if (exit_code == -3)
-        {
-            break;
-        }
-        ast = ast->data.ast_list.next;
+        last = exec_ast(it->data.ast_list.child, hm);
+        if (is_break_status(last))
+            return last;
+        it = it->data.ast_list.next;
     }
-    return exit_code;
+
+    if (it)
+    {
+        last = exec_ast(it, hm);
+        if (is_break_status(last))
+            return last;
+    }
+    return last;
 }
 
 int exec_if(struct ast *ast, struct hash_map *hm) // executes an if AST node
@@ -168,6 +177,7 @@ int exec_cmd(char **argv, struct hash_map *hm) // executes a command, handling
     {
         execvp(argv[0], argv);
         int err = errno; // execvp error
+        fprintf(stderr, "42sh: non existant file");
         if (err == 2)
             _exit(127);
         _exit(126);
@@ -206,7 +216,7 @@ exec_assignments(struct ast *assn,
     }
 }
 
-static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm)
+static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm) // call assignments
 {
     if (!cmd->data.ast_cmd.assignments)
         return 0;
@@ -214,7 +224,7 @@ static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm)
     return 0;
 }
 
-static char **exec_cmd_expand(struct ast *cmd, struct hash_map *hm)
+static char **exec_cmd_expand(struct ast *cmd, struct hash_map *hm) // expand argv
 {
     char **raw = cmd->data.ast_cmd.argv;
     if (!raw || !raw[0])
@@ -223,7 +233,7 @@ static char **exec_cmd_expand(struct ast *cmd, struct hash_map *hm)
 }
 
 static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm,
-                                 char **argv)
+                                 char **argv) // try to execute as function
 {
     const struct sh_function *fn = functions_lookup(argv[0]);
     if (!fn)
@@ -242,7 +252,7 @@ static int exec_cmd_try_function(struct ast *cmd, struct hash_map *hm,
 }
 
 static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm,
-                                char **argv)
+                                char **argv) // run builtin with redirs
 {
     struct saved_fd *saved = NULL;
     if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
@@ -258,7 +268,7 @@ static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm,
     return st;
 }
 
-static int exec_cmd_run_external(struct ast *cmd, char **argv)
+static int exec_cmd_run_external(struct ast *cmd, char **argv) // run external command
 {
     pid_t pid = fork();
     if (pid < 0)
@@ -269,6 +279,7 @@ static int exec_cmd_run_external(struct ast *cmd, char **argv)
         if (apply_redirs(cmd->data.ast_cmd.redirs, &saved) != 0)
             _exit(1);
         execvp(argv[0], argv);
+        fprintf(stderr, "42sh: non existant file");
         _exit(errno == ENOENT ? 127 : 126);
     }
     int st = wait_status(pid);
@@ -328,5 +339,6 @@ int child_exec_command(
         return exec_builtin(argv, hm);
 
     execvp(argv[0], argv);
+    fprintf(stderr, "42sh: non existant file");
     _exit(errno == ENOENT ? 127 : 126);
 }

@@ -1,0 +1,9 @@
+How To compile:
+
+autoreconf -vfi
+./configure
+make
+
+How To run the Testsuite:
+
+BIN_PATH="$(pwd)/src/42sh" COVERAGE="yes" make check

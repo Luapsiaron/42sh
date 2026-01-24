@@ -4,7 +4,7 @@
 #include <sys/types.h>
 
 #include "../expansion/hashmap.h"
-#include "ast/ast.h"
+#include "../ast/ast.h"
 
 int exec_cmd_node(struct ast *cmd, struct hash_map *hm);
 int exec_ast(struct ast *ast, struct hash_map *hm);

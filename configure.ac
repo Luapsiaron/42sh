@@ -22,7 +22,6 @@ AC_CONFIG_FILES([
   src/parser/Makefile
   src/utils/Makefile
   src/utils/str/Makefile
-  src/utils/stack/Makefile
   src/utils/parser/Makefile
   tests/Makefile
 ])

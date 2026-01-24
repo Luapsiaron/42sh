@@ -3,10 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../utils/stack/stack.h"
 #include "lexer_internal.h"
 
-void lexer_init(struct lexer *lx, FILE *input)
+void lexer_init(struct lexer *lx, FILE *input) // initializes the lexer
 {
     lx->input = input;
     lx->current = fgetc(input);
@@ -14,7 +13,7 @@ void lexer_init(struct lexer *lx, FILE *input)
     lx->error = 0;
 }
 
-int lexer_error_occured(const struct lexer *lx)
+int lexer_error_occured(const struct lexer *lx) // checks if an error occurred during lexing
 {
     return lx && lx->error;
 }

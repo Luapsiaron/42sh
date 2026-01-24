@@ -21,7 +21,7 @@ struct input_sel_ctx
     struct hash_map *hm;
 };
 
-static void usage(FILE *out)
+static void usage(FILE *out) // prints usage information
 {
     fprintf(out,
             "usage: 42sh [OPTIONS] [SCRIPT] [ARGUMENTS ...]\n"
@@ -33,7 +33,7 @@ static void usage(FILE *out)
             " PRETTY_PRINT=1   same as --pretty-print\n");
 }
 
-static void error_usage(const char *msg)
+static void error_usage(const char *msg) // prints error message and usage, then exits
 {
     if (msg)
         fprintf(stderr, "42sh: %s\n", msg);
@@ -41,7 +41,7 @@ static void error_usage(const char *msg)
     exit(2);
 }
 
-static int run_stream(FILE *input, int pretty_print, struct hash_map *hm)
+static int run_stream(FILE *input, int pretty_print, struct hash_map *hm) // runs the shell on the given input stream
 {
     int status = 0;
 
@@ -74,7 +74,7 @@ static int run_stream(FILE *input, int pretty_print, struct hash_map *hm)
     return status;
 }
 
-static void init_env_hashmap(struct hash_map *hm, char **envp)
+static void init_env_hashmap(struct hash_map *hm, char **envp) // initializes the environment variables hashmap
 {
     for (int i = 0; envp[i]; i++)
     {
@@ -87,7 +87,7 @@ static void init_env_hashmap(struct hash_map *hm, char **envp)
     }
 }
 
-static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close)
+static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close) // selects the input stream based on command-line arguments
 {
     int remaining = c.argc - optind;
     *must_close = false;
@@ -120,7 +120,7 @@ static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close)
 }
 
 static void init_positional_params(struct hash_map *hm, int argc, char **argv,
-                                   int start_index)
+                                   int start_index) // initializes positional parameters in the hash map
 {
     if (!hm)
         return;
@@ -141,7 +141,7 @@ static void init_positional_params(struct hash_map *hm, int argc, char **argv,
     }
 }
 
-int main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp) // main function, separates the 3 input types
 {
     int opt;
     int pretty_print = 0;

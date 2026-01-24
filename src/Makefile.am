@@ -16,6 +16,5 @@ AM_CPPFLAGS = -I$(top_srcdir)/src
   ast/libast.a \
   lexer/liblexer.a \
   utils/parser/libpretty_printer.a \
-  utils/stack/libstack.a \
   utils/str/libstr.a
 
