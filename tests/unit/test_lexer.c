@@ -117,3 +117,22 @@ Test(lexer, negation_token)
 
     fclose(f);
 }
+/*
+Test(token_printer, reserved_words_and_separators)
+{
+    FILE *f = fmem_from_str("wrong");
+    cr_assert_not_null(f);
+
+    struct lexer lx;
+    lexer_init(&lx, f);
+
+    struct token *t = NULL;
+    token_printer();
+
+    t = lexer_next(&lx);
+    assert_tok(t, UNKNOWN, NULL);
+    token_free(t);
+    token_printer(t);
+
+    fclose(f);
+}*/
