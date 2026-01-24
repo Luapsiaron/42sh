@@ -85,6 +85,59 @@ static char *random_value(void)
     return format_out(rand() % 32768);
 }
 
+
+static char *dollar_arobase(char *sep, struct hash_map *hm) // Concatenate the arguments
+{
+    struct buffer buff;
+    buff.capacity = 128;
+    buff.buff = malloc(buff.capacity);
+    buff.idx = 0;
+    if(buff.buff == NULL)
+    {
+        return NULL;
+    }
+
+    int i = 1; // Go through arguments
+    char key[32];
+    while(true)
+    {
+        sprintf(key, "%d", i);
+        char *val = hash_map_get(hm, key);
+
+        if(val == NULL)
+        {
+            break;
+        }
+        if(i > 1 && sep != NULL)
+        {
+            str_append(&buff, sep);
+        }
+        str_append(&buff, val);
+        i++;
+
+    }
+    char_append(&buff, '\0');
+    return buff.buff;
+}
+
+static char *dollar_star(struct hash_map *hm)
+{
+    char *ifs = hash_map_get(hm,"IFS");
+    char sep[2] = {' ', '\0'}; // 2 because i use str_append in dollar_arobase
+    if(ifs != NULL)
+    {
+        if(ifs[0] == '\0') // Empty IFS
+        {
+            sep[0] = '\0';
+        }
+        else
+        {
+            sep[0] = ifs[0];
+        }
+    }
+    return dollar_arobase(sep, hm);
+
+}
 /**
  * Handles special variables or look for them in the hash map
  */
@@ -105,11 +158,11 @@ static char *handle_specials(struct hash_map *hm,
     }
     if (strcmp(var_name, "*") == 0) // al arguments concatenated
     {
-        return NULL;
+        return dollar_star(hm);
     }
     if (strcmp(var_name, "@") == 0) // all arguments, separated
     {
-        return NULL;
+        return dollar_arobase(" ",hm);
     }
     if (strcmp(var_name, "#") == 0) // ARG NUMBER
     {

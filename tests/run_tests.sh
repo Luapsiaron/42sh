@@ -336,7 +336,7 @@ run_test "script test var \$UID" "./script/variables/var_uid.sh"
 run_test "script test var environment \$OLDPWD" "./script/variables/var_env.sh"
 run_test "script test var environment \$PWD" "./script/variables/var_env2.sh"
 run_test "script test var all in same file" "./script/variables/echo_var_all.sh" 1 2 3
-run_test "Test UID" "echo \$UID"
+run_test "Test Star and IFS" "./script/variables/var_star_ifs.sh" a1 a2 a3
 echo --------
 echo Pipeline
 echo --------
