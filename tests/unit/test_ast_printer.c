@@ -3,7 +3,6 @@
 #include <criterion/redirect.h>
 #include <string.h>
 
-#include "../../src/ast/ast_printer.h"
 #include "../../src/parser/parser.h"
 #include "../../src/utils/parser/pretty_printer.h"
 

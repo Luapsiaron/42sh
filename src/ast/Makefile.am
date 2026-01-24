@@ -10,7 +10,6 @@ libast_a_SOURCES = \
   ast_operators.c \
   ast_redir.c \
   ast_assignment.c \
-  ast_printer.c \
   ast_block.c \
   ast.h \
   ast_printer.h

@@ -51,7 +51,6 @@ run_stream(FILE *input, int pretty_print,
     while (1)
     {
         struct ast *tree = parse_input(input);
-        // ast_printer(tree, 0);
         if (!tree)
         {
             if (parse_error_occurred())
