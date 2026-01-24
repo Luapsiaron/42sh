@@ -293,6 +293,9 @@ run_test "Simple function" "my_func() { echo Hello from function; }; my_func"
 run_test "Function with args" "my_func() { echo Arg1: \$1; echo Arg2: \$2; }; my_func first second"
 run_test "Function within function" "outer_func() { inner_func() { echo Inner; }; echo Outer; inner_func; }; outer_func"
 run_test "Function exit code" "my_func() { false; }; my_func; echo \$?"
+run_test "Function with if" "my_func() { if ! true; then echo In func; fi; }; my_func"
+run_test "Function with loop" "my_func() { for i in 1 2 3; do echo Func loop \$i; done; }; my_func"
+run_test "Function with redirection" "my_func() { echo Hello > /tmp/test_func_redir.txt; }; my_func; cat /tmp/test_func_redir.txt"
 run_test "implicit_args" 'for i; do echo "Arg: $i"; done' 1 2 3
 echo
 echo --------

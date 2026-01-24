@@ -114,8 +114,7 @@ static struct ast *ast_dup(struct ast *n) // duplicates an AST node recursively
     return NULL;
 }
 
-static struct sh_function *
-find_func(const char *name) // finds a function by name
+static struct sh_function *find_func(const char *name) // finds a function by name
 {
     for (struct sh_function *it = g_funcs; it; it = it->next)
         if (strcmp(it->name, name) == 0)
@@ -152,27 +151,12 @@ int functions_register(const struct ast *funcdec) // registers a new function
     return 0;
 }
 
-const struct sh_function *
-functions_lookup(const char *name) // looks up a function by name
+const struct sh_function *functions_lookup(const char *name) // looks up a function by name
 {
     return find_func(name);
 }
 
-void functions_free_all(void) // frees all registered functions
-{
-    while (g_funcs)
-    {
-        struct sh_function *nx = g_funcs->next;
-        free(g_funcs->name);
-        ast_free(g_funcs->body);
-        ast_free(g_funcs->redirs);
-        free(g_funcs);
-        g_funcs = nx;
-    }
-}
-
-static void
-pos_clear(struct hash_map *hm) // clears positional parameters from the hash map
+static void pos_clear(struct hash_map *hm) // clears positional parameters from the hash map
 {
     for (int i = 1;; i++)
     {
@@ -184,8 +168,7 @@ pos_clear(struct hash_map *hm) // clears positional parameters from the hash map
     }
 }
 
-static char **
-pos_save(struct hash_map *hm) // saves positional parameters from the hash map
+static char **pos_save(struct hash_map *hm) // saves positional parameters from the hash map
 {
     int n = 0;
     char k[16];
@@ -205,8 +188,7 @@ pos_save(struct hash_map *hm) // saves positional parameters from the hash map
     return old;
 }
 
-static void
-pos_restore(struct hash_map *hm,
+static void pos_restore(struct hash_map *hm,
             char **old) // restores positional parameters to the hash map
 {
     pos_clear(hm);
