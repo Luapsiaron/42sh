@@ -8,7 +8,8 @@
 
 static char *io_buf = NULL;
 
-FILE *io_string_to_file(const char *string) // creates a temporary file from a string
+FILE *
+io_string_to_file(const char *string) // creates a temporary file from a string
 {
     if (!string)
         return NULL;

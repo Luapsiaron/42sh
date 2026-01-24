@@ -15,7 +15,8 @@ void skip_blanks(struct lexer *lx) // skip whitespace characters
     }
 }
 
-int lexer_peek_char(struct lexer *lx) // peek at next character without consuming it
+int lexer_peek_char(
+    struct lexer *lx) // peek at next character without consuming it
 {
     int c = fgetc(lx->input);
     if (c != EOF)

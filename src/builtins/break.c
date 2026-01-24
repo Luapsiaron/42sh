@@ -15,7 +15,7 @@ static int argv_len(char **argv)
     return n;
 }
 
-static int parse_n(const char *s, int *out) // parse 
+static int parse_n(const char *s, int *out) // parse
 {
     char *end = NULL;
     long v = strtol(s, &end, 10);
@@ -47,7 +47,9 @@ int builtin_break(char **argv, struct hash_map *hm)
 
     int n = 1;
     if (argc >= 2 && parse_n(argv[1], &n) != 0)
-        return fprintf(stderr, "break: %s: numeric argument required\n", argv[1]), 2;
+        return fprintf(stderr, "break: %s: numeric argument required\n",
+                       argv[1]),
+               2;
     if (argc >= 3)
         return fprintf(stderr, "break: too many arguments\n"), 2;
 

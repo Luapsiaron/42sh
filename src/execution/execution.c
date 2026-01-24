@@ -216,7 +216,8 @@ exec_assignments(struct ast *assn,
     }
 }
 
-static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm) // call assignments
+static int exec_cmd_apply_assign(struct ast *cmd,
+                                 struct hash_map *hm) // call assignments
 {
     if (!cmd->data.ast_cmd.assignments)
         return 0;
@@ -224,7 +225,8 @@ static int exec_cmd_apply_assign(struct ast *cmd, struct hash_map *hm) // call a
     return 0;
 }
 
-static char **exec_cmd_expand(struct ast *cmd, struct hash_map *hm) // expand argv
+static char **exec_cmd_expand(struct ast *cmd,
+                              struct hash_map *hm) // expand argv
 {
     char **raw = cmd->data.ast_cmd.argv;
     if (!raw || !raw[0])
@@ -268,7 +270,8 @@ static int exec_cmd_run_builtin(struct ast *cmd, struct hash_map *hm,
     return st;
 }
 
-static int exec_cmd_run_external(struct ast *cmd, char **argv) // run external command
+static int exec_cmd_run_external(struct ast *cmd,
+                                 char **argv) // run external command
 {
     pid_t pid = fork();
     if (pid < 0)

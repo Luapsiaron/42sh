@@ -33,7 +33,8 @@ static void usage(FILE *out) // prints usage information
             " PRETTY_PRINT=1   same as --pretty-print\n");
 }
 
-static void error_usage(const char *msg) // prints error message and usage, then exits
+static void
+error_usage(const char *msg) // prints error message and usage, then exits
 {
     if (msg)
         fprintf(stderr, "42sh: %s\n", msg);
@@ -41,7 +42,9 @@ static void error_usage(const char *msg) // prints error message and usage, then
     exit(2);
 }
 
-static int run_stream(FILE *input, int pretty_print, struct hash_map *hm) // runs the shell on the given input stream
+static int
+run_stream(FILE *input, int pretty_print,
+           struct hash_map *hm) // runs the shell on the given input stream
 {
     int status = 0;
 
@@ -74,7 +77,9 @@ static int run_stream(FILE *input, int pretty_print, struct hash_map *hm) // run
     return status;
 }
 
-static void init_env_hashmap(struct hash_map *hm, char **envp) // initializes the environment variables hashmap
+static void
+init_env_hashmap(struct hash_map *hm,
+                 char **envp) // initializes the environment variables hashmap
 {
     for (int i = 0; envp[i]; i++)
     {
@@ -87,7 +92,10 @@ static void init_env_hashmap(struct hash_map *hm, char **envp) // initializes th
     }
 }
 
-static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close) // selects the input stream based on command-line arguments
+static FILE *select_input_stream(
+    struct input_sel_ctx c,
+    bool
+        *must_close) // selects the input stream based on command-line arguments
 {
     int remaining = c.argc - optind;
     *must_close = false;
@@ -119,8 +127,9 @@ static FILE *select_input_stream(struct input_sel_ctx c, bool *must_close) // se
     return stdin;
 }
 
-static void init_positional_params(struct hash_map *hm, int argc, char **argv,
-                                   int start_index) // initializes positional parameters in the hash map
+static void init_positional_params(
+    struct hash_map *hm, int argc, char **argv,
+    int start_index) // initializes positional parameters in the hash map
 {
     if (!hm)
         return;
@@ -141,7 +150,8 @@ static void init_positional_params(struct hash_map *hm, int argc, char **argv,
     }
 }
 
-int main(int argc, char **argv, char **envp) // main function, separates the 3 input types
+int main(int argc, char **argv,
+         char **envp) // main function, separates the 3 input types
 {
     int opt;
     int pretty_print = 0;

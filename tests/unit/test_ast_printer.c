@@ -4,8 +4,8 @@
 #include <string.h>
 
 #include "../../src/ast/ast_printer.h"
-#include "../../src/utils/parser/pretty_printer.h"
 #include "../../src/parser/parser.h"
+#include "../../src/utils/parser/pretty_printer.h"
 
 static FILE *fmem_from_str(const char *s)
 {
@@ -32,13 +32,17 @@ Test(ast_printer, simple_command, .init = redirect_all_stdout)
 
 Test(ast_printer, if_elif_command, .init = redirect_all_stdout)
 {
-    FILE *f = fmem_from_str("if echo cmd; then false; elif echo oui; then test; else true; fi");
+    FILE *f = fmem_from_str(
+        "if echo cmd; then false; elif echo oui; then test; else true; fi");
     struct ast *ast = parse_input(f);
 
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("if { command \"echo\" \"cmd\" }; then { command \"false\" }; elif { command \"echo\" \"oui\" }; then { command \"test\" }; else { command \"true\" }; fi\n");
+    cr_assert_stdout_eq_str(
+        "if { command \"echo\" \"cmd\" }; then { command \"false\" }; elif { "
+        "command \"echo\" \"oui\" }; then { command \"test\" }; else { command "
+        "\"true\" }; fi\n");
 
     ast_free(ast);
 }
@@ -51,7 +55,9 @@ Test(ast_printer, pipe, .init = redirect_all_stdout)
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("and_or { pipeline { command \"echo\" \"oui\" | command \"echo\" \"non\" } || command \"echo\" \"abc\" }\n");
+    cr_assert_stdout_eq_str(
+        "and_or { pipeline { command \"echo\" \"oui\" | command \"echo\" "
+        "\"non\" } || command \"echo\" \"abc\" }\n");
 
     ast_free(ast);
 }
@@ -64,7 +70,8 @@ Test(ast_printer, and, .init = redirect_all_stdout)
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("and_or { command \"echo\" \"oui\" \"&\" \"echo\" \"non\" && command \"echo\" \"abc\" }\n");
+    cr_assert_stdout_eq_str("and_or { command \"echo\" \"oui\" \"&\" \"echo\" "
+                            "\"non\" && command \"echo\" \"abc\" }\n");
 
     ast_free(ast);
 }
@@ -77,7 +84,8 @@ Test(ast_printer, while_loop, .init = redirect_all_stdout)
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("while { command \"true\" }; do { command \"echo\" \"INFINIT\" }; done \n");
+    cr_assert_stdout_eq_str("while { command \"true\" }; do { command \"echo\" "
+                            "\"INFINIT\" }; done \n");
 
     ast_free(ast);
 }
@@ -90,20 +98,25 @@ Test(ast_printer, until_loop, .init = redirect_all_stdout)
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("until { command \"true\" }; do { command \"echo\" \"INFINIT\" }; done \n");
+    cr_assert_stdout_eq_str("until { command \"true\" }; do { command \"echo\" "
+                            "\"INFINIT\" }; done \n");
 
     ast_free(ast);
 }
 
 Test(ast_printer, for_loop, .init = redirect_all_stdout)
 {
-    FILE *f = fmem_from_str("for true; do echo INFINIT; done; for true in false; do echo INFINIT; done");
+    FILE *f = fmem_from_str("for true; do echo INFINIT; done; for true in "
+                            "false; do echo INFINIT; done");
     struct ast *ast = parse_input(f);
 
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("for command \"true\"; do { command \"echo\" \"INFINIT\" }; done ; for command \"true\" in command \"false\"; do { command \"echo\" \"INFINIT\" }; done \n");
+    cr_assert_stdout_eq_str(
+        "for command \"true\"; do { command \"echo\" \"INFINIT\" }; done ; for "
+        "command \"true\" in command \"false\"; do { command \"echo\" "
+        "\"INFINIT\" }; done \n");
 
     ast_free(ast);
 }
@@ -121,16 +134,19 @@ Test(ast_printer, negation, .init = redirect_all_stdout)
     ast_free(ast);
 }
 
-
 Test(ast_printer, func, .init = redirect_all_stdout)
 {
-    FILE *f = fmem_from_str("my_func() { echo Arg1: $1; echo Arg2: $2; }; my_func first second");
+    FILE *f = fmem_from_str(
+        "my_func() { echo Arg1: $1; echo Arg2: $2; }; my_func first second");
     struct ast *ast = parse_input(f);
 
     cr_assert_not_null(ast);
     ast_pretty_print(ast, stdout);
     fflush(stdout);
-    cr_assert_stdout_eq_str("funcdec \"my_func\" () block { command \"echo\" \"Arg1:\" \"$1\"; command \"echo\" \"Arg2:\" \"$2\" }; command \"my_func\" \"first\" \"second\"\n");
+    cr_assert_stdout_eq_str(
+        "funcdec \"my_func\" () block { command \"echo\" \"Arg1:\" \"$1\"; "
+        "command \"echo\" \"Arg2:\" \"$2\" }; command \"my_func\" \"first\" "
+        "\"second\"\n");
 
     ast_free(ast);
 }

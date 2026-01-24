@@ -50,7 +50,7 @@ static void str_append(struct buffer *buff, char *str)
  * @brief Count the number of arguments by iterating, for $#
  *
  * @param hm Environment variales hashmap
- * @return a string with the number of arguments 
+ * @return a string with the number of arguments
  */
 static char *dollar_hashtag(struct hash_map *hm)
 {
@@ -93,7 +93,9 @@ static char *random_value(void)
     static bool seeded = false;
     if (seeded == false)
     {
-        srand(getpid() ^ time(NULL)); // based on time + pid to have a random val everytime
+        srand(
+            getpid()
+            ^ time(NULL)); // based on time + pid to have a random val everytime
         seeded = true;
     }
     // 0-32767 range in bash rand
@@ -112,29 +114,28 @@ static char *dollar_arobase(char *sep, struct hash_map *hm)
     buff.capacity = 128;
     buff.buff = malloc(buff.capacity);
     buff.idx = 0;
-    if(buff.buff == NULL)
+    if (buff.buff == NULL)
     {
         return NULL;
     }
 
     int i = 1; // Go through arguments
     char key[32];
-    while(true)
+    while (true)
     {
         sprintf(key, "%d", i);
         char *val = hash_map_get(hm, key);
 
-        if(val == NULL)
+        if (val == NULL)
         {
             break;
         }
-        if(i > 1 && sep != NULL)
+        if (i > 1 && sep != NULL)
         {
             str_append(&buff, sep);
         }
         str_append(&buff, val);
         i++;
-
     }
     char_append(&buff, '\0');
     return buff.buff;
@@ -147,11 +148,11 @@ static char *dollar_arobase(char *sep, struct hash_map *hm)
  */
 static char *dollar_star(struct hash_map *hm)
 {
-    char *ifs = hash_map_get(hm,"IFS");
-    char sep[2] = {' ', '\0'}; // 2 because i use str_append in dollar_arobase
-    if(ifs != NULL)
+    char *ifs = hash_map_get(hm, "IFS");
+    char sep[2] = { ' ', '\0' }; // 2 because i use str_append in dollar_arobase
+    if (ifs != NULL)
     {
-        if(ifs[0] == '\0') // Empty IFS
+        if (ifs[0] == '\0') // Empty IFS
         {
             sep[0] = '\0';
         }
@@ -161,13 +162,12 @@ static char *dollar_star(struct hash_map *hm)
         }
     }
     return dollar_arobase(sep, hm);
-
 }
 /**
  * @brief Handles special shell variables or look for them in the hash map
  * @param hm Environment variables hashmap
  * @param var_name variable name
- * @return a new string with the value associated to the key or NULL on failure 
+ * @return a new string with the value associated to the key or NULL on failure
  */
 static char *handle_specials(struct hash_map *hm,
                              char *var_name) // var name = key in hashmap
@@ -190,7 +190,7 @@ static char *handle_specials(struct hash_map *hm,
     }
     if (strcmp(var_name, "@") == 0) // all arguments, separated
     {
-        return dollar_arobase(" ",hm);
+        return dollar_arobase(" ", hm);
     }
     if (strcmp(var_name, "#") == 0) // ARG NUMBER
     {
@@ -372,7 +372,7 @@ static void handle_escaped(struct buffer *buff, char *word, size_t *i)
  * Double quotes: var expansions and escape
  * @param word Input word
  * @param hm Environment variables hashmap
- * @return a new expanded string 
+ * @return a new expanded string
  */
 char *expand_word(char *word, struct hash_map *hm)
 {
