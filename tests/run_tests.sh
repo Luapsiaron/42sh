@@ -313,6 +313,13 @@ run_test "break in while loop" "while true; do break; done"
 run_test "break with level 2 in nested loops" "for i in 1 2 3; do echo outer; for j in a b c; do echo inner; break 2; done; echo after inner; done; echo after outer"
 run_test "positional -c args" \
   'echo "0:$0 1:$1 2:$2"' first second
+echo --------------------
+echo Command Substitution
+echo --------------------
+run_test "cmdsub backquotes simple" 'echo `echo ok`'
+run_test "cmdsub simple" 'echo $(echo ok)'
+run_test "cmdsub nested" 'echo $(echo $(echo nested))'
+run_test "cmdsub with quotes" 'A=$(echo "quoted value"); echo "$A'
 
 echo ================= RUN SCRIPT ===================
 run_test "non existant" "./nothere.sh"
