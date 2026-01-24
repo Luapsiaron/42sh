@@ -148,7 +148,6 @@ run_unit()
   fi
 }
 
-
 echo ================= RUN STRING ===================
 echo ---------------
 echo Simple commands
@@ -178,6 +177,7 @@ run_test "Cd Home diff" "HOME=/tmp cd; pwd"
 run_test "Cd home" "cd ; pwd"
 run_test "cd //" "cd //; pwd"
 run_test "cd PWD" "cd /tmp; echo \$PWD; cd /; echo \$PWD"
+./../src/42sh -c "test" --pretty-print > /dev/null
 echo -------------
 echo Lists and ifs
 echo -------------
@@ -216,6 +216,7 @@ run_test "Expand concat" "A=12; echo q\$Aw"
 run_test "True Exit code" "true; echo \$?"
 run_test "False Exit code" "false; echo \$?"
 run_test "Var in quotes" "Thibaut=Audrey; echo \"\$Thibaut OUI\""
+./../src/42sh -b "test" "aa" > /dev/null
 run_test "Empty var in quotes" "A=; echo \"\$A\""
 run_test "Var stuck in quotes" "A=1; echo \"\$A\"'test'"
 run_test "Variable not defined" "echo [\$PASLA]"
@@ -307,7 +308,11 @@ echo -----
 run_test "break in for loop" "for i in 1 2 3 4 5; do echo aa; break; done"
 run_test "break in while loop" "while true; do break; done"
 run_test "break with level 2 in nested loops" "for i in 1 2 3; do echo outer; for j in a b c; do echo inner; break 2; done; echo after inner; done; echo after outer"
+run_test "positional -c args" \
+  'echo "0:$0 1:$1 2:$2"' first second
+
 echo ================= RUN SCRIPT ===================
+run_test "non existant" "./nothere.sh"
 echo --
 echo If
 echo --

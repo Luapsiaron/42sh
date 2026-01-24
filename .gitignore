@@ -97,3 +97,4 @@ tests/test_parser
 tests/test_lexer
 tests/test_builtins
 tests/test_execution
+tests/test_ast_printer

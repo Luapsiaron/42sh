@@ -126,29 +126,6 @@ static FILE *select_input_stream(
     return stdin;
 }
 
-static void init_positional_params(
-    struct hash_map *hm, int argc, char **argv,
-    int start_index) // initializes positional parameters in the hash map
-{
-    if (!hm)
-        return;
-    if (argv && argv[0])
-        hash_map_insert(hm, "0", argv[0], NULL);
-
-    if (start_index < 0)
-        start_index = 0;
-    if (!argv || start_index >= argc)
-        return;
-
-    int pos = 1;
-    for (int i = start_index; i < argc; i++, pos++)
-    {
-        char key[16];
-        snprintf(key, sizeof(key), "%d", pos);
-        hash_map_insert(hm, key, argv[i], NULL);
-    }
-}
-
 int main(int argc, char **argv,
          char **envp) // main function, separates the 3 input types
 {
@@ -178,15 +155,6 @@ int main(int argc, char **argv,
             error_usage("option -c requires an argument");
         else
             error_usage("invalid option");
-    if (command != NULL)
-    {
-        init_positional_params(hm, argc, argv, optind);
-    }
-    else if (argc - optind >= 1)
-    {
-        init_positional_params(hm, argc, argv, optind + 1);
-    }
-
     bool must_close = false;
     struct input_sel_ctx c = { argc, argv, command, hm };
     FILE *input = select_input_stream(c, &must_close);
