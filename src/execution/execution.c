@@ -157,34 +157,6 @@ int exec_if(struct ast *ast, struct hash_map *hm) // executes an if AST node
     return 0; // false condition and no else, should continue
 }
 
-int exec_cmd(char **argv, struct hash_map *hm) // executes a command, handling
-                                               // builtins and external commands
-{
-    if (!argv || !argv[0])
-        return 0;
-
-    if (is_builtin(argv[0]))
-        return exec_builtin(argv, hm);
-
-    pid_t pid = fork();
-    if (pid < 0)
-    {
-        fprintf(stderr, "err: fork FAILED\n");
-        return 1;
-    }
-
-    if (pid == 0)
-    {
-        execvp(argv[0], argv);
-        int err = errno; // execvp error
-        fprintf(stderr, "42sh: non existant file");
-        if (err == 2)
-            _exit(127);
-        _exit(126);
-    }
-    return wait_status(pid);
-}
-
 static void
 exec_assignments(struct ast *assn,
                  struct hash_map *hm) // executes variable assignments
