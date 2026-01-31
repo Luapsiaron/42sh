@@ -95,7 +95,7 @@ static char *random_value(void)
     {
         srand(
             getpid()
-            ^ time(NULL)); // based on time + pid to have a random val everytime
+            ^ time(NULL)); // time + pid to have a random val everytime
         seeded = true;
     }
     // 0-32767 range in bash rand

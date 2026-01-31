@@ -321,6 +321,19 @@ run_test "cmdsub simple" 'echo $(echo ok)'
 run_test "cmdsub nested" 'echo $(echo $(echo nested))'
 run_test "cmdsub with quotes" 'A=$(echo "quoted value"); echo "$A'
 
+echo --------------------
+echo Command Blocks
+echo --------------------
+run_test "Simple block" "{ echo a ; echo b; }"
+run_test "Block with expand" "var=coco; { var=thibaut; }; echo \$var"
+run_test "Block redir output" "{ echo line1; echo line2; } > /tmp/block_out.txt; cat  /tmp/block_out.txt"
+run_test "Block nested" "{ { echo in; }; echo out; }"
+run_test "block in if" "if true; then { echo in; }; fi"
+run_test "block pipe" "{ echo a; echo b; } | ls -la"
+run_test "Block env var" "VAR=foo; { echo \$VAR; }"
+
+
+
 echo ================= RUN SCRIPT ===================
 run_test "non existant" "./nothere.sh"
 echo --

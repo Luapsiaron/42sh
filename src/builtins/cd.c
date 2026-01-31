@@ -91,7 +91,7 @@ static char *normalize_logical(char *path)
 }
 
 /**
- * @brief Resolves the target directory based on the argument provided
+ * @brief Resolves the target directory with the argument provided
  *
  * @param arg Argument passed to cd
  * @param hm environment variables hashmap
