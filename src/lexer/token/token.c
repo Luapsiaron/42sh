@@ -106,8 +106,7 @@ static const char *token_type_names[] = {
     [TOKEN_EOF] = "EOF",
 };
 
-const char *
-token_type_name(enum token_type t) // returns name of token type
+const char *token_type_name(enum token_type t) // returns name of token type
 {
     if (t < 0 || t >= sizeof(token_type_names) / sizeof(token_type_names[0]))
     {

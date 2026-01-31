@@ -31,7 +31,7 @@ static void char_append(struct buffer *buff, char c)
     buff->buff[buff->idx++] = c;
 }
 
-/** 
+/**
  ** Append string to buffer
  */
 static void str_append(struct buffer *buff, char *str)
@@ -91,9 +91,8 @@ static char *random_value(void)
     static bool seeded = false;
     if (seeded == false)
     {
-        srand(
-            getpid()
-            ^ time(NULL)); // time + pid to have a random val everytime
+        srand(getpid()
+              ^ time(NULL)); // time + pid to have a random val everytime
         seeded = true;
     }
     // 0-32767 range in bash rand

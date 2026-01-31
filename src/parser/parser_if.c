@@ -180,7 +180,7 @@ static struct ast *parse_else(struct parser *p)
 
 /*
 ** handle optional 'elif' and 'else' blocks
-** Free condition/then_body on err 
+** Free condition/then_body on err
 */
 static int parse_elif_else_body(struct parser *p, struct elif_else_body *body,
                                 struct ast *condition, struct ast *then_body)

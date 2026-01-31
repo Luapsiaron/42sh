@@ -93,8 +93,7 @@ init_env_hashmap(struct hash_map *hm,
 
 static FILE *select_input_stream(
     struct input_sel_ctx c,
-    bool
-        *must_close) // select input stream with command-line args
+    bool *must_close) // select input stream with command-line args
 {
     int remaining = c.argc - optind;
     *must_close = false;
