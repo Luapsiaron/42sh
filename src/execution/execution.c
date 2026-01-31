@@ -80,7 +80,7 @@ int wait_status(
 static int exec_redirwrap(struct ast *ast, struct hash_map *hm)
 {
     struct saved_fd *saved = NULL;
-    if(apply_redirs(ast->data.ast_redirwrap.redirections, &saved) != 0)
+    if (apply_redirs(ast->data.ast_redirwrap.redirections, &saved) != 0)
     {
         restore_fds(saved);
         return 1;
@@ -93,7 +93,7 @@ static int exec_redirwrap(struct ast *ast, struct hash_map *hm)
 }
 
 int exec_ast(struct ast *ast,
-             struct hash_map *hm) // executes an AST node based on its type
+             struct hash_map *hm) // executes an AST node with type
 {
     if (!ast)
         return 2;
@@ -126,7 +126,7 @@ int exec_ast(struct ast *ast,
     case AST_BLOCK:
         return exec_ast(ast->data.ast_block.body, hm);
     case AST_REDIRWRAP:
-        return exec_redirwrap(ast,hm);
+        return exec_redirwrap(ast, hm);
     default:
         fprintf(stderr, "Ast Type Not supported: %d\n", ast->type);
         return 2;

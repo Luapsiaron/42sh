@@ -36,7 +36,7 @@ struct elif_else_body
 static struct ast *parse_elif_command(struct parser *p);
 
 /*
-    Helper function to check if a token is a stop token
+    Check if token is stop token
     Exemple: end_token = {TOKEN8_FI, TOKEN_ELSE, TOKEN_ELIF}, end_token_count =
    3 is_stop_token(TOKEN_ELSE, end_token, end_token_count) -> 1
     is_stop_token(TOKEN_THEN, end_token, end_token_count) -> 0
@@ -56,9 +56,9 @@ static int is_stop_token(enum token_type token,
 }
 
 /*
-    Helper function to expect a specific token
-    If the next token matches the expected token, it pops it and returns 1
-    Otherwise, it returns 0
+    Expect specific token
+    If next token matches expected token, pop and return 1
+    Otherwise, 0
     Used to simplify token expectation checks in the IF grammar parsing
 */
 static int expect_token(struct parser *p, enum token_type expected)
@@ -81,8 +81,7 @@ struct ast *parse_compound_list(struct parser *p,
 {
     skip_newlines(p);
 
-    /* Check if we've reached an end token or EOF (Means invalid condition like
-     * 'if then')*/
+    /* Handle empty body (ex:'if then')*/
     if (is_stop_token(peek(p), end_token, end_token_count)
         || peek(p) == TOKEN_EOF)
     {
@@ -180,13 +179,8 @@ static struct ast *parse_else(struct parser *p)
 }
 
 /*
-    Parse the elif and else bodies of the if statement
-    After parsing the then body, this function checks for the presence of elif
-   and else parts
-    - If an elif is found, it parses it and assigns it to body->elif_body
-    - If an else is found, it parses it and assigns it to body->else_body
-    If any parsing fails, it frees the previously allocated AST nodes and
-   returns 0
+** handle optional 'elif' and 'else' blocks
+** Free condition/then_body on err 
 */
 static int parse_elif_else_body(struct parser *p, struct elif_else_body *body,
                                 struct ast *condition, struct ast *then_body)
@@ -278,15 +272,8 @@ static struct ast *parse_elif_command(struct parser *p)
 }
 
 /*
-    Parse an if statement
-    - Consumes the initial TOKEN_IF
-    - Parses the condition part until TOKEN_THEN
-    - Expects and consumes TOKEN_THEN
-    - Parses the then body until TOKEN_FI, TOKEN_ELSE, or TOKEN_ELIF
-    - Parses any elif and else bodies
-    - Expects and consumes TOKEN_FI
-    - Constructs and returns the AST node for the if statement
-    - On any error, frees allocated AST nodes and returns NULL
+** Main entry for 'if' rule grammar
+** Expect: IF condition THEN body [ELIF/ELSE body] FI
 */
 struct ast *parse_if(struct parser *p)
 {

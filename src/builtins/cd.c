@@ -21,7 +21,7 @@
  */
 static char *concatenate_path(char *curr, char *path)
 {
-    if (path != NULL && path[0] == '/') // already absolute
+    if (path != NULL && path[0] == '/') // if absolute, copy
     {
         return xstrdup(path);
     }
@@ -149,7 +149,7 @@ int builtin_cd(char **argv, struct hash_map *hm)
     }
 
     char *raw = hash_map_get(hm, "PWD"); // logical
-    char *curpath = xstrdup(raw); // dup not to modify hashmap data
+    char *curpath = xstrdup(raw); // dup not to modify hashmap
 
     char *logical = concatenate_path(curpath, target);
     char *symlink_path = normalize_logical(logical);
@@ -177,7 +177,7 @@ int builtin_cd(char **argv, struct hash_map *hm)
         }
     }
 
-    hash_map_insert(hm, "OLDPWD", curpath, NULL); // set OLDPWD to old PWD
+    hash_map_insert(hm, "OLDPWD", curpath, NULL);
     hash_map_insert(hm, "PWD", symlink_path, NULL);
 
     if (toprint)

@@ -17,7 +17,7 @@
 int last_exit_code = 0;
 
 /**
- * Push char, realloc if needed
+ * Append char, realloc if needed
  */
 static void char_append(struct buffer *buff, char c)
 {
@@ -31,10 +31,8 @@ static void char_append(struct buffer *buff, char c)
     buff->buff[buff->idx++] = c;
 }
 
-/**
- * @brief Appends a char to a dynamic buffer
- * @param buff Buffer struct where we append the char
- * @param c char to append
+/** 
+ ** Append string to buffer
  */
 static void str_append(struct buffer *buff, char *str)
 {
@@ -72,7 +70,7 @@ static char *dollar_hashtag(struct hash_map *hm)
 /**
  * @brief Formats an integer into string
  * @param n int value
- * @return new string with the int value
+ * @return new string with int value
  */
 static char *format_out(int n)
 {
@@ -86,7 +84,7 @@ static char *format_out(int n)
 }
 /**
  * @brief Generate a random value
- * @return a string with the random value
+ * @return string with random value
  */
 static char *random_value(void)
 {
@@ -106,7 +104,7 @@ static char *random_value(void)
  * @brief Concatenate arguments for $@
  * @param sep Separator string
  * @param hm Environment variables hashmap
- * @return a new string with the arguments concatenated
+ * @return new string with the arguments concatenated
  */
 static char *dollar_arobase(char *sep, struct hash_map *hm)
 {
@@ -164,10 +162,10 @@ static char *dollar_star(struct hash_map *hm)
     return dollar_arobase(sep, hm);
 }
 /**
- * @brief Handles special shell variables or look for them in the hash map
+ * @brief Handles special shell variables or look for them in hash map
  * @param hm Environment variables hashmap
  * @param var_name variable name
- * @return a new string with the value associated to the key or NULL on failure
+ * @return new string with value associated to key
  */
 static char *handle_specials(struct hash_map *hm,
                              char *var_name) // var name = key in hashmap
@@ -200,7 +198,7 @@ static char *handle_specials(struct hash_map *hm,
     {
         return format_out(getuid());
     }
-    if (strcmp(var_name, "IFS") == 0) // Internal Field Separator
+    if (strcmp(var_name, "IFS") == 0) // IFS
     {
         char *val = hash_map_get(hm, "IFS");
         if (val != NULL)
@@ -209,7 +207,7 @@ static char *handle_specials(struct hash_map *hm,
         }
         return xstrdup("");
     }
-    if (strcmp(var_name, "PWD") == 0) // PWD - working directory
+    if (strcmp(var_name, "PWD") == 0) // PWD
     {
         char *val = hash_map_get(hm, "PWD");
         if (val)
@@ -304,7 +302,7 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
         (*index)--; // Expand word func do i++, so one too far
     }
 
-    // Get value and add it to the buffer
+    // Get value -> add it to buffer
     if (var_name != NULL)
     {
         char *value = handle_specials(hm, var_name);
@@ -323,10 +321,10 @@ static void handle_dollar(struct buffer *buff, size_t *index, char *word,
 
 /**
  * @brief Expand a list of string
- * Go inside every string in argv and expand variables and quotes in each word
+ * Go inside every argv and expand variables and quotes in each word
  * @param argv List of arguments
  * @param hm Environment variables hashmap
- * @return a new string with expanded arguments
+ * @return new string with expanded arguments
  */
 char **expand_argv(char **argv, struct hash_map *hm)
 {
@@ -372,7 +370,7 @@ static void handle_escaped(struct buffer *buff, char *word, size_t *i)
  * Double quotes: var expansions and escape
  * @param word Input word
  * @param hm Environment variables hashmap
- * @return a new expanded string
+ * @return new expanded string
  */
 char *expand_word(char *word, struct hash_map *hm)
 {

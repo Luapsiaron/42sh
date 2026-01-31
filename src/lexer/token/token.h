@@ -64,9 +64,9 @@ struct reserved_word
     enum token_type type;
 };
 
-// Allocate and initialize a new token
+// Allocate and initialize new token
 // type: type of the token
-// value: lexeme of the token (Word copied with strdup or NULL)
+// value: lexeme of token (Word copied with strdup or NULL)
 // The token must be free with token_free() at the end
 struct token *token_new(enum token_type type, const char *value);
 
@@ -76,7 +76,7 @@ void token_free(struct token *t);
 // Use for debugging
 const char *token_type_name(enum token_type t);
 
-// Check if it corresponds to a shell reserved word (If, else, etc.)
+// Check if corresponds to shell reserved word (If, else, etc.)
 // s: input string
 // out: output token type if s is a reserverd word
 // Return bool if s is a reserved word or not

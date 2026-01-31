@@ -94,14 +94,14 @@ init_env_hashmap(struct hash_map *hm,
 static FILE *select_input_stream(
     struct input_sel_ctx c,
     bool
-        *must_close) // selects the input stream based on command-line arguments
+        *must_close) // select input stream with command-line args
 {
     int remaining = c.argc - optind;
     *must_close = false;
 
     if (c.command != NULL)
     {
-        // With -c, the remaining operands are positional parameters ($1..$n).
+        // With -c, remaining operands are positional parameters (ex: $1..$n).
         FILE *in = io_string_to_file(c.command);
         if (!in)
             error_usage("failed to open script string");
