@@ -1,9 +1,644 @@
-How To compile:
+<div id="top">
+
+<!-- HEADER STYLE: CLASSIC -->
+<div align="center">
+
+<img src="Epita.png" width="30%" style="position: relative; top: 0; right: 0;" alt="Project Logo"/>
+
+
+# 42SH
+
+<!-- BADGES -->
+<img src="https://img.shields.io/github/license/Luapsiaron/42sh?style=flat&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
+<img src="https://img.shields.io/github/last-commit/Luapsiaron/42sh?style=flat&logo=git&logoColor=white&color=0080ff" alt="last-commit">
+<img src="https://img.shields.io/github/languages/top/Luapsiaron/42sh?style=flat&color=0080ff" alt="repo-top-language">
+<img src="https://img.shields.io/github/languages/count/Luapsiaron/42sh?style=flat&color=0080ff" alt="repo-language-count">
+
+<em>Built with the tools and technologies:</em>
+
+<img src="https://img.shields.io/badge/ReadMe-018EF5.svg?style=flat&logo=ReadMe&logoColor=white" alt="ReadMe">
+<img src="https://img.shields.io/badge/C-A8B9CC.svg?style=flat&logo=C&logoColor=black" alt="C">
+
+</div>
+<br>
+
+---
+
+## Overview
+
+42sh is a comprehensive, modular shell implementation crafted for developers who want to build or extend their own command-line interpreter. It features a robust architecture that handles parsing, execution, and control flow, making scripting and command execution seamless.
+
+**Why 42sh?**
+
+This project empowers developers to create custom shells or enhance existing ones. The core features include:
+
+- **Puzzle Piece:** Modular design with dedicated components for lexing, parsing, AST management, and execution, ensuring maintainability and scalability.
+- **Rocket:** Advanced command execution with support for pipelines, redirections, and functions, enabling complex scripting.
+- **Wrench:** Utility modules for string manipulation and I/O handling, simplifying data processing tasks.
+- **Gear:** Built-in support for control flow constructs like loops and conditionals, facilitating dynamic scripting.
+- **Target:** Precise environment and state management for reliable shell behavior.
+
+---
+
+## Features
+
+|      | Component            | Details                                                                                                              |
+| :--- | :------------------- | :------------------------------------------------------------------------------------------------------------------- |
+| **Architecture**     | <ul><li>Modular design with separate components for lexer, parser, execution, builtins, and utils</li><li>Uses a layered approach separating parsing, execution, and expansion</li></ul> |
+| **Code Quality**     | <ul><li>Consistent use of Makefile.am for build automation</li><li>Code organized into directories per functionality</li><li>Adheres to autotools conventions, facilitating maintainability</li></ul> |
+| **Documentation**    | <ul><li>Basic README with project overview</li><li>Uses configure.ac and header files for API documentation</li><li>Limited inline comments observed in source files</li></ul> |
+| **Integrations**     | <ul><li>Build system managed via autotools (`autoconf`, `automake`)</li><li>No external dependencies or package managers explicitly integrated</li></ul> |
+| **Modularity**       | <ul><li>Source code split into multiple submodules (lexer, parser, execution, builtins)</li><li>Each module has dedicated Makefile.am for independent compilation</li></ul> |
+| **Testing**          | <ul><li>No explicit test suite or framework detected in the codebase</li><li>Potential for manual testing or future integration</li></ul> |
+| **Performance**      | <ul><li>Uses efficient parsing and execution flow</li><li>Minimal dynamic memory allocations observed</li></ul> |
+| **Security**         | <ul><li>Basic input validation implied but no explicit security measures documented</li><li>Potential risks in command execution handling</li></ul> |
+| **Dependencies**     | <ul><li>Primarily relies on standard C libraries</li><li>No external third-party dependencies specified</li></ul> |
+
+---
+
+## Project Structure
+
+```sh
+└── 42sh/
+    ├── Makefile.am
+    ├── README
+    ├── configure.ac
+    └── src
+        ├── 42sh.c
+        ├── Makefile.am
+        ├── ast
+        ├── builtins
+        ├── execution
+        ├── expansion
+        ├── io
+        ├── lexer
+        ├── parser
+        └── utils
+```
+
+---
+
+### Project Index
+
+<details open>
+	<summary><b><code>42SH/</code></b></summary>
+	<!-- __root__ Submodule -->
+	<details>
+		<summary><b>__root__</b></summary>
+		<blockquote>
+			<div class='directory-path' style='padding: 8px 0; color: #666;'>
+				<code><b>⦿ __root__</b></code>
+			<table style='width: 100%; border-collapse: collapse;'>
+			<thead>
+				<tr style='background-color: #f8f9fa;'>
+					<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+					<th style='text-align: left; padding: 8px;'>Summary</th>
+				</tr>
+			</thead>
+				<tr style='border-bottom: 1px solid #eee;'>
+					<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/Makefile.am'>Makefile.am</a></b></td>
+					<td style='padding: 8px;'>- Defines the project’s subdirectory structure for automated build processes, specifying the locations of source and test components<br>- It orchestrates the overall compilation and testing workflow within the larger codebase architecture, ensuring that source files and tests are correctly integrated during build execution<br>- This setup facilitates organized development and streamlined project management.</td>
+				</tr>
+				<tr style='border-bottom: 1px solid #eee;'>
+					<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/configure.ac'>configure.ac</a></b></td>
+					<td style='padding: 8px;'>- Defines the build configuration for the project, establishing version requirements, project metadata, and compiler settings<br>- It orchestrates the setup of Makefiles across the codebase, ensuring proper compilation and organization of source modules, tests, and subcomponents<br>- This configuration file is essential for preparing the environment to compile and manage the entire project structure efficiently.</td>
+				</tr>
+				<tr style='border-bottom: 1px solid #eee;'>
+					<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/README'>README</a></b></td>
+					<td style='padding: 8px;'>- Provides instructions for compiling and testing the project, ensuring proper setup and validation of the entire codebase<br>- Facilitates building the software and running its test suite to verify functionality, supporting development workflows and maintaining code quality within the overall architecture.</td>
+				</tr>
+			</table>
+		</blockquote>
+	</details>
+	<!-- src Submodule -->
+	<details>
+		<summary><b>src</b></summary>
+		<blockquote>
+			<div class='directory-path' style='padding: 8px 0; color: #666;'>
+				<code><b>⦿ src</b></code>
+			<table style='width: 100%; border-collapse: collapse;'>
+			<thead>
+				<tr style='background-color: #f8f9fa;'>
+					<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+					<th style='text-align: left; padding: 8px;'>Summary</th>
+				</tr>
+			</thead>
+				<tr style='border-bottom: 1px solid #eee;'>
+					<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/Makefile.am'>Makefile.am</a></b></td>
+					<td style='padding: 8px;'>- Defines the build configuration for the 42sh shell project, specifying source files, compilation flags, and linked libraries<br>- It orchestrates the integration of core components such as parsing, execution, expansion, and utilities, enabling the compilation of the complete shell application<br>- This setup ensures cohesive assembly of all modules necessary for the shells functionality within the overall architecture.</td>
+				</tr>
+				<tr style='border-bottom: 1px solid #eee;'>
+					<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/42sh.c'>42sh.c</a></b></td>
+					<td style='padding: 8px;'>- Facilitates command execution and script processing within the shell environment by parsing input streams, managing environment variables, and handling user options<br>- It orchestrates the overall flow from input selection to AST parsing, optional pretty-printing, and executing commands, ensuring flexible input sources such as scripts, files, or standard input, while maintaining shell state and error handling.</td>
+				</tr>
+			</table>
+			<!-- execution Submodule -->
+			<details>
+				<summary><b>execution</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.execution</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/loop.c'>loop.c</a></b></td>
+							<td style='padding: 8px;'>- Implements core loop execution logic within the interpreter, enabling support for while, until, and for loops<br>- Manages loop control flow, including break propagation and loop depth tracking, to facilitate correct execution and nested loop handling in the overall architecture<br>- Ensures seamless iteration and control flow management across the abstract syntax tree during script execution.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/condition.h'>condition.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the interface for evaluating conditional expressions within the codebase, enabling the execution engine to interpret and assess logical conditions based on the abstract syntax tree and associated data mappings<br>- Facilitates dynamic decision-making during program execution, integrating condition evaluation seamlessly into the overall architecture of the system.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/functions.h'>functions.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the interface for managing shell functions within the project, enabling registration, lookup, and execution of user-defined functions<br>- Facilitates dynamic function handling by maintaining function definitions and supporting invocation with redirection capabilities, thereby integrating custom scripting logic into the overall execution architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/redir_pipe.h'>redir_pipe.h</a></b></td>
+							<td style='padding: 8px;'>- Facilitates management of input/output redirections and pipeline execution within the shell environment<br>- It handles saving and restoring file descriptors, applying redirection rules, and executing command pipelines, ensuring proper data flow and resource management across complex command sequences<br>- This module is essential for orchestrating command execution and maintaining shell process integrity within the overall architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/redir_pipe.c'>redir_pipe.c</a></b></td>
+							<td style='padding: 8px;'>- Facilitates execution of command pipelines with proper redirection management<br>- Handles setup, process forking, and inter-process communication to ensure seamless data flow between commands<br>- Manages redirections, saves and restores file descriptors, and orchestrates multiple stages, enabling complex command sequences to run concurrently while maintaining correct input/output configurations within the overall architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/condition.c'>condition.c</a></b></td>
+							<td style='padding: 8px;'>- Provides core logic for evaluating conditional expressions within the execution engine, enabling decision-making based on abstract syntax trees<br>- It interprets logical operators to determine the flow of execution, integrating with the overall architecture that processes and executes code represented as ASTs<br>- This functionality is essential for implementing dynamic control structures in the project.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Provides core execution functionalities for command processing, including handling redirection, looping, and conditional logic<br>- Integrates essential components to facilitate the execution flow within the larger system, enabling complex command sequences and control structures to operate reliably in the overall architecture<br>- Ensures foundational support for executing and managing command behaviors across the project.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/functions.c'>functions.c</a></b></td>
+							<td style='padding: 8px;'>- Defines core mechanisms for managing shell functions, including registration, lookup, duplication, and execution within the broader command execution architecture<br>- Facilitates dynamic function handling, redirection management, and argument passing, enabling modular and flexible execution of user-defined functions in the shell environment<br>- Ensures proper resource management and supports complex AST structures for robust script execution.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/loop.h'>loop.h</a></b></td>
+							<td style='padding: 8px;'>- Implements core loop execution functions within the interpreter, enabling the evaluation of iterative constructs such as while, until, and for loops<br>- These functions facilitate control flow management by executing corresponding AST nodes, integrating with the projects overall architecture to support dynamic script execution and logical branching<br>- They are essential for enabling complex, repetitive behaviors in the interpreted language.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/execution.c'>execution.c</a></b></td>
+							<td style='padding: 8px;'>- Implements core command execution logic within the shell, managing the execution of various AST node types such as conditionals, loops, pipelines, and commands<br>- Handles built-in commands, external processes, and function calls, ensuring proper redirection, process control, and status reporting to facilitate the shells overall command processing and scripting capabilities.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/execution/execution.h'>execution.h</a></b></td>
+							<td style='padding: 8px;'>- Facilitates execution of command nodes, AST structures, and control flow constructs within the project<br>- Manages process creation, command execution, and pipeline handling, integrating with a hash map for environment or state management<br>- Supports orchestrating complex command sequences and conditional logic, ensuring proper process synchronization and status reporting across the overall architecture.</td>
+						</tr>
+					</table>
+				</blockquote>
+			</details>
+			<!-- utils Submodule -->
+			<details>
+				<summary><b>utils</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.utils</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Defines the subdirectories for utility components, organizing the build process within the project<br>- It ensures that the string and parser modules are included in the compilation workflow, facilitating modular development and maintainability across the overall architecture<br>- This setup supports a structured and scalable approach to managing auxiliary functionalities within the codebase.</td>
+						</tr>
+					</table>
+					<!-- parser Submodule -->
+					<details>
+						<summary><b>parser</b></summary>
+						<blockquote>
+							<div class='directory-path' style='padding: 8px 0; color: #666;'>
+								<code><b>⦿ src.utils.parser</b></code>
+							<table style='width: 100%; border-collapse: collapse;'>
+							<thead>
+								<tr style='background-color: #f8f9fa;'>
+									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+									<th style='text-align: left; padding: 8px;'>Summary</th>
+								</tr>
+							</thead>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/parser/pretty_printer.c'>pretty_printer.c</a></b></td>
+									<td style='padding: 8px;'>- Provides a comprehensive mechanism for rendering Abstract Syntax Tree (AST) nodes into a human-readable, formatted representation<br>- This utility facilitates debugging, analysis, and visualization of parsed code structures within the overall architecture, ensuring clarity in understanding complex syntax and control flow constructs during development and maintenance.</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/parser/pretty_printer.h'>pretty_printer.h</a></b></td>
+									<td style='padding: 8px;'>- Provides a utility for rendering Abstract Syntax Tree (AST) structures in a human-readable format, facilitating easier debugging and understanding of parsed code within the overall compiler or interpreter architecture<br>- Integrates seamlessly with other components to visualize ASTs, supporting development and maintenance of language processing features.</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/parser/Makefile.am'>Makefile.am</a></b></td>
+									<td style='padding: 8px;'>- Provides a core library for pretty-printing functionalities within the project, enabling formatted and readable output of data structures or code<br>- Integrates seamlessly with other components, supporting consistent and visually appealing presentation across the codebase<br>- Serves as a foundational utility to enhance debugging, logging, and user-facing displays throughout the architecture.</td>
+								</tr>
+							</table>
+						</blockquote>
+					</details>
+					<!-- str Submodule -->
+					<details>
+						<summary><b>str</b></summary>
+						<blockquote>
+							<div class='directory-path' style='padding: 8px 0; color: #666;'>
+								<code><b>⦿ src.utils.str</b></code>
+							<table style='width: 100%; border-collapse: collapse;'>
+							<thead>
+								<tr style='background-color: #f8f9fa;'>
+									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+									<th style='text-align: left; padding: 8px;'>Summary</th>
+								</tr>
+							</thead>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/str/Makefile.am'>Makefile.am</a></b></td>
+									<td style='padding: 8px;'>- Provides core string manipulation functionalities integral to the project’s utility library<br>- It encapsulates essential string operations, supporting consistent and efficient handling of string data across various modules<br>- By centralizing these functions, it enhances code reuse, maintainability, and robustness within the overall architecture.</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/str/str.c'>str.c</a></b></td>
+									<td style='padding: 8px;'>- Provides utility functions for safe string duplication, enabling efficient and reliable handling of string data within the codebase<br>- These functions facilitate memory management and string operations, supporting the overall architecture by ensuring consistent and secure string manipulation across various modules<br>- They serve as foundational tools for managing textual data in the project.</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/utils/str/str.h'>str.h</a></b></td>
+									<td style='padding: 8px;'>- Provides string duplication utilities to facilitate safe and efficient handling of string data across the codebase<br>- These functions support consistent memory management practices, enabling other modules to duplicate strings with or without length constraints, thereby enhancing robustness and reducing potential errors in string operations within the overall architecture.</td>
+								</tr>
+							</table>
+						</blockquote>
+					</details>
+				</blockquote>
+			</details>
+			<!-- expansion Submodule -->
+			<details>
+				<summary><b>expansion</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.expansion</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/expansion/hashmap.c'>hashmap.c</a></b></td>
+							<td style='padding: 8px;'>- Implements a hash map data structure optimized for key-value storage and retrieval, utilizing chaining for collision resolution<br>- Facilitates efficient insertion, lookup, update, and removal of string-based pairs, supporting dynamic memory management and debugging capabilities<br>- Serves as a core component for managing associative data within the larger architecture, enabling fast access and modification of stored information.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/expansion/expand.h'>expand.h</a></b></td>
+							<td style='padding: 8px;'>- Provides expansion functionalities for command-line arguments and words within the project, enabling dynamic substitution and processing based on a hash map<br>- Facilitates flexible command parsing and variable expansion, integral to the overall architectures ability to interpret and execute user inputs accurately<br>- Supports the core mechanism for handling complex command structures and environment variable management.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/expansion/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Provides core expansion functionalities by defining a static library that manages string expansion and hashmap operations<br>- Facilitates modular integration of expansion logic within the larger codebase, supporting efficient data handling and transformation tasks essential for the projects processing workflows<br>- Ensures consistent, error-checked implementation of expansion-related features across the system.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/expansion/hashmap.h'>hashmap.h</a></b></td>
+							<td style='padding: 8px;'>- Implements a hash map data structure to facilitate efficient key-value storage and retrieval within the project<br>- It provides core operations such as insertion, lookup, removal, and memory management, supporting the overall architecture by enabling fast access to associated data, which is essential for performance-critical components of the system.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/expansion/expand.c'>expand.c</a></b></td>
+							<td style='padding: 8px;'>- Implements variable and argument expansion within shell command processing, enabling dynamic substitution of environment variables, special shell parameters, and positional arguments<br>- It handles parsing, quoting, and escaping rules to produce correctly expanded command words, facilitating accurate command execution and scripting capabilities in the overall shell architecture.</td>
+						</tr>
+					</table>
+				</blockquote>
+			</details>
+			<!-- io Submodule -->
+			<details>
+				<summary><b>io</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.io</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/io/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Provides core input/output functionalities essential for data handling within the project<br>- It encapsulates standardized mechanisms for reading, writing, and managing data streams, supporting the overall architectures modular and portable design<br>- This library underpins higher-level components by ensuring consistent and reliable data operations across various modules of the codebase.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/io/io.h'>io.h</a></b></td>
+							<td style='padding: 8px;'>- Provides a utility to convert a string into a temporary file, facilitating seamless data handling within the application<br>- Integrates into the broader codebase by enabling efficient testing, data processing, or file-based operations, thereby supporting flexible input management and streamlining workflows across various modules.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/io/io.c'>io.c</a></b></td>
+							<td style='padding: 8px;'>- Provides functionality to convert strings into temporary in-memory file streams, facilitating seamless data handling within the application<br>- This utility supports the broader architecture by enabling efficient manipulation and processing of string data as file objects, thereby streamlining input/output operations and enhancing flexibility in data management across the codebase.</td>
+						</tr>
+					</table>
+				</blockquote>
+			</details>
+			<!-- lexer Submodule -->
+			<details>
+				<summary><b>lexer</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.lexer</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/lexer_ops.c'>lexer_ops.c</a></b></td>
+							<td style='padding: 8px;'>- Implements core lexical operations for tokenizing shell-like syntax, including handling comments, separators, redirections, logical operators, and special characters<br>- Facilitates the transformation of raw input into structured tokens, enabling higher-level parsing and interpretation within the overall architecture<br>- Ensures accurate recognition of command components, supporting robust command-line parsing and execution workflows.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Defines the core lexer library responsible for tokenizing source code within the project<br>- It consolidates lexical analysis functions, enabling the transformation of raw input into structured tokens for subsequent parsing and compilation stages<br>- This component is essential for the projects overall architecture, facilitating accurate syntax recognition and supporting language processing workflows.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/lexer_internal.h'>lexer_internal.h</a></b></td>
+							<td style='padding: 8px;'>- Defines internal functions essential for tokenizing input streams within the lexer component, facilitating the identification and processing of language constructs such as comments, separators, redirections, logical operators, pipes, negations, and words<br>- Supports the overall architecture by enabling efficient lexical analysis, which is foundational for parsing and interpreting source code or command inputs in the project.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/lexer_word.c'>lexer_word.c</a></b></td>
+							<td style='padding: 8px;'>- Implements lexical analysis for parsing shell-like command lines by identifying and extracting words, including complex constructs such as quoted strings, command substitutions, and escape sequences<br>- Facilitates accurate tokenization of input streams, enabling subsequent syntactic and semantic processing within the overall architecture of the command interpreter or shell environment.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/lexer.c'>lexer.c</a></b></td>
+							<td style='padding: 8px;'>- Provides core lexing functionality to tokenize input streams, enabling the parsing of command-line syntax and language constructs<br>- It manages token extraction, error detection, and state transitions, forming the foundational component for interpreting source code or scripts within the overall architecture<br>- This module ensures accurate, sequential tokenization essential for subsequent parsing and semantic analysis stages.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/lexer_internal.c'>lexer_internal.c</a></b></td>
+							<td style='padding: 8px;'>- Facilitates core lexical operations by managing character input, enabling seamless navigation through source code during tokenization<br>- Provides mechanisms to advance, peek, and skip whitespace characters, ensuring efficient and accurate parsing within the overall compiler or interpreter architecture<br>- These functions underpin the lexical analysis phase, transforming raw source input into structured tokens for subsequent syntactic processing.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/lexer.h'>lexer.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the lexer component responsible for reading characters from input files and generating tokens for parsing<br>- It manages lexing states, handles errors, and provides an interface to initialize and retrieve tokens sequentially, facilitating the transformation of raw input into structured data for subsequent compilation or interpretation stages within the overall architecture.</td>
+						</tr>
+					</table>
+					<!-- token Submodule -->
+					<details>
+						<summary><b>token</b></summary>
+						<blockquote>
+							<div class='directory-path' style='padding: 8px 0; color: #666;'>
+								<code><b>⦿ src.lexer.token</b></code>
+							<table style='width: 100%; border-collapse: collapse;'>
+							<thead>
+								<tr style='background-color: #f8f9fa;'>
+									<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+									<th style='text-align: left; padding: 8px;'>Summary</th>
+								</tr>
+							</thead>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/token/token.h'>token.h</a></b></td>
+									<td style='padding: 8px;'>- Defines the core data structures and functions for representing, creating, and managing lexical tokens within the shell parser<br>- Facilitates token classification, memory management, and debugging, serving as a foundational component for lexical analysis in the overall shell interpretation architecture<br>- Ensures accurate tokenization of shell syntax elements, enabling subsequent parsing and execution processes.</td>
+								</tr>
+								<tr style='border-bottom: 1px solid #eee;'>
+									<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/lexer/token/token.c'>token.c</a></b></td>
+									<td style='padding: 8px;'>- Defines core token structures and functions for lexical analysis, enabling creation, classification, and management of tokens within the parser<br>- Facilitates recognition of reserved words, token types, and debugging output, forming the foundation for syntax parsing and language understanding in the overall architecture.</td>
+								</tr>
+							</table>
+						</blockquote>
+					</details>
+				</blockquote>
+			</details>
+			<!-- builtins Submodule -->
+			<details>
+				<summary><b>builtins</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.builtins</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/break.c'>break.c</a></b></td>
+							<td style='padding: 8px;'>- Implements the behavior of the break command within a shell environment, enabling users to exit one or multiple nested loops based on specified arguments<br>- It manages loop depth context and ensures proper control flow interruption, integrating seamlessly into the overall execution architecture of the shell<br>- This functionality enhances script control and user interaction within the command interpreter.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/cd.h'>cd.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the interface for the change directory (cd) built-in command within the shell, enabling navigation through the filesystem<br>- Integrates with the projects command execution framework and utilizes a hash map for environment variable management<br>- Facilitates user interaction by allowing directory changes, contributing to the shells core functionality and overall architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/echo.h'>echo.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the interface for the echo built-in command within the shell, enabling the execution of the echo functionality as part of the command processing architecture<br>- It facilitates user input display by providing a standardized function declaration, integrating seamlessly into the overall command execution flow of the shell environment.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Defines core built-in command implementations for the project, encapsulating fundamental shell functionalities such as echo, change directory, exit, and break<br>- These components serve as essential building blocks within the overall architecture, enabling the shell to perform standard operations reliably and efficiently across various environments.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/exit.c'>exit.c</a></b></td>
+							<td style='padding: 8px;'>- Implements the built-in exit command for the shell, managing user input validation and setting the last exit code<br>- Ensures proper handling of exit status arguments within the permissible range, facilitating controlled termination of shell sessions and maintaining consistent state across the codebase.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/cd.c'>cd.c</a></b></td>
+							<td style='padding: 8px;'>- Implements the core logic for changing directories within a shell environment, managing path resolution, normalization, and environment variable updates<br>- Facilitates navigation by handling absolute and relative paths, maintaining logical consistency, and supporting special cases like cd-and default home directory<br>- Ensures seamless directory transitions aligned with the overall shell architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/exit.h'>exit.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the interface for the exit command within the shells built-in functionalities, enabling users to terminate the shell session gracefully<br>- Integrates with the overall command execution framework, ensuring proper handling of exit requests and resource cleanup during shell operation<br>- Serves as a crucial component for managing user-initiated shell termination within the project architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/echo.c'>echo.c</a></b></td>
+							<td style='padding: 8px;'>- Implements a built-in echo command for a shell environment, enabling the display of text with optional interpretation of escape sequences and control over newline suppression<br>- It processes command-line arguments to handle flags and input, facilitating flexible output formatting within the broader shell architecture<br>- This functionality enhances user interaction by providing a familiar and customizable text output feature.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/builtins/break.h'>break.h</a></b></td>
+							<td style='padding: 8px;'>- Implements the built-in break command, enabling controlled loop termination within the shell environment<br>- It interacts with the projects hash map for managing command states and return codes, integrating seamlessly into the overall architecture to facilitate user-driven flow control during script execution<br>- This functionality enhances scripting flexibility and command execution management.</td>
+						</tr>
+					</table>
+				</blockquote>
+			</details>
+			<!-- ast Submodule -->
+			<details>
+				<summary><b>ast</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.ast</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_basics.c'>ast_basics.c</a></b></td>
+							<td style='padding: 8px;'>- Defines fundamental constructs for representing abstract syntax trees within the architecture, enabling structured parsing and manipulation of command sequences and their components<br>- Facilitates creation of command nodes and list structures, supporting the overall parsing process and ensuring a clear, organized representation of shell commands and their relationships in the syntax tree.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_redir.c'>ast_redir.c</a></b></td>
+							<td style='padding: 8px;'>- Defines and manages redirection nodes within command syntax trees, enabling the representation of input/output redirections in shell commands<br>- Facilitates initialization and appending of redirection structures to command nodes, supporting accurate parsing and execution of complex command sequences in the overall architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_commands.c'>ast_commands.c</a></b></td>
+							<td style='padding: 8px;'>- Defines constructors for abstract syntax tree (AST) nodes representing control flow structures such as loops, conditionals, and for-loops<br>- Facilitates creation of structured, hierarchical representations of program logic within the compiler or interpreter architecture, enabling subsequent analysis, optimization, or code generation processes<br>- Ensures consistent initialization of control flow constructs in the overall AST structure.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Defines the core library for the Abstract Syntax Tree (AST) in the project, encapsulating fundamental structures and operations for representing and manipulating code syntax<br>- Serves as a foundational component enabling parsing, analysis, and transformation of source code within the overall architecture, supporting language processing and compilation workflows.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast.h'>ast.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the Abstract Syntax Tree (AST) structure and related functions for representing and manipulating parsed shell commands and control flow constructs<br>- Facilitates the transformation of tokenized input into a hierarchical, structured format, enabling subsequent interpretation or execution within the overall shell or scripting environment<br>- Serves as the core data model for syntax analysis and command execution flow management.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_operators.c'>ast_operators.c</a></b></td>
+							<td style='padding: 8px;'>- Defines core functions for constructing abstract syntax tree (AST) nodes representing logical and pipeline operations within the overall architecture<br>- Facilitates the creation of interconnected AST components for parsing and interpreting complex command structures, enabling modular and scalable handling of command sequences, logical operators, and control flow in the project’s execution framework.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_block.c'>ast_block.c</a></b></td>
+							<td style='padding: 8px;'>- Defines and initializes core Abstract Syntax Tree (AST) nodes representing code structures such as blocks, function declarations, and redirection wrappers<br>- Facilitates the construction of a hierarchical syntax representation essential for parsing and analyzing source code within the overall architecture<br>- Ensures consistent creation of AST components, supporting subsequent compilation or interpretation processes.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_assignment.c'>ast_assignment.c</a></b></td>
+							<td style='padding: 8px;'>- Defines and manages assignment nodes within the abstract syntax tree, enabling representation of variable assignments in command structures<br>- Facilitates creation and appending of assignment elements to command nodes, supporting the construction and manipulation of command execution workflows in the overall architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/ast/ast_core.c'>ast_core.c</a></b></td>
+							<td style='padding: 8px;'>- Provides core memory management functions for Abstract Syntax Tree (AST) nodes, enabling efficient creation and cleanup of various syntax structures within the project<br>- Facilitates safe deallocation of complex nested AST components, ensuring proper resource handling and supporting the overall architecture of parsing and interpreting code<br>- Acts as the backbone for managing AST lifecycle throughout the codebase.</td>
+						</tr>
+					</table>
+				</blockquote>
+			</details>
+			<!-- parser Submodule -->
+			<details>
+				<summary><b>parser</b></summary>
+				<blockquote>
+					<div class='directory-path' style='padding: 8px 0; color: #666;'>
+						<code><b>⦿ src.parser</b></code>
+					<table style='width: 100%; border-collapse: collapse;'>
+					<thead>
+						<tr style='background-color: #f8f9fa;'>
+							<th style='width: 30%; text-align: left; padding: 8px;'>File Name</th>
+							<th style='text-align: left; padding: 8px;'>Summary</th>
+						</tr>
+					</thead>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_internal.h'>parser_internal.h</a></b></td>
+							<td style='padding: 8px;'>- Defines internal parser structures and functions to interpret shell script syntax, enabling the transformation of tokenized input into an abstract syntax tree<br>- Supports parsing of commands, control flow constructs, pipelines, redirections, and function declarations, facilitating the overall process of syntactic analysis within the shell scripting architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_simple_command.c'>parser_simple_command.c</a></b></td>
+							<td style='padding: 8px;'>- Defines the parsing logic for simple shell commands, enabling the extraction of command components such as assignments, redirections, and arguments<br>- It constructs an Abstract Syntax Tree (AST) representing command structure, facilitating accurate interpretation and execution within the overall shell architecture<br>- This module ensures robust handling of command syntax, supporting flexible command forms and redirection features.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser.h'>parser.h</a></b></td>
+							<td style='padding: 8px;'>- Defines the interface for parsing input files into abstract syntax trees within the project architecture<br>- Facilitates error handling and parsing operations, enabling the transformation of raw input data into structured representations for further processing or analysis in the compiler or interpreter pipeline<br>- Ensures modularity and clarity in the parsing component of the overall system.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser.c'>parser.c</a></b></td>
+							<td style='padding: 8px;'>- Provides core parsing functionalities to process and manage tokens from the lexer, enabling syntactic analysis within the compiler or interpreter architecture<br>- Handles token peeking, advancing, and skipping irrelevant tokens like newlines and semicolons, ensuring smooth token stream navigation essential for accurate syntax parsing and error detection.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_if.c'>parser_if.c</a></b></td>
+							<td style='padding: 8px;'>- Defines the parser logic for interpreting shell-style if-elif-else statements, constructing an Abstract Syntax Tree (AST) representation of conditional structures<br>- It manages parsing flow, token expectations, and nested conditional blocks, enabling accurate syntactic analysis within the overall shell script parsing architecture<br>- This component ensures correct handling of complex conditional logic during script interpretation.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/Makefile.am'>Makefile.am</a></b></td>
+							<td style='padding: 8px;'>- Defines the core parsing library responsible for analyzing and interpreting shell script syntax within the project<br>- It consolidates various parser modules to facilitate the transformation of raw input into structured command representations, supporting the overall architectures goal of executing complex shell commands reliably and efficiently.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_pipeline.c'>parser_pipeline.c</a></b></td>
+							<td style='padding: 8px;'>- Defines the parsing logic for command pipelines within the shell syntax, enabling the interpretation of sequences of commands connected by pipes and optional negation<br>- Facilitates construction of an abstract syntax tree representing complex command structures, supporting features like negation and multi-command pipelines, integral to the overall command execution architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_shell_command.c'>parser_shell_command.c</a></b></td>
+							<td style='padding: 8px;'>- Provides parsing logic for shell commands and control structures within the syntax tree, enabling the interpretation of blocks, conditionals, loops, and function declarations<br>- Facilitates the transformation of tokenized input into an abstract syntax tree, supporting the overall architectures goal of accurate script analysis and execution flow management.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_and_or.c'>parser_and_or.c</a></b></td>
+							<td style='padding: 8px;'>- Implements parsing of logical AND and OR operations within command sequences, constructing an abstract syntax tree that accurately reflects the left-associative nature of combined commands<br>- Facilitates the interpretation of complex conditional command flows, enabling the execution engine to evaluate command chains with proper logical precedence and structure in the overall shell or scripting architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_input.c'>parser_input.c</a></b></td>
+							<td style='padding: 8px;'>- Facilitates parsing of input files into an Abstract Syntax Tree (AST), enabling structured interpretation of source code or data<br>- Ensures robust error handling and validation of the entire input stream, serving as a core component within the parser architecture to convert raw input into a meaningful, navigable representation for subsequent processing stages.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_command.c'>parser_command.c</a></b></td>
+							<td style='padding: 8px;'>- Parses individual commands within the shell scripting language, supporting various command types such as simple commands, control flow constructs, and function definitions<br>- It integrates command recognition with redirection handling, enabling accurate construction of the abstract syntax tree (AST) for executing or analyzing shell scripts within the overall architecture.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_list.c'>parser_list.c</a></b></td>
+							<td style='padding: 8px;'>- Parses a sequence of commands separated by semicolons or newlines, constructing an abstract syntax tree (AST) that represents the command list within the overall shell or command interpreter architecture<br>- It manages command separation, error handling, and supports complex command chaining, enabling the execution of multiple commands in a structured and sequential manner.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_while_until.c'>parser_while_until.c</a></b></td>
+							<td style='padding: 8px;'>- Defines parsing logic for while and until control flow statements within the syntax tree, enabling the interpreter to recognize, validate, and construct AST nodes for loop constructs<br>- Facilitates correct translation of loop syntax into executable representations, supporting the overall architectures ability to process and execute iterative code blocks effectively.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_for.c'>parser_for.c</a></b></td>
+							<td style='padding: 8px;'>- Defines the parser logic for interpreting for loop constructs within the scripting language<br>- It extracts loop variables, optional iteration conditions, and loop bodies, assembling them into an abstract syntax tree (AST) node<br>- This functionality integrates into the overall parser architecture, enabling accurate syntactic analysis and execution of for loops in the codebase.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_assignment.c'>parser_assignment.c</a></b></td>
+							<td style='padding: 8px;'>- Defines parsing logic for assignment expressions within the syntax tree, transforming assignment tokens into structured AST nodes<br>- Facilitates variable assignment handling by extracting variable names and values, enabling accurate representation of environment or configuration settings in the overall codebase architecture<br>- Ensures proper integration of assignment statements during parsing, supporting subsequent interpretation or execution phases.</td>
+						</tr>
+						<tr style='border-bottom: 1px solid #eee;'>
+							<td style='padding: 8px;'><b><a href='https://github.com/Luapsiaron/42sh/blob/master/src/parser/parser_redir.c'>parser_redir.c</a></b></td>
+							<td style='padding: 8px;'>- Defines parsing logic for command-line redirection syntax, enabling the recognition and translation of redirection tokens into abstract syntax tree nodes<br>- Facilitates accurate interpretation of input/output redirection operations within the overall command parsing architecture, ensuring correct handling of file descriptors and redirection types during command execution.</td>
+						</tr>
+					</table>
+				</blockquote>
+			</details>
+		</blockquote>
+	</details>
+</details>
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+This project requires the following dependencies:
+
+- **Programming Language:** C
+- **Package Manager:** Autotools
+
+### Installation
+
+Build 42sh from the source and install dependencies:
+
+1. **Clone the repository:**
+
+    ```sh
+    ❯ git clone https://github.com/Luapsiaron/42sh
+    ```
+
+2. **Navigate to the project directory:**
+
+    ```sh
+    ❯ cd 42sh
+    ```
+
+3. **Install the dependencies:**
+
+echo 'INSERT-INSTALL-COMMAND-HERE'
+
+### Usage
+
+Run the project with:
 
 autoreconf -vfi
 ./configure
 make
 
-How To run the Testsuite:
+### Testing
 
 BIN_PATH="$(pwd)/src/42sh" COVERAGE="yes" make check
+
+---
+
+## License
+
+42sh is protected under the [LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+
+---
+
+<div align="left"><a href="#top">⬆ Return</a></div>
+
+---
