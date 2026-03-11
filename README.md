@@ -8,8 +8,9 @@
 
 # 42SH
 
+<em>Unix shell written in C — EPITA student project</em>
+
 <!-- BADGES -->
-<img src="https://img.shields.io/github/license/Luapsiaron/42sh?style=flat&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
 <img src="https://img.shields.io/github/last-commit/Luapsiaron/42sh?style=flat&logo=git&logoColor=white&color=0080ff" alt="last-commit">
 <img src="https://img.shields.io/github/languages/top/Luapsiaron/42sh?style=flat&color=0080ff" alt="repo-top-language">
 <img src="https://img.shields.io/github/languages/count/Luapsiaron/42sh?style=flat&color=0080ff" alt="repo-language-count">
@@ -26,39 +27,63 @@
 
 ## Overview
 
-42sh is a modular implementation of a Unix-like shell designed to interpret and execute command-line instructions.
-The project focuses on building a robust and extensible architecture capable of handling command parsing, execution, and shell control flow.
+42sh is a Unix-like shell written in C that we developed as part of a school project at EPITA.
+The goal of the project was to understand how a real shell works internally by implementing everything ourselves: from command parsing to execution and shell control flow.
 
-Its design emphasizes maintainability and modularity, making it easier to understand, extend, and experiment with the internal components of a shell.
+Instead of relying on existing parsing libraries or frameworks, the whole pipeline had to be implemented manually. This means handling lexing, building an AST, managing expansions, and executing commands — all in pure C.
 
-**Why 42sh?**
+Working on 42sh was a great way to explore what actually happens when you type a command in your terminal and press enter.
 
-This project provides a solid foundation for understanding how modern command-line interpreters work and for building custom shell features.
-Key aspects of the implementation include:
 
-- **Modular architecture** – The shell is organized into separate components for lexing, parsing, AST construction, and command execution, improving maintainability and scalability.
-- **Advanced command execution** – Support for pipelines, redirections, and shell functions allows the execution of complex command sequences.
-- **Utility modules** – Helper components for string manipulation, input/output management, and other common operations simplify internal processing.
-- **Control flow support** – Built-in handling of control structures such as loops and conditionals enables dynamic scripting capabilities.
-- **Environment management** – Precise handling of the shell environment and internal state ensures consistent and predictable behavior.
+## Think for yourself
+
+If you're an EPITA student working on a similar project:
+feel free to read the code and take inspiration from it, but try to understand what is happening before copying anything.
+
+The point of these projects is really to learn how things work under the hood and struggling with the implementation is part of the process.
+
+So just don't copy/paste like an idiot, without thinkinh! Thanks!
+
+
+## About the project
+
+The project focuses on building a shell architecture that stays reasonably modular while still being written in low-level C.
+
+The codebase is split into several components that reflect the typical lifecycle of a command:
+
+- **Lexer** - transforms raw input into tokens
+- **Parser** - builds the AST from the token stream
+- **Execution** - walks the AST and executes commands
+- **Expansion** - handles variable expansions and substitutions
+- **Builtins** - implements shell built-in commands
+- **Utilities and I/O helpers** - shared helpers used across modules
+
+The idea was to keep the implementation understandable while still supporting features expected from a basic shell.
 
 ---
 
 ## Features
 
-|      | Component            | Details                                                                                                              |
-| :--- | :------------------- | :------------------------------------------------------------------------------------------------------------------- |
-| **Architecture**     | <ul><li>Modular design with separate components for lexer, parser, execution, builtins, and utils</li><li>Uses a layered approach separating parsing, execution, and expansion</li></ul> |
-| **Code Quality**     | <ul><li>Consistent use of Makefile.am for build automation</li><li>Code organized into directories per functionality</li><li>Adheres to autotools conventions, facilitating maintainability</li></ul> |
-| **Documentation**    | <ul><li>Basic README with project overview</li><li>Uses configure.ac and header files for API documentation</li><li>Limited inline comments observed in source files</li></ul> |
-| **Integrations**     | <ul><li>Build system managed via autotools (`autoconf`, `automake`)</li><li>No external dependencies or package managers explicitly integrated</li></ul> |
-| **Modularity**       | <ul><li>Source code split into multiple submodules (lexer, parser, execution, builtins)</li><li>Each module has dedicated Makefile.am for independent compilation</li></ul> |
-| **Testing**          | <ul><li>No explicit test suite or framework detected in the codebase</li><li>Potential for manual testing or future integration</li></ul> |
-| **Performance**      | <ul><li>Uses efficient parsing and execution flow</li><li>Minimal dynamic memory allocations observed</li></ul> |
-| **Security**         | <ul><li>Basic input validation implied but no explicit security measures documented</li><li>Potential risks in command execution handling</li></ul> |
-| **Dependencies**     | <ul><li>Primarily relies on standard C libraries</li><li>No external third-party dependencies specified</li></ul> |
+The shell currently supports a set of core features typically found in Unix shells:
 
----
+- command execution
+- pipelines (|)
+- redirections (>, <, etc.)
+- environment variable handling
+- shell builtins
+- control flow structures (loops and conditionals)
+
+Internally, commands are parsed into an Abstract Syntax Tree (AST) before being executed, which makes it easier to handle more complex shell constructs.
+
+
+## Architecture
+
+The shell follows a classic pipeline architecture:
+
+input → lexer → parser → AST → execution
+
+Each stage is implemented in its own module, making the code easier to maintain and extend.
+
 
 ## Project Structure
 
@@ -80,14 +105,9 @@ Key aspects of the implementation include:
         └── utils
 ```
 
+---
+
 ## Getting Started
-
-### Prerequisites
-
-This project requires the following dependencies:
-
-- **Programming Language:** C
-- **Package Manager:** Autotools
 
 ### Installation
 
@@ -105,27 +125,33 @@ Build 42sh from the source and install dependencies:
     ❯ cd 42sh
     ```
 
-3. **Install the dependencies:**
-
-echo 'INSERT-INSTALL-COMMAND-HERE'
 
 ### Usage
 
 Run the project with:
 
+```sh
 autoreconf -vfi
 ./configure
 make
+```
 
 ### Testing
 
+```sh
 BIN_PATH="$(pwd)/src/42sh" COVERAGE="yes" make check
+```
 
 ---
 
 ## License
 
-42sh is protected under the [LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+This project was developed as part of coursework at **EPITA**.
+
+All work produced during coursework is technically the property of EPITA.  
+However, this repository is shared publicly for educational and learning purposes, as no restriction was made against open-sourcing it.
+
+If you are working on a similar project, please use this code responsibly.
 
 ---
 
